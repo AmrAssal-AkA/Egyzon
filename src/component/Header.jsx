@@ -8,6 +8,7 @@ function Header() {
     {name : 'Home' , link : '/'},
     {name : 'Products' , link : '/products'},
     {name : 'Partners' , link : '/partners'},
+    {name : 'About' , link : ""}
   ];
 
     let [open,setOpen] =useState(false);
@@ -16,10 +17,10 @@ function Header() {
   return (
     <div className='shadow-md w-full fixed top-0 left-0 z-10 bg-yellow-300'>
         <div className='md:flex items-center justify-between py-4 px-10 '>
-          <div className='font-bold text-2xl cursor-pointer flex items-center font-stretch-normal text-gray-900'>
-            <span >
+          <div className='font-bold text-2xl  flex items-center font-stretch-normal text-gray-900  cursor-pointer'>
+              <Link to="/">
                 <img src={Logo} alt="Logo" className='w-20' />
-            </span>
+                </Link>
             </div>
           <div onClick={() => setOpen(!open)} className='text-3xl absolute right-8 top-6 cursor-pointer md:hidden'>
             <ion-icon name={open ? "close" : "menu"}></ion-icon>
@@ -35,7 +36,7 @@ function Header() {
                 }
                 <form className='flex flex-1 mx-6 mx-w-xl' >
                   <div className='flex items-center w-full'>
-                    <input type='text' placeholder='Search' value={search} onChange={e => setSearch(e.target.value)} className='w-full py-2 px-4 border border-gray-300 rounded-l-md bg-white' />
+                    <input type='text' placeholder='Search' value={search} onChange={e => setSearch(e.target.value)} className='w-full py-1 px-3 border border-gray-300 rounded-l-md bg-white ' />
                     <button type='submit' className='bg-yellow-400 text-white px-3 py-1 rounded-r-full'>
                     <ion-icon name="search"></ion-icon>
                     </button>

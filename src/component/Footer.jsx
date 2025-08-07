@@ -14,7 +14,9 @@ function Footer() {
       <div className='flex flex-col md:flex-row justify-between items-start md:items-center px-6 py-4'>
         {/* logo and slogan */}
         <div className='flex flex-col items-start'>
+          <Link to="/">
           <img src={Logo} alt='Logo' className='w-28 mb-1' />
+          </Link>
           <span className='text-lg text-black'>Experience shopping<br />like never before!</span>
         </div>
         {/* search bar */}

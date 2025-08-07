@@ -5,11 +5,11 @@ import ProductsPage from './pages/Products'
 import PartnerPage from './pages/Partners'
 import HomePage from './pages/Home'
 import CartPage from './pages/cartpage'
-
+import Electronics from './pages/electronics'
+import Groceries from './pages/Groceries'
 import './App.css'
 
 function App() {
-
   return (
     <>
     <Router>
@@ -19,6 +19,9 @@ function App() {
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/partners" element={<PartnerPage />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/electronic" element={<Electronics />} />
+        <Route path='/groceries' element={<Groceries/>} />
+        {/* Add other routes as needed */}
       </Routes>
       <Footer />
     </Router>
