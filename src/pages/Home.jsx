@@ -132,26 +132,22 @@ function Home() {
             </div>
           </div>
           {/* Best Product Sellers */}
-          <div className="w-full border-b pb-4 mt-10">
-          <div className="flex items-start gap-6">
-    {/* Left box */}
-          <div className="border p-4 min-w-[150px] flex items-center justify-center h-[120px]">
-          <span className="font-bold text-2xl text-center leading-tight">
-            Best<br />Sellers
-          </span>
+            <div className="border p-4 flex flex-wrap md:flex-nowrap gap-4 items-center">
+      {/* Title Box */}
+      <div className="border p-4 flex items-center justify-center text-center font-bold text-lg md:w-1/5 w-full">
+        Best <br /> product <br /> Sellers
+      </div>
+
+      {/* Products */}
+      <div className="flex gap-4 flex-wrap justify-center md:justify-start">
+        {Products.map((product) => (
+          <div key={product.id} className="flex flex-col items-center w-28">
+            <img src={product.image} alt={product.name} className=' h-32 object-cover mb-2 rounded'/>
+            <p className="text-sm mt-1">{product.name}</p>
           </div>
-    {/* Product placeholders */}
-            <div className='flex flex-1 gap-8'>
-              {bestSellers.map(product => (
-                <div key={product.id} className= "flex flex-col items-center  cursor-pointer">
-                  <img src={product.image} alt={product.name} className='w-full h-32 object-cover mb-2 rounded' />
-                  <h2 className='text-xl font-semibold'>{product.name}</h2>
-                  <p className='text-lg font-bold'>{product.price} EGP</p>
-                </div>
-              ))}
-            </div>
-  </div>
-</div>
+        ))}
+      </div>
+    </div>
           {/* Feedback Form */}
           <div className='mt-10'>
             <h1 className='text-3xl md:text-5xl font-bold text-center'>Feedback</h1>
