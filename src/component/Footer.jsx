@@ -8,6 +8,7 @@ function Footer() {
     {name : 'Home' , link : '/'},
     {name : 'Products' , link : '/products'},
     {name : 'Partners' , link : '/partners'},
+    {name : 'About' , link : '/'}
   ];
   return (
     <footer className='bg-yellow-300 text-gray-800 py-6 mt-10'>
@@ -34,9 +35,9 @@ function Footer() {
             </button>
           </form>
         {/* navigation links */}
-        <div className="flex flex-col font-bold text-black text-sm">
+        <div className="flex flex-row gap-6 font-bold text-black text-xl mt-5">
           {Links.map(link => (
-            <Link key={link.name} to={link.link} className="hover:text-green-900 mb-1 last:mb-0">{link.name}</Link>
+            <Link key={link.name} to={link.link} className="hover:text-green-900 mb-1 last:mb-0 "  >{link.name}</Link>
           ))}
         </div>
       </div>

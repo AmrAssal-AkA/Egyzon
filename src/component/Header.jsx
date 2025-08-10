@@ -29,7 +29,7 @@ function Header() {
                 {
                   Links.map(Links => (
                     <li key={Links.name} className='md:ml-8 text-xl md:my-0 my-7 active:text-green-800 md:mr-15'>
-                      <Link to={Links.link} className='text-gray-800 hover:text-gray-400 duration-500'>{Links.name}</Link>
+                      <Link to={Links.link} className='text-gray-800 hover:border-transparent-2 duration-500'>{Links.name}</Link>
                     </li>
                     
                   ))
