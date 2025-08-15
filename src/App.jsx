@@ -16,7 +16,7 @@ function App() {
     <Router>
       <Header />
       <Routes>
-        <Route index element={<HomePage />} />
+        <Route path='/' element={<HomePage />} />
         <Route path="/products" element={<Products />} />
         <Route path="/partners" element={<PartnerPage />} />
         <Route path="/cart" element={<CartPage />} />

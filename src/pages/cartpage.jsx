@@ -1,21 +1,8 @@
 import React from 'react'
 import PS5 from '../assets/Products/Products Images/Ps5.webp'
 
+
 function cartpage() {
-    const cartItems = [
-    {
-    id : 1,
-    name : " Sony Ps5",
-    image : PS5,
-    BuyerName : "Egyzon",
-    price : 30000,
-    inStock: true,
-      qty: 1,
-      price: 30000,
-      accessories: ["Accessories"],
-      protection: "Protection Plans starting at 14.99"
-    }
-  ];
   return (
     <div className="bg-gray-100  py-8 px-2 md:px-8 mt-30">
       <h1 className="text-2xl font-bold mb-4">MY CART</h1>

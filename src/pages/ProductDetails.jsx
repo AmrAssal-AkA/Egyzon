@@ -10,14 +10,7 @@ function ProductDetails() {
 
   const [quantity , setQuantity] = useState(1);
 
-  const changeQuantity = (type) => { 
-    if ( type == "increase") {
-      setQuantity(prev => prev +1);
-    }
-    else {
-      setQuantity (prev => prev - 1)
-    }
-  }
+
 
   return (
      <div className="min-h-screen bg-white px-4 py-6 mt-40">
@@ -65,14 +58,14 @@ function ProductDetails() {
           <div className="flex items-center gap-2 mb-6">
             <button
               className="border px-2 rounded cursor-pointer"
-              onClick={() => changeQuantity("decrease")}
+              onClick={() => setQuantity(quantity - 1)}
             >-</button>
 
             <span className="px-2">{quantity}</span>
 
             <button
               className="border px-2 rounded cursor-pointer"
-              onClick={() => changeQuantity("increase")}
+              onClick={() => setQuantity(quantity + 1)}
             >+</button>
             <button className="ml-4 bg-yellow-300 border border-black text-black px-6 py-1 rounded-full font-semibold hover:bg-yellow-400 transition cursor-pointer">
               Add to cart
