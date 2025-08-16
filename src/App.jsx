@@ -6,6 +6,7 @@ import CartPage from './pages/cartpage'
 import Electronics from './pages/electronics'
 import Groceries from './pages/Groceries'
 import ProductDetails from './pages/ProductDetails'
+import ErrorPage from './pages/Error'
 import './App.css'
 import RootLayout from './component/RootLayout'
 
@@ -21,6 +22,7 @@ function App() {
         <Route path="electronic" element={<Electronics />} />
         <Route path='groceries' element={<Groceries />} />
         <Route path='Product/:id' element={<ProductDetails/>} />
+        <Route path='*' element={<ErrorPage />} />
       </Route>
     )
   )
