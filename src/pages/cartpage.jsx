@@ -1,5 +1,4 @@
 import React from 'react'
-import PS5 from '../assets/Products/Products Images/Ps5.webp'
 
 
 function cartpage() {
