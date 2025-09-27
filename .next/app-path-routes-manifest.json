@@ -1,0 +1,9 @@
+{
+  "/Deals/page": "/Deals",
+  "/_not-found/page": "/_not-found",
+  "/cart/page": "/cart",
+  "/favicon.ico/route": "/favicon.ico",
+  "/page": "/",
+  "/products/[productId]/page": "/products/[productId]",
+  "/products/page": "/products"
+}

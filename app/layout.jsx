@@ -4,7 +4,7 @@ import Mainheader from "@/components/MainHeader";
 import { Footer } from "@/components/footer";
 import CartProvider from "@/context/CartContext";
 import { ToastContainer, toast } from "react-toastify";
- import 'react-toastify/dist/ReactToastify.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 
