@@ -25,14 +25,21 @@ var _s = __turbopack_context__.k.signature();
 function CartPage() {
     _s();
     const { cartItems, addtocart, removeFromCart, clearCart } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$context$2f$CartContext$2e$jsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCart"])();
+    const subPrice = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
+        "CartPage.useMemo[subPrice]": ()=>{
+            return cartItems.reduce({
+                "CartPage.useMemo[subPrice]": (total, item)=>total + Number(item.price) * item.quantity
+            }["CartPage.useMemo[subPrice]"], 0);
+        }
+    }["CartPage.useMemo[subPrice]"], [
+        cartItems
+    ]);
     const totalPrice = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
         "CartPage.useMemo[totalPrice]": ()=>{
-            return cartItems.reduce({
-                "CartPage.useMemo[totalPrice]": (total, item)=>total + Number(item.price) * item.quantity
-            }["CartPage.useMemo[totalPrice]"], 0);
+            return subPrice * 1.14; // Assuming 14% tax, so total is subtotal + tax
         }
     }["CartPage.useMemo[totalPrice]"], [
-        cartItems
+        subPrice
     ]);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "max-w-4xl mx-auto p-4 mt-40",
@@ -42,7 +49,7 @@ function CartPage() {
                 children: "Your Cart"
             }, void 0, false, {
                 fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                lineNumber: 20,
+                lineNumber: 23,
                 columnNumber: 7
             }, this),
             cartItems.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -52,7 +59,7 @@ function CartPage() {
                         className: "w-16 h-16 mx-auto text-gray-400"
                     }, void 0, false, {
                         fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                        lineNumber: 23,
+                        lineNumber: 26,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -60,7 +67,7 @@ function CartPage() {
                         children: "Your cart is empty."
                     }, void 0, false, {
                         fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                        lineNumber: 24,
+                        lineNumber: 27,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -69,13 +76,13 @@ function CartPage() {
                         children: "Continue Shopping"
                     }, void 0, false, {
                         fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                        lineNumber: 25,
+                        lineNumber: 28,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                lineNumber: 22,
+                lineNumber: 25,
                 columnNumber: 9
             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 children: [
@@ -93,7 +100,7 @@ function CartPage() {
                                                 className: "w-20 h-20 object-cover rounded-md"
                                             }, void 0, false, {
                                                 fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                                lineNumber: 41,
+                                                lineNumber: 44,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -103,7 +110,7 @@ function CartPage() {
                                                         children: item.name
                                                     }, void 0, false, {
                                                         fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                                        lineNumber: 47,
+                                                        lineNumber: 50,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -114,19 +121,19 @@ function CartPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                                        lineNumber: 48,
+                                                        lineNumber: 51,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                                lineNumber: 46,
+                                                lineNumber: 49,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                        lineNumber: 40,
+                                        lineNumber: 43,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -143,19 +150,19 @@ function CartPage() {
                                                             size: 16
                                                         }, void 0, false, {
                                                             fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                                            lineNumber: 60,
+                                                            lineNumber: 63,
                                                             columnNumber: 23
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                                        lineNumber: 55,
+                                                        lineNumber: 58,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: item.quantity
                                                     }, void 0, false, {
                                                         fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                                        lineNumber: 62,
+                                                        lineNumber: 65,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -165,18 +172,18 @@ function CartPage() {
                                                             size: 16
                                                         }, void 0, false, {
                                                             fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                                            lineNumber: 67,
+                                                            lineNumber: 70,
                                                             columnNumber: 23
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                                        lineNumber: 63,
+                                                        lineNumber: 66,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                                lineNumber: 54,
+                                                lineNumber: 57,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -186,29 +193,29 @@ function CartPage() {
                                                     size: 20
                                                 }, void 0, false, {
                                                     fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                                    lineNumber: 74,
+                                                    lineNumber: 77,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                                lineNumber: 70,
+                                                lineNumber: 73,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                        lineNumber: 53,
+                                        lineNumber: 56,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, item.id, true, {
                                 fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                lineNumber: 36,
+                                lineNumber: 39,
                                 columnNumber: 15
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                        lineNumber: 34,
+                        lineNumber: 37,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -220,7 +227,7 @@ function CartPage() {
                                 children: "Clear Cart"
                             }, void 0, false, {
                                 fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                lineNumber: 82,
+                                lineNumber: 85,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -229,23 +236,45 @@ function CartPage() {
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                         className: "text-lg font-semibold",
                                         children: [
-                                            "Total:",
+                                            "Subtotal:",
                                             " ",
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 className: "text-yellow-600",
                                                 children: [
-                                                    totalPrice.toFixed(2),
+                                                    subPrice.toFixed(1),
                                                     " EGP"
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                                lineNumber: 91,
+                                                lineNumber: 95,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                        lineNumber: 89,
+                                        lineNumber: 93,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "text-lg font-semibold",
+                                        children: [
+                                            "Total:",
+                                            " ",
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "text-yellow-600",
+                                                children: [
+                                                    totalPrice.toFixed(1),
+                                                    " EGP"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
+                                                lineNumber: 101,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
+                                        lineNumber: 99,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -253,19 +282,19 @@ function CartPage() {
                                         children: "Proceed to Checkout"
                                     }, void 0, false, {
                                         fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                        lineNumber: 95,
+                                        lineNumber: 105,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                lineNumber: 88,
+                                lineNumber: 92,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                        lineNumber: 81,
+                        lineNumber: 84,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -276,30 +305,30 @@ function CartPage() {
                                 size: 16
                             }, void 0, false, {
                                 fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                                lineNumber: 104,
+                                lineNumber: 114,
                                 columnNumber: 13
                             }, this),
                             "Back to Shopping"
                         ]
                     }, void 0, true, {
                         fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                        lineNumber: 100,
+                        lineNumber: 110,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-                lineNumber: 33,
+                lineNumber: 36,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/Documents/Git-Projects/egyzon-v2/components/cartpage.jsx",
-        lineNumber: 19,
+        lineNumber: 22,
         columnNumber: 5
     }, this);
 }
-_s(CartPage, "ghPpsus1qAeISr0RbVRT0yezWh0=", false, function() {
+_s(CartPage, "tV1o/2851WBpJQMOq6tUQQ6Avoo=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$context$2f$CartContext$2e$jsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCart"]
     ];

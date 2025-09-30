@@ -11,7 +11,7 @@ export default async function ProductDetailPage({ params }) {
     notFound();
   }
   return (
-    <div className="m-70">
+    <div className="md:m-70 mt-40 mb-30">
       <ProductDetail product={product} />
     </div>
   );

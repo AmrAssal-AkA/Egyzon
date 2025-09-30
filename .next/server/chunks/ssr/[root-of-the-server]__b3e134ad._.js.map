@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/amrassal/Documents/Git-Projects/egyzon-v2/lib/actions.js"],"sourcesContent":["\"use server\";\n\nimport { cookies } from \"next/headers\";\nimport { redirect } from \"next/navigation\";\n\nexport async function logout() {\n  cookies().delete(\"session\");\n  redirect(\"/\");\n}\n"],"names":[],"mappings":";;;;;;AAEA;AACA;AAAA;;;;;;AAEO,eAAe;IACpB,IAAA,0LAAO,IAAG,MAAM,CAAC;IACjB,IAAA,iPAAQ,EAAC;AACX;;;IAHsB;;AAAA,+RAAA","debugId":null}},
+    {"offset": {"line": 31, "column": 0}, "map": {"version":3,"sources":["file:///Users/amrassal/Documents/Git-Projects/egyzon-v2/.next-internal/server/app/_not-found/page/actions.js%20%28server%20actions%20loader%29"],"sourcesContent":["export {logout as '00e44c7f8b0e0dd3cd60222e1bfd30fba027f16708'} from 'ACTIONS_MODULE0'\n"],"names":[],"mappings":";AAAA","debugId":null}}]
+}

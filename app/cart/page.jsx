@@ -1,7 +1,7 @@
-import React from "react";
-import CartPage from "../../components/cartpage";
+import CartPage from "../../components/product/cartpage";
 
-export default function cart() {
+export default async function Cart() {
+
   return (
     <div className="mt-40">
       <CartPage />

@@ -6,9 +6,18 @@
   "rootMainFiles": [],
   "pages": {
     "/_error": [
-      "static/chunks/a39abce31eceaed6.js",
-      "static/chunks/36143fd70040d27f.js",
-      "static/chunks/turbopack-243487fc2efffc07.js"
+      "static/chunks/0385e_next_dist_compiled_next-devtools_index_8cac34d2.js",
+      "static/chunks/0385e_next_dist_compiled_58a2c218._.js",
+      "static/chunks/0385e_next_dist_shared_lib_e26c3e6a._.js",
+      "static/chunks/0385e_next_dist_client_2fbfde36._.js",
+      "static/chunks/0385e_next_dist_fba19400._.js",
+      "static/chunks/0385e_next_error_002b812e.js",
+      "static/chunks/[next]_entry_page-loader_ts_30eac236._.js",
+      "static/chunks/0385e_react-dom_5b0040ae._.js",
+      "static/chunks/0385e_591a8a21._.js",
+      "static/chunks/[root-of-the-server]__15c19958._.js",
+      "static/chunks/Documents_Git-Projects_egyzon-v2_pages__error_2da965e7._.js",
+      "static/chunks/turbopack-Documents_Git-Projects_egyzon-v2_pages__error_0e7cdc4f._.js"
     ]
   },
   "ampFirstPages": []

@@ -1,19 +1,13 @@
 "use client";
 import React, { useState } from "react";
 import { useCart } from "@/context/CartContext";
-import { toast } from "react-toastify";
-import Quantity from "@/components/quantityselector";
+
+import Quantity from "@/components/product/quantityselector";
+import useHandleAddToCart from "@/Hooks/useHandleAddToCart";
 
 export default function productDetailPage({ product }) {
   const [quantity, setQuantity] = useState(1);
-  const { addtocart } = useCart();
-
-  const handleAddToCart = () => {
-    addtocart(product, quantity);
-    toast.success(`${quantity} x ${product.name} added to cart`, {
-      position: "bottom-right",
-    });
-  };
+  const addToCart = useHandleAddToCart();
 
   return (
     <div className="max-w-5xl mx-auto p-6">
@@ -36,7 +30,7 @@ export default function productDetailPage({ product }) {
           <div className="flex flex-row space-x-5">
             <Quantity quantity={quantity} onQuantityChange={setQuantity} />
             <button
-              onClick={handleAddToCart}
+              onClick={() => addToCart(product, quantity)}
               className="mt-10 bg-yellow-400 text-white rounded-3xl hover:bg-transparent hover:text-black w-35 h-10 cursor-pointer hover:border-1"
             >
               Add To Cart

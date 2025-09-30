@@ -39,7 +39,7 @@ const ProductsData = [
     {
         id: "1",
         name: "Apple Iphone 17",
-        price: "80000",
+        price: 75000,
         image: "/productImages/iphone 17.webp",
         description: "Meet the new iPhone 17. Designed with contoured edges, thinner borders, and durable materials like Ceramic Shield 2 on the front, it looks — and stays — beautiful. You can see and do more of everything you love on a 6.3-inch Super Retina XDR display.5 And enjoy smoother scrolling and more immersive gaming with ProMotion, with an adaptive refresh rate up to 120Hz. Take it for a spin.",
         category: "electronics"
@@ -47,7 +47,7 @@ const ProductsData = [
     {
         id: "2",
         name: "Samsung Galaxy s25 ultra",
-        price: "65000",
+        price: 65000,
         image: "/productImages/samsung S25.jpeg",
         description: "The Samsung Galaxy S25 Ultra features a powerful Snapdragon 8 Elite processor, a vibrant 6.9-inch QHD+ display with a 120Hz refresh rate and Gorilla Glass Armor 2 for enhanced durability and reduced glare, and a versatile camera system led by a 200MP main sensor and a new 50MP ultra-wide lens. It boasts enhanced AI features through a Gemini/Bixby hybrid assistant ,a refined design with rounded corners and a titanium frame",
         category: "electronics"
@@ -55,7 +55,7 @@ const ProductsData = [
     {
         id: "3",
         name: "Playstation 5 ",
-        price: "30000",
+        price: 30000,
         image: "/productImages/ps5.jpg",
         description: "The PlayStation 5 (PS5) is Sony's powerful fifth-generation game console featuring an ultra-high-speed SSD for rapid load times, a custom CPU/GPU for stunning graphics and high frame rates up to 120fps, and support for advanced features like 4K resolution, ray tracing, haptic feedback, adaptive triggers, and 3D Audio for immersive gameplay. It offers backward compatibility with most PS4 games, a DualSense controller with tactile feedback, and access to a vast library of PlayStation games.",
         category: "electronics"
@@ -73,21 +73,24 @@ const ProductsData = [
         image: "/productImages/Apple MacBook pro.jpeg",
         name: "MacBook Pro M4",
         price: 120000,
-        category: "electronics"
+        category: "electronics",
+        description: "The latest MacBook Pro with the powerful M4 chip."
     },
     {
         id: "6",
         name: "Sony Headset",
         image: "/productImages/Sony WH-1000XM4.avif",
         price: 1500,
-        category: "electronics"
+        category: "electronics",
+        description: "Sony WH-1000XM4 Wireless Noise-Cancelling Headphones."
     },
     {
         id: "7",
         name: "dell xps Laptop",
         image: "/productImages/dell xps.avif",
         price: 15000,
-        category: "electronics"
+        category: "electronics",
+        description: "Dell XPS laptop with high-resolution display and powerful performance."
     }
 ];
 const categories = [
@@ -201,7 +204,7 @@ async function ProductDetailPage({ params }) {
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$client$2f$components$2f$navigation$2e$react$2d$server$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["notFound"])();
     }
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "m-70",
+        className: "md:m-70 mt-40 mb-30",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Git$2d$Projects$2f$egyzon$2d$v2$2f$app$2f$products$2f5b$productId$5d2f$productDetailPage$2e$jsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"], {
             product: product
         }, void 0, false, {

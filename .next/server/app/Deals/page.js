@@ -2,7 +2,7 @@ var R=require("../../chunks/ssr/[turbopack]_runtime.js")("server/app/Deals/page.
 R.c("server/chunks/ssr/0385e_606ad23a._.js")
 R.c("server/chunks/ssr/[root-of-the-server]__e8a2741f._.js")
 R.c("server/chunks/ssr/Documents_Git-Projects_egyzon-v2_app_6bef9d01._.js")
-R.c("server/chunks/ssr/Documents_Git-Projects_egyzon-v2_051de7e6._.js")
+R.c("server/chunks/ssr/Documents_Git-Projects_egyzon-v2_4bd4e7cb._.js")
 R.c("server/chunks/ssr/Documents_Git-Projects_egyzon-v2_app_error_jsx_82fd7be9._.js")
 R.c("server/chunks/ssr/Documents_Git-Projects_egyzon-v2_app_not-found_jsx_36ffb3de._.js")
 R.c("server/chunks/ssr/0385e_next_dist_client_components_5bb7107a._.js")
