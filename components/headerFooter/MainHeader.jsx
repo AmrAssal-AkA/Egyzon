@@ -11,18 +11,24 @@ import {
   UserPlus,
   LogOut,
   Settings,
+  Search,
 } from "lucide-react";
 import Dropdown from "./dropdown";
 
 import Logo from "@/public/Logo/EgyzonLogo.png";
 import { useCart } from "@/context/CartContext";
 import { usePathname } from "next/navigation";
+import ToggleTheme from "./ToggleTheme";
 
-export const navlinks = [
-  { name: "Home", path: "/" },
+const categoryLinks = [
   { name: "Products", path: "/products" },
   { name: "Deals", path: "/Deals" },
-  { name: "Become a Partner", path: "/Partner" },
+  { name: "Best Sellers", path: "/best-sellers" },
+  { name: "New Arrivals", path: "/new-arrivals" },
+  { name: "Electronics", path: `/categories/electronics` },
+  { name: "Fashion", path: `/categories/fashion` },
+  { name: "Home & Kitchen", path: `/categories/home-kitchen` },
+  { name: "More...", path: "/categories" },
 ];
 
 export default function Mainheader({ user }) {
@@ -37,9 +43,9 @@ export default function Mainheader({ user }) {
   const [Open, setOpen] = useState(false);
 
   return (
-    <nav className="w-full fixed top-0 left-0 z-50 bg-yellow-400 shadow-sm border-b border-yellow-500/50">
-      <div className="max-w-7xl mx-auto px-6 md:px-10">
-        <div className="flex justify-between items-center h-20">
+    <nav className="w-full fixed top-0 left-0 z-50 bg-yellow-400 shadow-sm border-b border-yellow-500/50 dark:bg-gray-800 dark:border-gray-700">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10">
+        <div className="flex justify-between items-center h-20 gap-4 md:gap-8">
           {/* Logo Section */}
           <div className="flex-shrink-0 flex items-center cursor-pointer">
             <Link
@@ -57,28 +63,21 @@ export default function Mainheader({ user }) {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex md:items-center md:gap-8 md:flex-1 md:justify-center">
-            {navlinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.path}
-                className={`relative text-base font-semibold transition-colors duration-200 py-2 group ${
-                  currentPath === link.path
-                    ? "text-yellow-900"
-                    : "text-black hover:text-yellow-800"
-                }`}
+          {/* Desktop Search Bar */}
+          <div className="hidden md:flex flex-1 max-w-3xl">
+            <div className="flex w-full shadow-sm">
+              <input
+                type="text"
+                placeholder="Search products..."
+                className="w-full px-4 py-2 rounded-l-md border-none focus:outline-none focus:ring-2 focus:ring-black text-black bg-white"
+              />
+              <button
+                type="button"
+                className="bg-black text-yellow-400 px-5 py-2 rounded-r-md font-bold hover:bg-gray-800 transition-colors flex items-center justify-center"
               >
-                {link.name}
-                <span
-                  className={`absolute bottom-0 left-0 w-full h-0.5 bg-yellow-900 transform origin-left transition-transform duration-300 ease-out ${
-                    currentPath === link.path
-                      ? "scale-x-100"
-                      : "scale-x-0 group-hover:scale-x-100"
-                  }`}
-                />
-              </Link>
-            ))}
+                <Search size={20} />
+              </button>
+            </div>
           </div>
 
           {/* Right Actions Section */}
@@ -87,7 +86,7 @@ export default function Mainheader({ user }) {
             <Link href={"/cart"} className="inline-block">
               <button
                 onClick={openCart}
-                className="relative p-2.5 text-black bg-yellow-500/20 hover:bg-yellow-500/50 rounded-full transition-colors flex items-center justify-center"
+                className="relative p-2.5 text-black bg-yellow-500/20 hover:bg-yellow-500/50 rounded-full transition-colors flex items-center justify-center cursor-pointer dark:text-white dark:bg-gray-700 dark:hover:bg-gray-600"
                 aria-label="Open cart"
               >
                 <ShoppingCart size={22} strokeWidth={2.5} />
@@ -100,10 +99,10 @@ export default function Mainheader({ user }) {
             </Link>
 
             {/* Account Dropdown (Desktop) */}
-            <div className="hidden md:block">
+            <div className="hidden md:flex items-center gap-3 sm:gap-5">
               <Dropdown
                 trigger={
-                  <button className="flex items-center gap-2 p-2 px-3 text-black bg-yellow-500/20 hover:bg-yellow-500/50 rounded-full transition-colors font-semibold">
+                  <button className="flex items-center gap-2 p-2 px-3 text-black bg-yellow-500/20 hover:bg-yellow-500/50 rounded-full transition-colors font-semibold cursor-pointer dark:text-white dark:bg-gray-700 dark:hover:bg-gray-600">
                     <CircleUserRound size={22} strokeWidth={2.5} />
                     {user && (
                       <span className="truncate max-w-[120px] text-sm">
@@ -118,7 +117,7 @@ export default function Mainheader({ user }) {
                     <>
                       <Link
                         href="/profile/settings"
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-yellow-50 hover:text-black transition-colors"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-yellow-50 hover:text-black transition-colors dark:text-white dark:hover:bg-gray-600"
                         role="menuitem"
                       >
                         <Settings className="w-4 h-4" />
@@ -127,7 +126,7 @@ export default function Mainheader({ user }) {
                       <form action={logout} className="w-full">
                         <button
                           type="submit"
-                          className="w-full text-left flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                          className="w-full text-left flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors dark:text-red-400 dark:hover:bg-gray-600"
                           role="menuitem"
                         >
                           <LogOut className="w-4 h-4" />
@@ -139,7 +138,7 @@ export default function Mainheader({ user }) {
                     <>
                       <Link
                         href="/login"
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-yellow-50 hover:text-black transition-colors"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-yellow-50 hover:text-black transition-colors dark:text-white dark:hover:bg-gray-600"
                         role="menuitem"
                       >
                         <LogIn className="w-4 h-4" />
@@ -147,7 +146,7 @@ export default function Mainheader({ user }) {
                       </Link>
                       <Link
                         href="/signup"
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-yellow-50 hover:text-black transition-colors"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-yellow-50 hover:text-black transition-colors dark:text-white dark:hover:bg-gray-600"
                         role="menuitem"
                       >
                         <UserPlus className="w-4 h-4" />
@@ -157,6 +156,7 @@ export default function Mainheader({ user }) {
                   )}
                 </div>
               </Dropdown>
+              <ToggleTheme />
             </div>
 
             {/* Mobile Menu Toggle */}
@@ -173,6 +173,41 @@ export default function Mainheader({ user }) {
             </button>
           </div>
         </div>
+
+        {/* Mobile Search Bar */}
+        <div className="md:hidden pb-3">
+          <div className="flex w-full shadow-sm">
+            <input
+              type="text"
+              placeholder="Search products..."
+              className="w-full px-4 py-2 rounded-l-md border-none focus:outline-none focus:ring-2 focus:ring-black text-black"
+            />
+            <button
+              type="button"
+              className="bg-black text-yellow-400 px-4 py-2 rounded-r-md font-bold hover:bg-gray-800 transition-colors flex items-center justify-center"
+            >
+              <Search size={20} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Secondary Navigation */}
+      <div className="bg-yellow-500 border-t border-yellow-600/30 dark:bg-gray-700 dark:border-gray-600/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10">
+          <ul className="flex items-center gap-6 overflow-x-auto py-2.5 text-sm font-semibold text-yellow-950 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            {categoryLinks.map((link) => (
+              <li key={link.name} className="whitespace-nowrap shrink-0">
+                <Link
+                  href={link.path}
+                  className="hover:text-black hover:underline underline-offset-4 decoration-2 transition-all dark:text-white dark:hover:text-yellow-400"
+                >
+                  {link.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       {/* Mobile Navigation Panel */}
@@ -182,7 +217,7 @@ export default function Mainheader({ user }) {
         }`}
       >
         <ul className="flex flex-col px-6 pt-4 pb-6 space-y-2">
-          {navlinks.map((link) => (
+          {categoryLinks.map((link) => (
             <li key={link.name}>
               <Link
                 href={link.path}

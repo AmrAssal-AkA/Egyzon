@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///G:/Projects/egyzon-v2/app/products/layout.jsx"],"sourcesContent":["import React from \"react\";\r\n\r\nfunction ProductsAndCategoryLayout({ products, categories, children }) {\r\n  const pathname = usePa\r\n  const isDetailPage = !!children;\r\n  return (\r\n    <div className=\"mt-20\">\r\n      {!isDetailPage && (\r\n        <>\r\n          <section className=\"px-6 md:px-8 py-8\">\r\n            <div className=\"mb-8\">{categories}</div>\r\n          </section>\r\n          <section className=\"px-6 md:px-8 py-8 gap-6\">\r\n            <div className=\"mb-0\">{products}</div>\r\n          </section>\r\n        </>\r\n      )}\r\n      {children}\r\n    </div>\r\n  );\r\n}\r\n\r\nexport default ProductsAndCategoryLayout;\r\n"],"names":[],"mappings":";;;;;AAAA;;;AAEA,SAAS,0BAA0B,EAAE,QAAQ,EAAE,UAAU,EAAE,QAAQ,EAAE;IACnE,MAAM,WAAW;IACjB,MAAM,eAAe,CAAC,CAAC;IACvB,qBACE,8OAAC;QAAI,WAAU;;YACZ,CAAC,8BACA;;kCACE,8OAAC;wBAAQ,WAAU;kCACjB,cAAA,8OAAC;4BAAI,WAAU;sCAAQ;;;;;;;;;;;kCAEzB,8OAAC;wBAAQ,WAAU;kCACjB,cAAA,8OAAC;4BAAI,WAAU;sCAAQ;;;;;;;;;;;;;YAI5B;;;;;;;AAGP;uCAEe","debugId":null}}]
+}

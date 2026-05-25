@@ -15,14 +15,14 @@ export default function Dropdown({ trigger, children }) {
   }
 
   return (
-    <div className="relative inline-block text-left">
+    <div className="relative inline-block text-left dark:bg-gray-800">
       <div onClick={HandleMenuOpen}>{trigger}</div>
 
       {isOpen && (
         <>
         <div className="fixed inset-0 z-0" onClick={HandleMenuClose} />
         <div
-          className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-xl bg-white  z-10"
+          className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-xl bg-white  z-10 dark:bg-gray-800"
           role="menu"
           aria-orientation="vertical"
         >

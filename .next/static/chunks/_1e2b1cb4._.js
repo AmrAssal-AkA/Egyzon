@@ -73,10 +73,10 @@ function ProductGrid({ products }) {
             lineNumber: 17,
             columnNumber: 9
         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8",
+            className: "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 dark:shadow-gray-700",
             children: products.map((product)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                     href: `/products/${product.id}`,
-                    className: "group flex flex-col bg-white rounded-2xl overflow-hidden shadow-md shadow-amber-400 hover:shadow-xl transition-all duration-300 border border-gray-100 h-full",
+                    className: "group flex flex-col bg-white rounded-2xl overflow-hidden shadow-md shadow-amber-400 hover:shadow-xl transition-all duration-300 border border-gray-100 h-full dark:bg-gray-800 dark:border-gray-700",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "relative aspect-square sm:aspect-[4/5] overflow-hidden bg-white p-4 sm:p-6 flex justify-center items-center",
@@ -98,7 +98,7 @@ function ProductGrid({ products }) {
                             className: "p-4 sm:p-5 flex flex-col flex-grow",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                    className: "text-xs sm:text-sm text-gray-500 mb-1 uppercase tracking-wider font-semibold",
+                                    className: "text-xs sm:text-sm text-gray-500 mb-1 uppercase tracking-wider font-semibold dark:text-white",
                                     children: product.category
                                 }, void 0, false, {
                                     fileName: "[project]/components/product/ProductGrid.jsx",
@@ -106,7 +106,7 @@ function ProductGrid({ products }) {
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                    className: "text-sm sm:text-base font-semibold text-gray-900 line-clamp-2 mb-2 min-h-[40px] sm:min-h-[48px]",
+                                    className: "text-sm sm:text-base font-semibold text-gray-900 line-clamp-2 mb-2 min-h-[40px] sm:min-h-[48px] dark:text-white",
                                     children: product.name
                                 }, void 0, false, {
                                     fileName: "[project]/components/product/ProductGrid.jsx",
@@ -117,7 +117,7 @@ function ProductGrid({ products }) {
                                     className: "mt-auto pt-4 flex flex-col gap-3",
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "text-lg sm:text-xl font-bold text-yellow-600",
+                                            className: "text-lg sm:text-xl font-bold text-yellow-600 dark:text-yellow-400",
                                             children: [
                                                 Number(product.price).toFixed(2),
                                                 " EGP"

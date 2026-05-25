@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 3, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
+    {"offset": {"line": 35, "column": 0}, "map": {"version":3,"sources":["file:///G:/Projects/egyzon-v2/app/products/%40modal/%5BproductId%5D/page.jsx"],"sourcesContent":["import { notFound } from \"next/navigation\";\r\n\r\nimport { ProductsData } from \"@/lib/Products\";\r\nimport ProductDetail from \"../../../../components/product/productDetailPage\";\r\n\r\nexport default async function ProductDetailPage({ params }) {\r\n  const { productId } = await params;\r\n  const product = ProductsData.find((p) => p.id === productId);\r\n\r\n  if (!product) {\r\n    notFound();\r\n  }\r\n  return (\r\n    <div className=\"fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-y-auto\">\r\n      <div className=\"bg-white rounded-lg width-full max-w-4xl m-4\">\r\n        <div className=\"md:m-70 mt-40 mb-30\">\r\n          <ProductDetail product={product} />\r\n        </div>\r\n      </div>\r\n    </div>\r\n  );\r\n}\r\n"],"names":[],"mappings":";;;;;AAAA;AAAA;AAEA;AACA;;;;;AAEe,eAAe,kBAAkB,EAAE,MAAM,EAAE;IACxD,MAAM,EAAE,SAAS,EAAE,GAAG,MAAM;IAC5B,MAAM,UAAU,+HAAY,CAAC,IAAI,CAAC,CAAC,IAAM,EAAE,EAAE,KAAK;IAElD,IAAI,CAAC,SAAS;QACZ,IAAA,iMAAQ;IACV;IACA,qBACE,8OAAC;QAAI,WAAU;kBACb,cAAA,8OAAC;YAAI,WAAU;sBACb,cAAA,8OAAC;gBAAI,WAAU;0BACb,cAAA,8OAAC,sJAAa;oBAAC,SAAS;;;;;;;;;;;;;;;;;;;;;AAKlC","debugId":null}}]
+}

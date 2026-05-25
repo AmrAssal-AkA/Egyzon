@@ -1,12 +1,13 @@
 {
   "/Deals/page": "app/Deals/page.js",
-  "/Partner/page": "app/Partner/page.js",
   "/_not-found/page": "app/_not-found/page.js",
   "/cart/page": "app/cart/page.js",
+  "/categories/[slug]/page": "app/categories/[slug]/page.js",
+  "/categories/page": "app/categories/page.js",
+  "/checkout/page": "app/checkout/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
   "/login/page": "app/login/page.js",
   "/page": "app/page.js",
-  "/products/[productId]/page": "app/products/[productId]/page.js",
   "/products/page": "app/products/page.js",
   "/signup/page": "app/signup/page.js"
 }

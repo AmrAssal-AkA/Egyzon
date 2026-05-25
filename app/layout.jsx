@@ -5,6 +5,7 @@ import Mainheader from "@/components/headerFooter/MainHeader";
 import { Footer } from "@/components/headerFooter/footer";
 import CartProvider from "@/context/CartContext";
 import { ToastContainer, toast } from "react-toastify";
+import ThemeProvider from "@/providers/themeProvider";
 
 
 export const metadata = {
@@ -15,14 +16,16 @@ export const metadata = {
 export default async function RootLayout({ children }) {
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
+        <ThemeProvider>
         <CartProvider>
           <Mainheader  />
           {children}
-          <ToastContainer  position="top-right" />
+          <ToastContainer  />
           <Footer />
         </CartProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
