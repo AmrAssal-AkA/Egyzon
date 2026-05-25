@@ -9,19 +9,16 @@ import { ProductsData, categories } from "@/lib/Products";
 export default async function Home() {
 
 
-  //limit Products desplay in homepage
   const NumberOfProduct = 4;
   const ProductstoShow = ProductsData.slice(0, NumberOfProduct);
-  //limit categories display in homepage
   const NumberOfCategory = 4;
   const categoriesToShow = categories.slice(0, NumberOfCategory);
 
   return (
     <main className="mt-30 justify-center">
-      <div>
         <CarouselMain />
-      </div>
 
+        {/* Product Section */}
       <section className="m-8">
         <h1 className="text-5xl text-center font-bold font-serif">
           Latest <span className="text-yellow-400">Products</span>{" "}
@@ -31,7 +28,7 @@ export default async function Home() {
       {/* category section */}
       <section className="m-8">
         <h1 className="text-5xl text-center font-bold">Categories</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 max-w-8xl mx-auto mt-5 shadow-lg">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 max-w-6xl mx-auto mt-5 shadow-lg">
           {categoriesToShow.map((category) => (
             <div
               key={category.id}

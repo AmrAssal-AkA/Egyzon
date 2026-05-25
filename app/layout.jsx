@@ -20,7 +20,7 @@ export default async function RootLayout({ children }) {
         <CartProvider>
           <Mainheader  />
           {children}
-          <ToastContainer />
+          <ToastContainer  position="top-right" />
           <Footer />
         </CartProvider>
       </body>

@@ -10,12 +10,12 @@ export default async function ProductsAndCategory() {
   return (
     <div className="mt-40">
       <h1 className="text-5xl text-center font-bold">
-        Browse <span className="text-yellow-500">products and categories</span>
+        Browse <span className="text-yellow-500"> categories</span>
       </h1>
 
       {/* categories section */}
       <section className="m-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 max-w-8xl mx-auto mt-5 shadow-lg">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 max-w-6xl mx-auto mt-5 shadow-lg">
           {categories.map((category) => (
             <div
               key={category.id}
@@ -36,6 +36,9 @@ export default async function ProductsAndCategory() {
       </section>
 
       <section className="p-10">
+            <h1 className="text-5xl text-center font-bold mb-10">
+        Explore Our <span className="text-yellow-500">Products</span>
+      </h1>
         <Suspense fallback={<div>Loading products...</div>}>
           <ProductGrid products={ProductsData} />
         </Suspense>

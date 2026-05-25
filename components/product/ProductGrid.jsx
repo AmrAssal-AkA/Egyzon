@@ -6,42 +6,56 @@ export default function ProductGrid({ products }) {
   const addToCart = useHandleAddToCart();
 
   const handleAddToCartClick = (e, product) => {
-    e.preventDefault(); // Prevent navigating to product detail page
-    e.stopPropagation(); // Stop event from bubbling up
+    e.preventDefault();
+
     addToCart(product, 1);
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 max-w-8xl mx-auto mt-5 shadow-lg">
+    <div className="w-full max-w-6xl mx-auto mt-8">
       {!products || products.length === 0 ? (
-        <p className="col-span-full text-center text-gray-500">
-          No products found.
-        </p>
+        <div className="flex justify-center items-center h-64 bg-gray-50 rounded-2xl">
+          <p className="text-lg text-gray-500 font-medium">
+            No products found.
+          </p>
+        </div>
       ) : (
-        products.map((product) => (
-          <Link href={`/products/${product.id}`} key={product.id}>
-            <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer ">
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-85 fill"
-              />
-              <div className="p-4 text-center">
-                <h2 className="text-2xl font-semibold mb-2">{product.name}</h2>
-                <h2 className=" text-gray-500 mb-2">{product.category}</h2>
-                <p className="text-yellow-600 font-bold text-xl">
-                  {product.price} EGP
-                </p>
-                <button
-                  onClick={(e) => handleAddToCartClick(e, product)}
-                  className="mt-10 bg-yellow-400 text-white rounded-3xl hover:bg-transparent hover:text-black w-35 h-10 cursor-pointer hover:border-1"
-                >
-                  Add To Cart
-                </button>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+          {products.map((product) => (
+            <Link
+              href={`/products/${product.id}`}
+              key={product.id}
+              className="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-md shadow-amber-400 hover:shadow-xl transition-all duration-300 border border-gray-100 h-full"
+            >
+              <div className="relative aspect-square sm:aspect-[4/5] overflow-hidden bg-white p-4 sm:p-6 flex justify-center items-center">
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-full object-contain object-center transform group-hover:scale-105 transition-transform duration-700"
+                />
               </div>
-            </div>
-          </Link>
-        ))
+              <div className="p-4 sm:p-5 flex flex-col flex-grow">
+                <h3 className="text-xs sm:text-sm text-gray-500 mb-1 uppercase tracking-wider font-semibold">
+                  {product.category}
+                </h3>
+                <h2 className="text-sm sm:text-base font-semibold text-gray-900 line-clamp-2 mb-2 min-h-[40px] sm:min-h-[48px]">
+                  {product.name}
+                </h2>
+                <div className="mt-auto pt-4 flex flex-col gap-3">
+                  <p className="text-lg sm:text-xl font-bold text-yellow-600">
+                    {Number(product.price).toFixed(2)} EGP
+                  </p>
+                  <button
+                    onClick={(e) => handleAddToCartClick(e, product)}
+                    className="w-full bg-yellow-400 text-gray-900 font-bold py-2.5 rounded-xl hover:bg-yellow-500 transition-colors active:scale-95 duration-200"
+                  >
+                    Add To Cart
+                  </button>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
       )}
     </div>
   );

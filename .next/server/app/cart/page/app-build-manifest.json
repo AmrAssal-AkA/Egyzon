@@ -1,28 +1,26 @@
 {
   "pages": {
     "/cart/page": [
-      "static/chunks/0385e_next_dist_84d48cc6._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_app_favicon_ico_mjs_c7523331._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_6efb8cae._.css",
-      "static/chunks/0385e_81f82439._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_7f1c7086._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_app_layout_jsx_1638bf46._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_app_error_jsx_395ae348._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_app_error_jsx_fa723f5d._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_app_not-found_jsx_81100691._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_app_not-found_jsx_fa723f5d._.js",
-      "static/chunks/0385e_next_dist_client_components_builtin_global-error_fa723f5d.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_3a555736._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_app_cart_page_jsx_fa723f5d._.js",
-      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_4712aafb._.js",
-      "static/chunks/0385e_next_dist_compiled_react-dom_bd681c31._.js",
-      "static/chunks/0385e_next_dist_compiled_next-devtools_index_24188ce5.js",
-      "static/chunks/0385e_next_dist_compiled_ba6315b2._.js",
-      "static/chunks/0385e_next_dist_client_71078ec0._.js",
-      "static/chunks/0385e_next_dist_2794bf37._.js",
-      "static/chunks/0385e_@swc_helpers_cjs_8a050d34._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_a0ff3932._.js",
-      "static/chunks/turbopack-Documents_Git-Projects_egyzon-v2_887a3abe._.js"
+      "static/chunks/node_modules_next_dist_8db7fb1f._.js",
+      "static/chunks/app_favicon_ico_mjs_228ad3b6._.js",
+      "static/chunks/_137b156b._.css",
+      "static/chunks/node_modules_f05bb6af._.js",
+      "static/chunks/_8404e85a._.js",
+      "static/chunks/app_layout_jsx_05c78893._.js",
+      "static/chunks/app_error_jsx_60242091._.js",
+      "static/chunks/app_error_jsx_53705a85._.js",
+      "static/chunks/node_modules_next_dist_client_components_builtin_global-error_53705a85.js",
+      "static/chunks/_ed4e5a13._.js",
+      "static/chunks/app_cart_page_jsx_53705a85._.js",
+      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_e4e2c227._.js",
+      "static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js",
+      "static/chunks/node_modules_next_dist_compiled_next-devtools_index_a9cb0712.js",
+      "static/chunks/node_modules_next_dist_compiled_5150ccfd._.js",
+      "static/chunks/node_modules_next_dist_client_cf1d9188._.js",
+      "static/chunks/node_modules_next_dist_b0daae9a._.js",
+      "static/chunks/node_modules_@swc_helpers_cjs_a8804bf6._.js",
+      "static/chunks/_a0ff3932._.js",
+      "static/chunks/turbopack-_900dbc97._.js"
     ]
   }
 }
