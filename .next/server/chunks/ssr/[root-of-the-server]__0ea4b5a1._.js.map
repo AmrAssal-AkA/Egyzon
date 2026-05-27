@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 3, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
-    {"offset": {"line": 23, "column": 0}, "map": {"version":3,"sources":["file:///G:/Projects/egyzon-v2/app/categories/%5Bslug%5D/page.jsx"],"sourcesContent":["import React from 'react'\r\n\r\nfunction CategoryPage({params}) {\r\n    const { slug } = params;\r\n  return (\r\n    <main className=\"min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50 p-4 mt-30\">\r\n      <div className=\"max-w-6xl mx-auto\">\r\n        <h1 className=\"text-4xl font-bold mb-6 text-center bg-gradient-to-r from-yellow-300 via-yellow-600 to-yellow-700 bg-clip-text text-transparent\">\r\n          Category: {slug}\r\n        </h1>\r\n       \r\n      </div>\r\n    </main>\r\n  )\r\n}\r\n\r\nexport default CategoryPage"],"names":[],"mappings":";;;;;AAAA;;;AAEA,SAAS,aAAa,EAAC,MAAM,EAAC;IAC1B,MAAM,EAAE,IAAI,EAAE,GAAG;IACnB,qBACE,8OAAC;QAAK,WAAU;kBACd,cAAA,8OAAC;YAAI,WAAU;sBACb,cAAA,8OAAC;gBAAG,WAAU;;oBAAkI;oBACnI;;;;;;;;;;;;;;;;;AAMrB;uCAEe","debugId":null}}]
-}

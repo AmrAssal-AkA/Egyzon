@@ -30,7 +30,7 @@ function Quantity({ quantity, onQuantityChange }) {
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                         onClick: ()=>onQuantityChange(Math.max(1, quantity - 1)),
-                        className: "p-2 rounded-xl border border-gray-300 hover:border-gray-400 transition-colors",
+                        className: "p-2 rounded-xl border border-gray-300 hover:border-gray-400 transition-colors dark:border-gray-600 dark:hover:border-gray-500",
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$minus$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Minus$3e$__["Minus"], {
                             className: "w-5 h-5"
                         }, void 0, false, {
@@ -44,7 +44,7 @@ function Quantity({ quantity, onQuantityChange }) {
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                        className: "px-6 py-2 bg-gray-100 rounded-xl font-medium min-w-16 text-center",
+                        className: "px-6 py-2 bg-gray-100 rounded-xl font-medium min-w-16 text-center dark:bg-gray-600",
                         children: quantity
                     }, void 0, false, {
                         fileName: "[project]/components/product/quantityselector.jsx",
@@ -53,7 +53,7 @@ function Quantity({ quantity, onQuantityChange }) {
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                         onClick: ()=>onQuantityChange(quantity + 1),
-                        className: "p-2 rounded-xl border border-gray-300 hover:border-gray-400 transition-colors",
+                        className: "p-2 rounded-xl border border-gray-300 hover:border-gray-400 transition-colors dark:border-gray-600 dark:hover:border-gray-500",
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$plus$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Plus$3e$__["Plus"], {
                             className: "w-5 h-5"
                         }, void 0, false, {
@@ -131,15 +131,15 @@ function ImageGallery({ product }) {
         setSelectedImage((prev)=>(prev - 1 + product.images.length) % product.images.length);
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "grid lg:grid-cols-2 gap-12",
+        className: "grid lg:grid-cols-2 gap-12 dark:shadow-gray-700",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "space-y-4",
+                className: "space-y-4 dark:shadow-gray-700  ",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "relative group",
+                        className: "relative group ",
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200",
+                            className: "aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 ",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
                                     src: product.image[selectedImage],
@@ -283,7 +283,7 @@ function productDetailPage({ product }) {
         ]
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "min-h-screen bg-gray-50/30",
+        className: "min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black py-8",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "mx-auto px-2 sm:px-3 lg:px-4",
             children: [
@@ -293,7 +293,7 @@ function productDetailPage({ product }) {
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "lg:col-span-7",
                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "bg-white rounded-3xl p-3 sm:p-6 border border-gray-100 shadow-sm",
+                                className: "bg-white rounded-3xl p-3 sm:p-6 border border-gray-100 shadow-sm dark:bg-gray-900 dark:border-gray-800/50 dark:shadow-2xl dark:shadow-gray-950/50",
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$product$2f$ImageGallery$2e$jsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
                                     product: productWithImages
                                 }, void 0, false, {
@@ -315,13 +315,13 @@ function productDetailPage({ product }) {
                             className: "lg:col-span-5 flex flex-col gap-2 lg:sticky lg:top-32",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "bg-white rounded-3xl p-3 sm:p-4 border border-gray-100 shadow-sm space-y-2",
+                                    className: "bg-white rounded-3xl p-3 sm:p-4 border border-gray-100 shadow-sm space-y-2 dark:bg-gray-900 dark:border-gray-800/50 dark:shadow-xl dark:shadow-gray-950/50",
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "space-y-2",
                                             children: [
                                                 product.category && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "inline-block px-3 py-1 rounded-full bg-yellow-50 text-yellow-700 text-xs font-bold uppercase tracking-wider",
+                                                    className: "inline-block px-3 py-1 rounded-full bg-yellow-50 text-yellow-700 text-xs font-bold uppercase tracking-wider dark:bg-yellow-500/15 dark:text-yellow-300 dark:border dark:border-yellow-500/30",
                                                     children: product.category
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/product/productDetailPage.jsx",
@@ -329,7 +329,7 @@ function productDetailPage({ product }) {
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                                                    className: "text-2xl sm:text-3xl font-bold text-gray-900 leading-tight",
+                                                    className: "text-2xl sm:text-3xl font-bold text-gray-900 leading-tight dark:text-white",
                                                     children: product.name
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/product/productDetailPage.jsx",
@@ -349,7 +349,7 @@ function productDetailPage({ product }) {
                                                     className: "flex items-baseline gap-3",
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                            className: "text-4xl font-black text-yellow-600",
+                                                            className: "text-4xl font-black text-yellow-600 dark:text-yellow-400",
                                                             children: [
                                                                 Number(product.price).toFixed(2),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -367,7 +367,7 @@ function productDetailPage({ product }) {
                                                             columnNumber: 19
                                                         }, this),
                                                         product.oldPrice && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "text-lg text-gray-400 line-through decoration-red-500/50 font-medium",
+                                                            className: "text-lg text-gray-400 line-through decoration-red-500/50 font-medium dark:text-gray-500 ",
                                                             children: [
                                                                 Number(product.oldPrice).toFixed(2),
                                                                 " EGP"
@@ -398,10 +398,10 @@ function productDetailPage({ product }) {
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "pt-2 border-t border-gray-100",
+                                            className: "pt-2 border-t border-gray-100 dark:border-gray-800/50",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                                    className: "text-xs font-bold text-gray-400 uppercase tracking-widest mb-1",
+                                                    className: "text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 dark:text-gray-500",
                                                     children: "Stock Status"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/product/productDetailPage.jsx",
@@ -409,7 +409,7 @@ function productDetailPage({ product }) {
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "flex items-center gap-2 text-green-600 font-bold bg-green-50 w-fit px-4 py-2 rounded-xl",
+                                                    className: "flex items-center gap-2 text-green-600 font-bold bg-green-50 w-fit px-4 py-2 rounded-xl dark:bg-green-950/40 dark:text-green-300 dark:border dark:border-green-800/50",
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                             className: "w-2 h-2 rounded-full bg-green-500 animate-pulse"
@@ -432,10 +432,10 @@ function productDetailPage({ product }) {
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "pt-2 border-t border-gray-100",
+                                            className: "pt-2 border-t border-gray-100 dark:border-gray-800/50",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                                    className: "text-xs font-bold text-gray-400 uppercase tracking-widest mb-1",
+                                                    className: "text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 dark:text-gray-500",
                                                     children: "Quick Overview"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/product/productDetailPage.jsx",
@@ -443,7 +443,7 @@ function productDetailPage({ product }) {
                                                     columnNumber: 17
                                                 }, this),
                                                 product.description && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                    className: "text-base text-gray-600 leading-relaxed line-clamp-4",
+                                                    className: "text-base text-gray-600 leading-relaxed line-clamp-4 dark:text-gray-300",
                                                     children: product.description
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/product/productDetailPage.jsx",
@@ -463,7 +463,7 @@ function productDetailPage({ product }) {
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "bg-yellow-400 rounded-3xl p-3 sm:p-4 border border-yellow-500/20 shadow-xl shadow-yellow-400/10",
+                                    className: "bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-3xl p-3 sm:p-4 border border-yellow-600/30 shadow-2xl shadow-yellow-500/20 dark:from-yellow-500 dark:to-yellow-600 dark:border-yellow-600/50",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "flex flex-col gap-2",
                                         children: [
@@ -480,7 +480,7 @@ function productDetailPage({ product }) {
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                         onClick: ()=>addToCart(product, quantity),
-                                                        className: "w-full flex items-center justify-center gap-3 bg-gray-900 text-white px-5 py-2 rounded-2xl hover:bg-black transition-all duration-300 font-bold text-base active:scale-95 group shadow-xl shadow-gray-900/20",
+                                                        className: "w-full flex items-center justify-center gap-3 bg-gray-900 text-white px-5 py-2 rounded-2xl hover:bg-gray-950 transition-all duration-300 font-bold text-base active:scale-95 group shadow-xl shadow-gray-900/30 dark:bg-black dark:hover:bg-gray-900",
                                                         children: [
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shopping$2d$cart$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ShoppingCart$3e$__["ShoppingCart"], {
                                                                 className: "w-6 h-6 transform group-hover:-translate-y-1 transition-transform"
@@ -497,7 +497,7 @@ function productDetailPage({ product }) {
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                        className: "w-full py-2 px-5 rounded-2xl border-2 border-gray-900 text-gray-900 font-bold text-base hover:bg-gray-900 hover:text-white transition-all duration-300 active:scale-95",
+                                                        className: "w-full py-2 px-5 rounded-2xl border-2 border-gray-900 text-gray-900 font-bold text-base hover:bg-gray-900 hover:text-white transition-all duration-300 active:scale-95 dark:border-yellow-600 dark:text-yellow-50 dark:hover:bg-gray-900 dark:hover:text-white",
                                                         children: "Buy Now"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/product/productDetailPage.jsx",
@@ -511,7 +511,7 @@ function productDetailPage({ product }) {
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "flex items-center justify-center gap-4 text-xs font-semibold text-gray-900/70 border-t border-gray-900/10 pt-1",
+                                                className: "flex items-center justify-center gap-4 text-xs font-semibold text-gray-900/70 border-t border-gray-900/20 pt-1 dark:text-gray-700 dark:border-gray-900/50",
                                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     className: "flex items-center gap-2",
                                                     children: [
@@ -577,13 +577,13 @@ function productDetailPage({ product }) {
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "mt-2 bg-white rounded-3xl p-3 sm:p-5 border border-gray-100 shadow-sm",
+                    className: "mt-2 bg-white rounded-3xl p-3 sm:p-5 border border-gray-100 shadow-sm dark:bg-gray-900 dark:border-gray-800/50 dark:shadow-xl dark:shadow-gray-950/50",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "max-w-3xl mx-auto mb-3",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                    className: "text-lg font-bold text-gray-900 mb-1",
+                                    className: "text-lg font-bold text-gray-900 mb-1 dark:text-gray-50",
                                     children: "Product Description"
                                 }, void 0, false, {
                                     fileName: "[project]/components/product/productDetailPage.jsx",
@@ -591,7 +591,7 @@ function productDetailPage({ product }) {
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    className: "text-gray-700 leading-relaxed text-sm",
+                                    className: "text-gray-700 leading-relaxed text-sm dark:text-gray-300",
                                     children: product.description || "No additional description available for this product."
                                 }, void 0, false, {
                                     fileName: "[project]/components/product/productDetailPage.jsx",
@@ -605,7 +605,7 @@ function productDetailPage({ product }) {
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                            className: "text-lg font-bold text-gray-900 mb-2 border-b pb-1",
+                            className: "text-lg font-bold text-gray-900 mb-2 border-b pb-1 dark:text-gray-50 dark:border-gray-800/50",
                             children: "Product Specifications"
                         }, void 0, false, {
                             fileName: "[project]/components/product/productDetailPage.jsx",
@@ -613,13 +613,13 @@ function productDetailPage({ product }) {
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-0 text-xs sm:text-sm",
+                            className: "grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-0 text-xs sm:text-sm dark:text-gray-300",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "flex justify-between py-1 border-b border-gray-50",
+                                    className: "flex justify-between py-1 border-b border-gray-50 dark:border-gray-800/30",
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "text-gray-500 font-medium",
+                                            className: "text-gray-500 font-medium dark:text-gray-400",
                                             children: "Category"
                                         }, void 0, false, {
                                             fileName: "[project]/components/product/productDetailPage.jsx",
@@ -627,7 +627,7 @@ function productDetailPage({ product }) {
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "text-gray-900 font-bold",
+                                            className: "text-gray-900 font-bold dark:text-gray-200",
                                             children: product.category
                                         }, void 0, false, {
                                             fileName: "[project]/components/product/productDetailPage.jsx",
@@ -641,10 +641,10 @@ function productDetailPage({ product }) {
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "flex justify-between py-1 border-b border-gray-50",
+                                    className: "flex justify-between py-1 border-b border-gray-50 dark:border-gray-800/30",
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "text-gray-500 font-medium",
+                                            className: "text-gray-500 font-medium dark:text-gray-400",
                                             children: "Warranty"
                                         }, void 0, false, {
                                             fileName: "[project]/components/product/productDetailPage.jsx",
@@ -652,7 +652,7 @@ function productDetailPage({ product }) {
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "text-gray-900 font-bold",
+                                            className: "text-gray-900 font-bold dark:text-gray-200",
                                             children: "1 Year Local Warranty"
                                         }, void 0, false, {
                                             fileName: "[project]/components/product/productDetailPage.jsx",
@@ -666,10 +666,10 @@ function productDetailPage({ product }) {
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "flex justify-between py-1 border-b border-gray-50",
+                                    className: "flex justify-between py-1 border-b border-gray-50 dark:border-gray-800/30",
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "text-gray-500 font-medium",
+                                            className: "text-gray-500 font-medium dark:text-gray-400",
                                             children: "Shipping"
                                         }, void 0, false, {
                                             fileName: "[project]/components/product/productDetailPage.jsx",
@@ -677,7 +677,7 @@ function productDetailPage({ product }) {
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "text-gray-900 font-bold",
+                                            className: "text-gray-900 font-bold dark:text-gray-200",
                                             children: "Fulfilled by Egyzon"
                                         }, void 0, false, {
                                             fileName: "[project]/components/product/productDetailPage.jsx",

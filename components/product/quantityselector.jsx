@@ -8,16 +8,16 @@ export default function Quantity({ quantity, onQuantityChange }) {
       <div className="flex items-center space-x-3">
         <button
           onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
-          className="p-2 rounded-xl border border-gray-300 hover:border-gray-400 transition-colors"
+          className="p-2 rounded-xl border border-gray-300 hover:border-gray-400 transition-colors dark:border-gray-600 dark:hover:border-gray-500"
         >
           <Minus className="w-5 h-5" />
         </button>
-        <span className="px-6 py-2 bg-gray-100 rounded-xl font-medium min-w-16 text-center">
+        <span className="px-6 py-2 bg-gray-100 rounded-xl font-medium min-w-16 text-center dark:bg-gray-600">
           {quantity}
         </span>
         <button
           onClick={() => onQuantityChange(quantity + 1)}
-          className="p-2 rounded-xl border border-gray-300 hover:border-gray-400 transition-colors"
+          className="p-2 rounded-xl border border-gray-300 hover:border-gray-400 transition-colors dark:border-gray-600 dark:hover:border-gray-500"
         >
           <Plus className="w-5 h-5" />
         </button>

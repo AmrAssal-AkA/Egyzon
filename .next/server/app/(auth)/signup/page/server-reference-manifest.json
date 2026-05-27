@@ -1,20 +1,4 @@
 {
-  "node": {
-    "00e44c7f8b0e0dd3cd60222e1bfd30fba027f16708": {
-      "workers": {
-        "app/(auth)/signup/page": {
-          "moduleId": "[project]/Documents/Git-Projects/egyzon-v2/.next-internal/server/app/(auth)/signup/page/actions.js { ACTIONS_MODULE0 => \"[project]/Documents/Git-Projects/egyzon-v2/lib/actions.js [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "logout",
-          "filename": "Documents/Git-Projects/egyzon-v2/lib/actions.js"
-        }
-      },
-      "layer": {
-        "app/(auth)/signup/page": "action-browser"
-      },
-      "exportedName": "logout",
-      "filename": "Documents/Git-Projects/egyzon-v2/lib/actions.js"
-    }
-  },
+  "node": {},
   "edge": {}
 }

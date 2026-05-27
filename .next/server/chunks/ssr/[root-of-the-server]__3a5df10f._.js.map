@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 3, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
-    {"offset": {"line": 23, "column": 0}, "map": {"version":3,"sources":["file:///Users/amrassal/Documents/Git-Projects/egyzon-v2/app/cart/page.jsx"],"sourcesContent":["import React from \"react\";\nimport CartPage from \"../../components/cartpage\";\n\nexport default function cart() {\n  return (\n    <div className=\"mt-40\">\n      <CartPage />\n    </div>\n  );\n}\n"],"names":[],"mappings":";;;;;AAAA;;;;;;;;;AAGe,SAAS;IACtB,qBACE,8RAAC;QAAI,WAAU;kBACb,cAAA,8RAAC;;;;;;;;;;AAGP","debugId":null}}]
-}

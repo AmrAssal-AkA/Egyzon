@@ -1,22 +1,23 @@
 1:"$Sreact.fragment"
-2:I[67178,["/_next/static/chunks/6de348f293c4b2c6.js"],"default"]
-3:I[32587,["/_next/static/chunks/6de348f293c4b2c6.js"],"default"]
-4:I[95907,["/_next/static/chunks/03c9806d27bf241c.js","/_next/static/chunks/007d367545745316.js"],"default"]
-5:I[62483,["/_next/static/chunks/6de348f293c4b2c6.js","/_next/static/chunks/60d0906c8848d772.js"],"default"]
-6:I[14634,["/_next/static/chunks/03c9806d27bf241c.js","/_next/static/chunks/007d367545745316.js"],"default"]
-7:I[64091,["/_next/static/chunks/6de348f293c4b2c6.js","/_next/static/chunks/4e09b3b69495c5fc.js"],"default"]
-8:I[30562,["/_next/static/chunks/6de348f293c4b2c6.js"],"ToastContainer"]
-9:I[30998,["/_next/static/chunks/6de348f293c4b2c6.js"],"Footer"]
-a:I[75364,["/_next/static/chunks/03c9806d27bf241c.js","/_next/static/chunks/007d367545745316.js"],"OutletBoundary"]
-c:I[39739,["/_next/static/chunks/03c9806d27bf241c.js","/_next/static/chunks/007d367545745316.js"],"AsyncMetadataOutlet"]
-e:I[75364,["/_next/static/chunks/03c9806d27bf241c.js","/_next/static/chunks/007d367545745316.js"],"ViewportBoundary"]
-10:I[75364,["/_next/static/chunks/03c9806d27bf241c.js","/_next/static/chunks/007d367545745316.js"],"MetadataBoundary"]
-11:"$Sreact.suspense"
-13:I[80820,["/_next/static/chunks/6de348f293c4b2c6.js"],"default"]
-:HL["/_next/static/chunks/a46e45d07753dd51.css","style"]
-0:{"P":null,"b":"2srOY24NqZeeqSz5m1vPZ","p":"","c":["","Deals"],"i":false,"f":[[["",{"children":["Deals",{"children":["__PAGE__",{}]}]},"$undefined","$undefined",true],["",["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/a46e45d07753dd51.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/_next/static/chunks/6de348f293c4b2c6.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"children":["$","$L2",null,{"children":[["$","$L3",null,{}],["$","$L4",null,{"parallelRouterKey":"children","error":"$5","errorStyles":[],"errorScripts":[["$","script","script-0",{"src":"/_next/static/chunks/60d0906c8848d772.js","async":true}]],"template":["$","$L6",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[["$","$L7",null,{}],[]],"forbidden":"$undefined","unauthorized":"$undefined"}],["$","$L8",null,{}],["$","$L9",null,{}]]}]}]}]]}],{"children":["Deals",["$","$1","c",{"children":[null,["$","$L4",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L6",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":["__PAGE__",["$","$1","c",{"children":[["$","div",null,{"className":"m-40","children":["$","h1",null,{"className":"text-5xl text-center font-bold","children":["explore"," ",["$","span",null,{"className":"text-yellow-500 ","children":"the new hot Deals 🔥"}]]}]}],null,["$","$La",null,{"children":["$Lb",["$","$Lc",null,{"promise":"$@d"}]]}]]}],{},null,false]},null,false]},null,false],["$","$1","h",{"children":[null,[["$","$Le",null,{"children":"$Lf"}],null],["$","$L10",null,{"children":["$","div",null,{"hidden":true,"children":["$","$11",null,{"fallback":null,"children":"$L12"}]}]}]]}],false]],"m":"$undefined","G":["$13",[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/a46e45d07753dd51.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]]],"s":false,"S":true}
-f:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
-b:null
-14:I[45201,["/_next/static/chunks/03c9806d27bf241c.js","/_next/static/chunks/007d367545745316.js"],"IconMark"]
-d:{"metadata":[["$","title","0",{"children":"Egyzon"}],["$","meta","1",{"name":"description","content":"Egyzon is brand new in ecommerce websites in egypt"}],["$","link","2",{"rel":"icon","href":"/favicon.ico?favicon.9a060314.ico","sizes":"256x256","type":"image/x-icon"}],["$","$L14","3",{}]],"error":null,"digest":"$undefined"}
-12:"$d:metadata"
+3:I[39756,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/7dc95fbec1e0051b.js"],"default"]
+4:I[37457,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/7dc95fbec1e0051b.js"],"default"]
+5:I[97367,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/7dc95fbec1e0051b.js"],"OutletBoundary"]
+7:I[11533,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/7dc95fbec1e0051b.js"],"AsyncMetadataOutlet"]
+9:I[97367,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/7dc95fbec1e0051b.js"],"ViewportBoundary"]
+b:I[97367,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/7dc95fbec1e0051b.js"],"MetadataBoundary"]
+c:"$Sreact.suspense"
+e:I[68027,["/_next/static/chunks/b1a2e2c8bc025ac7.js"],"default"]
+:HL["/_next/static/chunks/d57c01a8aa243ffd.css","style"]
+0:{"P":null,"b":"U8A6YhzXiCgVCX9PxsL_Y","p":"","c":["","Deals"],"i":false,"f":[[["",{"children":["Deals",{"children":["__PAGE__",{}]}]},"$undefined","$undefined",true],["",["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/d57c01a8aa243ffd.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/_next/static/chunks/b1a2e2c8bc025ac7.js","async":true,"nonce":"$undefined"}]],"$L2"]}],{"children":["Deals",["$","$1","c",{"children":[null,["$","$L3",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L4",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":["__PAGE__",["$","$1","c",{"children":[["$","div",null,{"className":"m-40 text-center","children":[["$","h1",null,{"className":"text-4xl font-bold","children":["explore some ",["$","span",null,{"className":"text-yellow-500 text-5xl","children":" Hot Deals 🔥 "}]]}],["$","p",null,{"className":"text-2xl font-medium p-3","children":"Hot deals coming soon"}]]}],null,["$","$L5",null,{"children":["$L6",["$","$L7",null,{"promise":"$@8"}]]}]]}],{},null,false]},null,false]},null,false],["$","$1","h",{"children":[null,[["$","$L9",null,{"children":"$La"}],null],["$","$Lb",null,{"children":["$","div",null,{"hidden":true,"children":["$","$c",null,{"fallback":null,"children":"$Ld"}]}]}]]}],false]],"m":"$undefined","G":["$e",[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/d57c01a8aa243ffd.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]]],"s":false,"S":true}
+f:I[60043,["/_next/static/chunks/b1a2e2c8bc025ac7.js"],"default"]
+10:I[36343,["/_next/static/chunks/b1a2e2c8bc025ac7.js"],"default"]
+11:I[26158,["/_next/static/chunks/b1a2e2c8bc025ac7.js"],"default"]
+12:I[36994,["/_next/static/chunks/b1a2e2c8bc025ac7.js","/_next/static/chunks/7e32adbbc3f5a2ca.js"],"default"]
+13:I[97057,["/_next/static/chunks/b1a2e2c8bc025ac7.js"],"ToastContainer"]
+14:I[12505,["/_next/static/chunks/b1a2e2c8bc025ac7.js"],"Footer"]
+2:["$","html",null,{"lang":"en","suppressHydrationWarning":true,"children":["$","body",null,{"children":["$","$Lf",null,{"children":["$","$L10",null,{"children":[["$","$L11",null,{}],["$","$L3",null,{"parallelRouterKey":"children","error":"$12","errorStyles":[],"errorScripts":[["$","script","script-0",{"src":"/_next/static/chunks/7e32adbbc3f5a2ca.js","async":true}]],"template":["$","$L4",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[["$","div",null,{"className":"m-50","children":[["$","h1",null,{"className":"text-5xl text-center font-bold","children":[["$","span",null,{"className":"text-yellow-500","children":"404 not found "}],"page!"]}],["$","p",null,{"className":"text-2xl text-center","children":"the page you try to open not found!"}]]}],[]],"forbidden":"$undefined","unauthorized":"$undefined"}],["$","$L13",null,{}],["$","$L14",null,{}]]}]}]}]}]
+a:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
+6:null
+15:I[27201,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/7dc95fbec1e0051b.js"],"IconMark"]
+8:{"metadata":[["$","title","0",{"children":"Egyzon"}],["$","meta","1",{"name":"description","content":"Egyzon is brand new in ecommerce websites in egypt"}],["$","link","2",{"rel":"icon","href":"/favicon.ico?favicon.9a060314.ico","sizes":"256x256","type":"image/x-icon"}],["$","$L15","3",{}]],"error":null,"digest":"$undefined"}
+d:"$8:metadata"

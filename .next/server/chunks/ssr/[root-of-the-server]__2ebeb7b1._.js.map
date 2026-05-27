@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 3, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
-    {"offset": {"line": 23, "column": 0}, "map": {"version":3,"sources":["file:///G:/Projects/egyzon-v2/app/Deals/page.jsx"],"sourcesContent":["import React from \"react\";\r\n\r\nexport default function Deals() {\r\n  return (\r\n    <div className='m-40 text-center'>\r\n        <h1 className='text-4xl font-bold'>explore some <span className='text-yellow-500 text-5xl'> Hot Deals &#128293; </span></h1>\r\n        <p className='text-2xl font-medium p-3'>Hot deals coming soon</p>\r\n    </div>\r\n  );\r\n}\r\n"],"names":[],"mappings":";;;;;AAAA;;;AAEe,SAAS;IACtB,qBACE,8OAAC;QAAI,WAAU;;0BACX,8OAAC;gBAAG,WAAU;;oBAAqB;kCAAa,8OAAC;wBAAK,WAAU;kCAA2B;;;;;;;;;;;;0BAC3F,8OAAC;gBAAE,WAAU;0BAA2B;;;;;;;;;;;;AAGhD","debugId":null}}]
-}

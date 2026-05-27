@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/amrassal/Documents/Git-Projects/egyzon-v2/app/%28auth%29/layout.jsx"],"sourcesContent":["export default function AuthLayout({ children }) {\n  return (\n    <div className=\"min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8\">\n      {children}\n    </div>\n  );\n}\n"],"names":[],"mappings":";;;;;;AAAe,SAAS,WAAW,EAAE,QAAQ,EAAE;IAC7C,qBACE,8RAAC;QAAI,WAAU;kBACZ;;;;;;AAGP","debugId":null}}]
-}

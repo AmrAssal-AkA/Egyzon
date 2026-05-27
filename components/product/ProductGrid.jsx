@@ -12,7 +12,7 @@ export default function ProductGrid({ products }) {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto mt-8">
+    <div className="w-full max-w-6xl mx-auto mt-8 dark:shadow-gray-700">
       {!products || products.length === 0 ? (
         <div className="flex justify-center items-center h-64 bg-gray-50 rounded-2xl">
           <p className="text-lg text-gray-500 font-medium">
@@ -27,7 +27,7 @@ export default function ProductGrid({ products }) {
               key={product.id}
               className="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-md shadow-amber-400 hover:shadow-xl transition-all duration-300 border border-gray-100 h-full dark:bg-gray-800 dark:border-gray-700"
             >
-              <div className="relative aspect-square sm:aspect-[4/5] overflow-hidden bg-white p-4 sm:p-6 flex justify-center items-center">
+              <div className="relative aspect-square sm:aspect-[4/5] overflow-hidden bg-white p-4 sm:p-6 flex justify-center items-center dark:bg-gray-700">
                 <img
                   src={product.image}
                   alt={product.name}

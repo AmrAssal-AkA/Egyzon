@@ -1,28 +1,17 @@
 {
   "pages": {
     "/(auth)/login/page": [
-      "static/chunks/0385e_next_dist_84d48cc6._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_app_favicon_ico_mjs_c7523331._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_6efb8cae._.css",
-      "static/chunks/0385e_aa542f54._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_afb65b6d._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_app_layout_jsx_1638bf46._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_app_error_jsx_395ae348._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_app_error_jsx_85680977._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_app_not-found_jsx_81100691._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_app_not-found_jsx_85680977._.js",
-      "static/chunks/0385e_next_dist_client_components_builtin_global-error_85680977.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_c93e6310._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_app_(auth)_login_page_jsx_85680977._.js",
-      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_4712aafb._.js",
-      "static/chunks/0385e_next_dist_compiled_react-dom_bd681c31._.js",
-      "static/chunks/0385e_next_dist_compiled_next-devtools_index_24188ce5.js",
-      "static/chunks/0385e_next_dist_compiled_ba6315b2._.js",
-      "static/chunks/0385e_next_dist_client_71078ec0._.js",
-      "static/chunks/0385e_next_dist_2794bf37._.js",
-      "static/chunks/0385e_@swc_helpers_cjs_8a050d34._.js",
-      "static/chunks/Documents_Git-Projects_egyzon-v2_a0ff3932._.js",
-      "static/chunks/turbopack-Documents_Git-Projects_egyzon-v2_887a3abe._.js"
+      "static/chunks/ff1a16fafef87110.js",
+      "static/chunks/7dc95fbec1e0051b.js",
+      "static/chunks/d57c01a8aa243ffd.css",
+      "static/chunks/b1a2e2c8bc025ac7.js",
+      "static/chunks/7e32adbbc3f5a2ca.js",
+      "static/chunks/8391752ed3ac386f.js",
+      "static/chunks/ee7bf2650e6b54f7.js",
+      "static/chunks/2e71a1a701aa0d9e.js",
+      "static/chunks/7880f8283a6f3daf.js",
+      "static/chunks/8082ab48faca5ea1.js",
+      "static/chunks/turbopack-8df44133c2dd0236.js"
     ]
   }
 }

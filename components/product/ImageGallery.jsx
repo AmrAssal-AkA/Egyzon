@@ -16,10 +16,10 @@ export default function ImageGallery({ product }) {
     );
   };
   return (
-    <div className="grid lg:grid-cols-2 gap-12">
-      <div className="space-y-4">
-        <div className="relative group">
-          <div className="aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+    <div className="grid lg:grid-cols-2 gap-12 dark:shadow-gray-700">
+      <div className="space-y-4 dark:shadow-gray-700  ">
+        <div className="relative group ">
+          <div className="aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 ">
             <img
               src={product.image[selectedImage]}
               alt={product.name}

@@ -57,7 +57,7 @@ function ProductGrid({ products }) {
         addToCart(product, 1);
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "w-full max-w-6xl mx-auto mt-8",
+        className: "w-full max-w-6xl mx-auto mt-8 dark:shadow-gray-700",
         children: !products || products.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "flex justify-center items-center h-64 bg-gray-50 rounded-2xl",
             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -79,7 +79,7 @@ function ProductGrid({ products }) {
                     className: "group flex flex-col bg-white rounded-2xl overflow-hidden shadow-md shadow-amber-400 hover:shadow-xl transition-all duration-300 border border-gray-100 h-full dark:bg-gray-800 dark:border-gray-700",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "relative aspect-square sm:aspect-[4/5] overflow-hidden bg-white p-4 sm:p-6 flex justify-center items-center",
+                            className: "relative aspect-square sm:aspect-[4/5] overflow-hidden bg-white p-4 sm:p-6 flex justify-center items-center dark:bg-gray-700",
                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
                                 src: product.image,
                                 alt: product.name,
