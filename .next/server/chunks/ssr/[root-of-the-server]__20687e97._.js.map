@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 3, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
+    {"offset": {"line": 23, "column": 0}, "map": {"version":3,"sources":["file:///Users/amrassal/Documents/Git-Projects/Egyzon/app/%28store%29/cart/page.jsx"],"sourcesContent":["import CartPage from \"../../components/product/cartpage\";\n\nexport default async function Cart() {\n\n  return (\n    <div className=\"mt-40\">\n      <CartPage />\n    </div>\n  );\n}\n"],"names":[],"mappings":";;;;;;;;;;;;AAEe,eAAe;IAE5B,qBACE,8OAAC;QAAI,WAAU;kBACb,cAAA,8OAAC;;;;;;;;;;AAGP","debugId":null}}]
+}

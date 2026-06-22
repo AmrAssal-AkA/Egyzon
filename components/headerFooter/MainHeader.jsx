@@ -23,8 +23,8 @@ import ToggleTheme from "./ToggleTheme";
 const categoryLinks = [
   { name: "Products", path: "/products" },
   { name: "Deals", path: "/Deals" },
-  { name: "Best Sellers", path: "/best-sellers" },
-  { name: "New Arrivals", path: "/new-arrivals" },
+  { name: "Best Sellers", path: "/bestseller" },
+  { name: "New Arrivals", path: "/newArrival" },
   { name: "Electronics", path: `/categories/electronics` },
   { name: "Fashion", path: `/categories/fashion` },
   { name: "Home & Kitchen", path: `/categories/home-kitchen` },
@@ -69,11 +69,11 @@ export default function Mainheader({ user }) {
               <input
                 type="text"
                 placeholder="Search products..."
-                className="w-full px-4 py-2 rounded-l-md border-none focus:outline-none focus:ring-2 focus:ring-black text-black bg-white"
+                className="w-full px-4 py-2 rounded-l-md border-none focus:outline-none focus:ring-2 focus:ring-yellow-500 text-gray-900 bg-white dark:bg-gray-700 dark:text-white dark:focus:ring-yellow-400 dark:placeholder:text-gray-400 placeholder:text-gray-500 transition-colors"
               />
               <button
                 type="button"
-                className="bg-black text-yellow-400 px-5 py-2 rounded-r-md font-bold hover:bg-gray-800 transition-colors flex items-center justify-center"
+                className="bg-gray-900 text-yellow-400 px-5 py-2 rounded-r-md font-bold hover:bg-gray-950 dark:bg-yellow-500 dark:text-black dark:hover:bg-yellow-600 transition-colors flex items-center justify-center"
               >
                 <Search size={20} />
               </button>
@@ -162,7 +162,7 @@ export default function Mainheader({ user }) {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setOpen(!Open)}
-              className="md:hidden p-2 text-black bg-yellow-500/20 hover:bg-yellow-500/50 rounded-full transition-colors flex items-center justify-center focus:outline-none"
+              className="md:hidden p-2 text-black bg-yellow-500/20 hover:bg-yellow-500/50 rounded-full transition-colors flex items-center justify-center focus:outline-none dark:text-white dark:bg-gray-700 dark:hover:bg-gray-600"
               aria-label="Toggle navigation"
             >
               {Open ? (
@@ -175,16 +175,16 @@ export default function Mainheader({ user }) {
         </div>
 
         {/* Mobile Search Bar */}
-        <div className="md:hidden pb-3">
+        <div className="md:hidden pb-3 px-4 sm:px-6">
           <div className="flex w-full shadow-sm">
             <input
               type="text"
               placeholder="Search products..."
-              className="w-full px-4 py-2 rounded-l-md border-none focus:outline-none focus:ring-2 focus:ring-black text-black"
+              className="w-full px-4 py-2 rounded-l-md border-none focus:outline-none focus:ring-2 focus:ring-yellow-500 text-gray-900 bg-white dark:bg-gray-700 dark:text-white dark:focus:ring-yellow-400 dark:placeholder:text-gray-400 placeholder:text-gray-500 transition-colors"
             />
             <button
               type="button"
-              className="bg-black text-yellow-400 px-4 py-2 rounded-r-md font-bold hover:bg-gray-800 transition-colors flex items-center justify-center"
+              className="bg-gray-900 text-yellow-400 px-4 py-2 rounded-r-md font-bold hover:bg-gray-950 transition-colors flex items-center justify-center dark:bg-yellow-500 dark:text-black dark:hover:bg-yellow-600"
             >
               <Search size={20} />
             </button>
@@ -192,15 +192,94 @@ export default function Mainheader({ user }) {
         </div>
       </div>
 
+      {/* Mobile Menu */}
+      <div
+        className={`md:hidden absolute top-full left-0 w-full bg-yellow-400/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-lg transition-all duration-300 ease-in-out overflow-hidden ${
+          Open ? "max-h-screen" : "max-h-0"
+        }`}
+      >
+        <div className="flex flex-col px-4 pt-4 pb-8 gap-4">
+          {user ? (
+            <div className="flex items-center gap-3 border-b border-yellow-500/50 dark:border-gray-700 pb-4">
+              <CircleUserRound
+                size={40}
+                className="text-black dark:text-white"
+              />
+              <div>
+                <p className="font-bold text-black dark:text-white">
+                  {user.name}
+                </p>
+                <p className="text-sm text-gray-700 dark:text-gray-400">
+                  {user.email}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 border-b border-yellow-500/50 dark:border-gray-700 pb-4">
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className="flex items-center justify-center gap-2 py-2.5 px-4 bg-black text-yellow-400 rounded-md font-semibold transition-colors hover:bg-gray-800 dark:bg-yellow-500 dark:text-black dark:hover:bg-yellow-600"
+              >
+                <LogIn size={18} />
+                <span>Login</span>
+              </Link>
+              <Link
+                href="/signup"
+                onClick={() => setOpen(false)}
+                className="flex items-center justify-center gap-2 py-2.5 px-4 bg-white text-black rounded-md font-semibold transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+              >
+                <UserPlus size={18} />
+                <span>Sign Up</span>
+              </Link>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-black dark:text-white">
+              Appearance
+            </span>
+            <ToggleTheme />
+          </div>
+
+          {user && (
+            <>
+              <Link
+                href="/profile/settings"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 py-2 text-black dark:text-white font-medium"
+              >
+                <Settings size={20} />
+                <span>Settings</span>
+              </Link>
+              <form action={logout} className="w-full">
+                <button
+                  type="submit"
+                  onClick={() => setOpen(false)}
+                  className="w-full flex items-center gap-3 py-2 text-red-600 dark:text-red-400 font-medium"
+                >
+                  <LogOut size={20} />
+                  <span>Logout</span>
+                </button>
+              </form>
+            </>
+          )}
+        </div>
+      </div>
+
       {/* Secondary Navigation */}
-      <div className="bg-yellow-500 border-t border-yellow-600/30 dark:bg-gray-700 dark:border-gray-600/30">
+      <div className="hidden md:block bg-yellow-500 border-t border-yellow-600/30 dark:bg-gray-700 dark:border-gray-600/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10">
-          <ul className="flex items-center gap-6 overflow-x-auto py-2.5 text-sm font-semibold text-yellow-950 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <ul className="flex items-center gap-6 overflow-x-auto py-2.5 text-sm font-semibold text-yellow-950 dark:text-yellow-50 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {categoryLinks.map((link) => (
               <li key={link.name} className="whitespace-nowrap shrink-0">
                 <Link
                   href={link.path}
-                  className="hover:text-black hover:underline underline-offset-4 decoration-2 transition-all dark:text-white dark:hover:text-yellow-400"
+                  className={`py-1.5 px-2 rounded-md transition-colors ${
+                    currentPath === link.path
+                      ? "bg-black text-yellow-400 dark:bg-yellow-400 dark:text-black"
+                      : "hover:bg-black/10 dark:hover:bg-white/10"
+                  }`}
                 >
                   {link.name}
                 </Link>
@@ -208,78 +287,6 @@ export default function Mainheader({ user }) {
             ))}
           </ul>
         </div>
-      </div>
-
-      {/* Mobile Navigation Panel */}
-      <div
-        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out bg-yellow-400 border-t border-yellow-500/30 shadow-inner ${
-          Open ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
-        }`}
-      >
-        <ul className="flex flex-col px-6 pt-4 pb-6 space-y-2">
-          {categoryLinks.map((link) => (
-            <li key={link.name}>
-              <Link
-                href={link.path}
-                onClick={() => setOpen(false)}
-                className={`block px-4 py-3 rounded-lg text-base font-bold transition-colors ${
-                  currentPath === link.path
-                    ? "bg-yellow-500/40 text-yellow-950"
-                    : "text-black hover:bg-yellow-500/20"
-                }`}
-              >
-                {link.name}
-              </Link>
-            </li>
-          ))}
-
-          {/* Mobile Account Actions */}
-          <li className="pt-4 mt-2 border-t border-yellow-500/30">
-            <div className="px-4 pb-3 text-xs font-bold text-yellow-800 uppercase tracking-wider">
-              Account
-            </div>
-            {user ? (
-              <div className="flex flex-col space-y-2">
-                <Link
-                  href="/profile/settings"
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold text-black hover:bg-yellow-500/20 transition-colors"
-                >
-                  <Settings className="w-5 h-5" />
-                  <span>Settings</span>
-                </Link>
-                <form action={logout} className="w-full">
-                  <button
-                    type="submit"
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold text-red-700 hover:bg-red-50 transition-colors"
-                  >
-                    <LogOut className="w-5 h-5" />
-                    <span>Logout</span>
-                  </button>
-                </form>
-              </div>
-            ) : (
-              <div className="flex flex-col space-y-2">
-                <Link
-                  href="/login"
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold text-black hover:bg-yellow-500/20 transition-colors"
-                >
-                  <LogIn className="w-5 h-5" />
-                  <span>Login</span>
-                </Link>
-                <Link
-                  href="/signup"
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold text-black hover:bg-yellow-500/20 transition-colors"
-                >
-                  <UserPlus className="w-5 h-5" />
-                  <span>Sign Up</span>
-                </Link>
-              </div>
-            )}
-          </li>
-        </ul>
       </div>
     </nav>
   );

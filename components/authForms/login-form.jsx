@@ -45,7 +45,7 @@ export default function LoginForm() {
 
   return (
     <form
-      className="w-full max-w-md bg-gradient-to-br from-white to-gray-50 p-10 rounded-2xl shadow-lg border border-gray-100 dark:bg-gray-800 dark:from-gray-900 dark:to-gray-800 dark:border-gray-700"
+      className="w-full max-w-md bg-gradient-to-br from-white to-gray-50 p-10 rounded-2xl shadow-lg border border-gray-100 dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-900 dark:border-gray-700"
       onSubmit={handleLogin}
     >
       {/* Email Field */}

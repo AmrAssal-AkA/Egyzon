@@ -25,15 +25,24 @@ function SignUpForm() {
     e.preventDefault();
 
     //user error handling
-    if(!firstName || !lastName || firstName.trim() === "" || lastName.trim() === "") {
+    if (
+      !firstName ||
+      !lastName ||
+      firstName.trim() === "" ||
+      lastName.trim() === ""
+    ) {
       setNameError("Please enter both first and last name.");
       return;
     }
-    if(!email || email.trim() === "" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (
+      !email ||
+      email.trim() === "" ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    ) {
       setEmailError("Please enter a valid email address.");
       return;
     }
-    if(!password || password.trim() === "" || password.length < 6) {
+    if (!password || password.trim() === "" || password.length < 6) {
       setPasswordError("Please enter a password with at least 6 characters.");
       return;
     }
@@ -45,12 +54,11 @@ function SignUpForm() {
     setLoading(true);
 
     // waiting for Auth Api integration (Backend is not ready yet)
-
   };
 
   return (
     <form
-      className="w-full max-w-md bg-gradient-to-br from-white to-gray-50 p-10 rounded-2xl shadow-lg border border-gray-100 dark:bg-gray-800 dark:from-gray-900 dark:to-gray-800 dark:border-gray-700"
+      className="w-full max-w-md bg-gradient-to-br from-white to-gray-50 p-10 rounded-2xl shadow-lg border border-gray-100 dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-900 dark:border-gray-700"
       onSubmit={handleSignUp}
     >
       {/* Name Fields - Side by Side */}
@@ -87,7 +95,9 @@ function SignUpForm() {
             onChange={(e) => setLastName(e.target.value)}
           />
         </div>
-        {NameError && <p className="text-red-500 text-sm mt-2 col-span-2">{NameError}</p>}
+        {NameError && (
+          <p className="text-red-500 text-sm mt-2 col-span-2">{NameError}</p>
+        )}
       </div>
 
       {/* Email Field */}
@@ -106,7 +116,9 @@ function SignUpForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value.toLowerCase())}
         />
-        {emailError && <p className="text-red-500 text-sm mt-2">{emailError}</p>}
+        {emailError && (
+          <p className="text-red-500 text-sm mt-2">{emailError}</p>
+        )}
       </div>
 
       {/* Password Field */}
@@ -145,7 +157,9 @@ function SignUpForm() {
             {passwordVisible ? <EyeClosed size={20} /> : <Eye size={20} />}
           </button>
         </div>
-        {passwordError && <p className="text-red-500 text-sm mt-2">{passwordError}</p>}
+        {passwordError && (
+          <p className="text-red-500 text-sm mt-2">{passwordError}</p>
+        )}
       </div>
 
       {/* Submit Button */}
@@ -156,8 +170,8 @@ function SignUpForm() {
       >
         {loading ? "Signing Up..." : "Sign Up"}
       </button>
-          {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
-          {success && <p className="text-green-500 text-sm mt-4">{success}</p>}
+      {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
+      {success && <p className="text-green-500 text-sm mt-4">{success}</p>}
     </form>
   );
 }

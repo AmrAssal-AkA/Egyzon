@@ -1,7 +1,12 @@
 {
+  "/(store)/Deals/page": "app/(store)/Deals/page.js",
+  "/(store)/bestseller/page": "app/(store)/bestseller/page.js",
+  "/(store)/cart/page": "app/(store)/cart/page.js",
+  "/(store)/products/[productId]/page": "app/(store)/products/[productId]/page.js",
+  "/(store)/products/page": "app/(store)/products/page.js",
+  "/Partner/Register/page": "app/Partner/Register/page.js",
+  "/Partner/page": "app/Partner/page.js",
   "/_not-found/page": "app/_not-found/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/page": "app/page.js",
-  "/products/[productId]/page": "app/products/[productId]/page.js",
-  "/products/page": "app/products/page.js"
+  "/page": "app/page.js"
 }

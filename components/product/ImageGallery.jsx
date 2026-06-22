@@ -12,7 +12,7 @@ export default function ImageGallery({ product }) {
 
   const prevImage = () => {
     setSelectedImage(
-      (prev) => (prev - 1 + product.images.length) % product.images.length
+      (prev) => (prev - 1 + product.images.length) % product.images.length,
     );
   };
   return (
@@ -31,13 +31,13 @@ export default function ImageGallery({ product }) {
 
         <button
           onClick={prevImage}
-          className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all transform -translate-x-2 group-hover:translate-x-0"
+          className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-700 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all transform -translate-x-2 group-hover:translate-x-0 text-gray-900 dark:text-white"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
         <button
           onClick={nextImage}
-          className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0"
+          className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-700 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0 text-gray-900 dark:text-white"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
@@ -45,7 +45,7 @@ export default function ImageGallery({ product }) {
         {/* Favorite Button */}
         <button
           onClick={() => setIsFavorited(!isFavorited)}
-          className="absolute top-4 right-4 bg-white bg-opacity-90 hover:bg-white p-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110"
+          className="absolute top-4 right-4 bg-white dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-90 hover:bg-white dark:hover:bg-gray-700 p-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110"
         >
           <Heart
             className={`w-6 h-6 transition-colors ${
@@ -65,7 +65,7 @@ export default function ImageGallery({ product }) {
               selectedImage === index
                 ? "ring-2 ring-yellow-500 scale-105"
                 : "hover:scale-105 opacity-70 hover:opacity-100"
-            }`}
+            } dark:ring-yellow-400`}
           >
             <img src={image} alt="" className="w-full h-full object-cover" />
           </button>

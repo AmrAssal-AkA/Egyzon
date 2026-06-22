@@ -110,7 +110,12 @@ const ProductsData = [
         price: 75000,
         image: "/productImages/iphone 17.webp",
         description: "Meet the new iPhone 17. Designed with contoured edges, thinner borders, and durable materials like Ceramic Shield 2 on the front, it looks — and stays — beautiful. You can see and do more of everything you love on a 6.3-inch Super Retina XDR display.5 And enjoy smoother scrolling and more immersive gaming with ProMotion, with an adaptive refresh rate up to 120Hz. Take it for a spin.",
-        category: "electronics"
+        category: "electronics",
+        rating: 4.9,
+        stock: 10,
+        seller: "Apple",
+        createdAt: "2023-05-15T09:30:00Z",
+        sales: 120
     },
     {
         id: "2",
@@ -118,7 +123,12 @@ const ProductsData = [
         price: 65000,
         image: "/productImages/samsung S25.jpeg",
         description: "The Samsung Galaxy S25 Ultra features a powerful Snapdragon 8 Elite processor, a vibrant 6.9-inch QHD+ display with a 120Hz refresh rate and Gorilla Glass Armor 2 for enhanced durability and reduced glare, and a versatile camera system led by a 200MP main sensor and a new 50MP ultra-wide lens. It boasts enhanced AI features through a Gemini/Bixby hybrid assistant ,a refined design with rounded corners and a titanium frame",
-        category: "electronics"
+        category: "electronics",
+        rating: 4.8,
+        stock: 15,
+        seller: "Samsung",
+        createdAt: "2023-05-15T09:30:00Z",
+        sales: 120
     },
     {
         id: "3",
@@ -126,7 +136,12 @@ const ProductsData = [
         price: 30000,
         image: "/productImages/ps5.jpg",
         description: "The PlayStation 5 (PS5) is Sony's powerful fifth-generation game console featuring an ultra-high-speed SSD for rapid load times, a custom CPU/GPU for stunning graphics and high frame rates up to 120fps, and support for advanced features like 4K resolution, ray tracing, haptic feedback, adaptive triggers, and 3D Audio for immersive gameplay. It offers backward compatibility with most PS4 games, a DualSense controller with tactile feedback, and access to a vast library of PlayStation games.",
-        category: "electronics"
+        category: "electronics",
+        rating: 4.7,
+        stock: 10,
+        seller: "Sony",
+        createdAt: "2023-05-15T09:30:00Z",
+        sales: 120
     },
     {
         id: "4",
@@ -134,7 +149,12 @@ const ProductsData = [
         price: 25000,
         image: "/productImages/xbox-series-x.png",
         description: "The Xbox Series X is Microsoft's powerful, high-performance gaming console designed for an unparalleled next-generation experience , featuring a custom AMD processor, a 1TB SSD for fast loading, Quick Resume to switch between games instantly, DirectX ray tracing for realistic graphics, 4K resolution support, and backward compatibility with thousands of Xbox One, Xbox 360, and original Xbox games.  ",
-        category: "electronics"
+        category: "electronics",
+        rating: 4.6,
+        stock: 10,
+        seller: "Microsoft",
+        createdAt: "2023-05-15T09:30:00Z",
+        sales: 120
     },
     {
         id: "5",
@@ -142,7 +162,12 @@ const ProductsData = [
         name: "MacBook Pro M4",
         price: 120000,
         category: "electronics",
-        description: "The latest MacBook Pro with the powerful M4 chip."
+        description: "The latest MacBook Pro with the powerful M4 chip.",
+        rating: 4.9,
+        stock: 10,
+        seller: "Apple",
+        createdAt: "2023-05-15T09:30:00Z",
+        sales: 120
     },
     {
         id: "6",
@@ -150,7 +175,12 @@ const ProductsData = [
         image: "/productImages/Sony WH-1000XM4.avif",
         price: 1500,
         category: "electronics",
-        description: "Sony WH-1000XM4 Wireless Noise-Cancelling Headphones."
+        description: "Sony WH-1000XM4 Wireless Noise-Cancelling Headphones.",
+        rating: 4.8,
+        stock: 10,
+        seller: "Sony",
+        createdAt: "2023-05-15T09:30:00Z",
+        sales: 120
     },
     {
         id: "7",
@@ -158,7 +188,77 @@ const ProductsData = [
         image: "/productImages/dell xps.avif",
         price: 15000,
         category: "electronics",
-        description: "Dell XPS laptop with high-resolution display and powerful performance."
+        description: "Dell XPS laptop with high-resolution display and powerful performance.",
+        rating: 4.5,
+        stock: 15,
+        seller: "Dell",
+        createdAt: "2023-05-15T09:30:00Z",
+        sales: 120
+    },
+    {
+        id: "8",
+        name: "T-shirt",
+        price: 500,
+        image: "/productImages/t-shirt.jpg",
+        description: "A comfortable cotton t-shirt.",
+        category: "fashion",
+        rating: 4.2,
+        stock: 100,
+        seller: "FashionBrand",
+        createdAt: "2023-06-01T10:00:00Z",
+        sales: 300
+    },
+    {
+        id: "9",
+        name: "Jeans",
+        price: 1200,
+        image: "/productImages/jeans.jpg",
+        description: "Stylish blue jeans.",
+        category: "fashion",
+        rating: 4.6,
+        stock: 80,
+        seller: "FashionBrand",
+        createdAt: "2023-05-20T14:00:00Z",
+        sales: 250
+    },
+    {
+        id: "10",
+        name: "Organic Apples",
+        price: 150,
+        image: "/productImages/apples.jpg",
+        description: "Fresh organic apples.",
+        category: "grocery",
+        rating: 4.8,
+        stock: 200,
+        seller: "FreshFarms",
+        createdAt: "2023-06-10T08:00:00Z",
+        sales: 500
+    },
+    {
+        id: "11",
+        name: "Car Wax",
+        price: 300,
+        image: "/productImages/car-wax.jpg",
+        description: "High-quality car wax for a brilliant shine.",
+        category: "car-care",
+        rating: 4.7,
+        stock: 50,
+        seller: "AutoShine",
+        createdAt: "2023-04-25T11:20:00Z",
+        sales: 150
+    },
+    {
+        id: "12",
+        name: "The Great Gatsby",
+        price: 250,
+        image: "/productImages/gatsby.jpg",
+        description: "A classic novel by F. Scott Fitzgerald.",
+        category: "books",
+        rating: 4.9,
+        stock: 120,
+        seller: "BookWorld",
+        createdAt: "2023-03-10T18:45:00Z",
+        sales: 400
     }
 ];
 const categories = [
@@ -173,7 +273,7 @@ const categories = [
     {
         id: 2,
         name: "Car Care",
-        slug: "care-care",
+        slug: "car-care",
         image: "HomePage/car-care.jpg",
         description: "Car Care Products – Shine, Protect & Refresh Your Ride",
         color: "bg-yellow-400"
@@ -228,54 +328,47 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 ;
 function CategoryGrid({ categories }) {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 max-w-6xl mx-auto mt-5 shadow-lg dark:shadow-gray-700",
+        className: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 max-w-6xl mx-auto mt-5",
         children: categories.map((category)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"], {
                 href: `/categories/${category.slug}`,
-                className: "bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col h-full",
-                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col h-full  dark:bg-gray-800 dark:border-gray-700",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
-                            src: category.image,
-                            alt: category.name,
-                            className: "w-full h-64 object-cover"
-                        }, void 0, false, {
-                            fileName: "[project]/components/category/categoryGrid.jsx",
-                            lineNumber: 17,
-                            columnNumber: 13
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "p-4 text-center flex-grow flex flex-col justify-start dark:text-white",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                    className: "text-2xl font-semibold mb-2 ",
-                                    children: category.name
-                                }, void 0, false, {
-                                    fileName: "[project]/components/category/categoryGrid.jsx",
-                                    lineNumber: 23,
-                                    columnNumber: 15
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    className: "light:text-gray-600 mb-4 dark:text-gray-200",
-                                    children: category.description
-                                }, void 0, false, {
-                                    fileName: "[project]/components/category/categoryGrid.jsx",
-                                    lineNumber: 24,
-                                    columnNumber: 15
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/components/category/categoryGrid.jsx",
-                            lineNumber: 22,
-                            columnNumber: 13
-                        }, this)
-                    ]
-                }, category.id, true, {
-                    fileName: "[project]/components/category/categoryGrid.jsx",
-                    lineNumber: 13,
-                    columnNumber: 11
-                }, this)
-            }, category.id, false, {
+                className: "bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col h-full dark:bg-gray-800 dark:shadow-gray-700 dark:hover:shadow-gray-600 dark:border dark:border-gray-700",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                        src: category.image,
+                        alt: category.name,
+                        className: "w-full h-64 object-cover"
+                    }, void 0, false, {
+                        fileName: "[project]/components/category/categoryGrid.jsx",
+                        lineNumber: 13,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "p-4 text-center flex-grow flex flex-col justify-start dark:text-white",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                className: "text-2xl font-semibold mb-2 text-gray-900 dark:text-white",
+                                children: category.name
+                            }, void 0, false, {
+                                fileName: "[project]/components/category/categoryGrid.jsx",
+                                lineNumber: 19,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                className: "text-gray-600 mb-4 dark:text-gray-300",
+                                children: category.description
+                            }, void 0, false, {
+                                fileName: "[project]/components/category/categoryGrid.jsx",
+                                lineNumber: 22,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/components/category/categoryGrid.jsx",
+                        lineNumber: 18,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, category.id, true, {
                 fileName: "[project]/components/category/categoryGrid.jsx",
                 lineNumber: 8,
                 columnNumber: 9
@@ -312,33 +405,34 @@ async function Home() {
     const NumberOfCategory = 4;
     const categoriesToShow = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$Products$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["categories"].slice(0, NumberOfCategory);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
-        className: "mt-30 justify-center",
+        className: "mt-30 justify-center bg-white dark:bg-gray-900",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$HomePage$2f$carousel$2e$jsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                 fileName: "[project]/app/page.jsx",
-                lineNumber: 20,
-                columnNumber: 9
+                lineNumber: 17,
+                columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
                 className: "m-8",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                        className: "text-5xl text-center font-bold font-serif",
+                        className: "text-5xl text-center font-bold font-serif text-gray-900 dark:text-white",
                         children: [
-                            "Latest ",
+                            "Latest",
+                            " ",
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                className: "text-yellow-400",
+                                className: "text-yellow-400 dark:text-yellow-400",
                                 children: "Products"
                             }, void 0, false, {
                                 fileName: "[project]/app/page.jsx",
-                                lineNumber: 25,
-                                columnNumber: 18
+                                lineNumber: 23,
+                                columnNumber: 11
                             }, this),
                             " "
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/page.jsx",
-                        lineNumber: 24,
+                        lineNumber: 21,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$product$2f$ProductGrid$2e$jsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"], {
@@ -351,23 +445,24 @@ async function Home() {
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/page.jsx",
-                lineNumber: 23,
+                lineNumber: 20,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
                 className: "m-8",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                        className: "text-5xl text-center font-bold m-10",
+                        className: "text-5xl text-center font-bold m-10 text-gray-900 dark:text-white",
                         children: [
-                            "Top ",
+                            "Top",
+                            " ",
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                className: "text-yellow-400",
+                                className: "text-yellow-400 dark:text-yellow-400",
                                 children: "Categories"
                             }, void 0, false, {
                                 fileName: "[project]/app/page.jsx",
-                                lineNumber: 31,
-                                columnNumber: 65
+                                lineNumber: 33,
+                                columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
@@ -379,8 +474,8 @@ async function Home() {
                         categories: categoriesToShow
                     }, void 0, false, {
                         fileName: "[project]/app/page.jsx",
-                        lineNumber: 32,
-                        columnNumber: 11
+                        lineNumber: 37,
+                        columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
@@ -391,7 +486,7 @@ async function Home() {
         ]
     }, void 0, true, {
         fileName: "[project]/app/page.jsx",
-        lineNumber: 19,
+        lineNumber: 16,
         columnNumber: 5
     }, this);
 }

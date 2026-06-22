@@ -16,7 +16,7 @@ export default function productDetailPage({ product }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black py-8">
+    <div className="min-h-screen bg-white dark:bg-gray-900 py-8">
       <div className="mx-auto px-2 sm:px-3 lg:px-4">
         <div className="lg:grid lg:grid-cols-12 lg:items-start gap-2 xl:gap-3">
           {/* Left Column: Product Image Gallery */}
@@ -138,19 +138,25 @@ export default function productDetailPage({ product }) {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-0 text-xs sm:text-sm dark:text-gray-300">
             <div className="flex justify-between py-1 border-b border-gray-50 dark:border-gray-800/30">
-              <span className="text-gray-500 font-medium dark:text-gray-400">Category</span>
+              <span className="text-gray-500 font-medium dark:text-gray-400">
+                Category
+              </span>
               <span className="text-gray-900 font-bold dark:text-gray-200">
                 {product.category}
               </span>
             </div>
             <div className="flex justify-between py-1 border-b border-gray-50 dark:border-gray-800/30">
-              <span className="text-gray-500 font-medium dark:text-gray-400">Warranty</span>
+              <span className="text-gray-500 font-medium dark:text-gray-400">
+                Warranty
+              </span>
               <span className="text-gray-900 font-bold dark:text-gray-200">
                 1 Year Local Warranty
               </span>
             </div>
             <div className="flex justify-between py-1 border-b border-gray-50 dark:border-gray-800/30">
-              <span className="text-gray-500 font-medium dark:text-gray-400">Shipping</span>
+              <span className="text-gray-500 font-medium dark:text-gray-400">
+                Shipping
+              </span>
               <span className="text-gray-900 font-bold dark:text-gray-200">
                 Fulfilled by Egyzon
               </span>

@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 3, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
+    {"offset": {"line": 23, "column": 0}, "map": {"version":3,"sources":["file:///Users/amrassal/Documents/Git-Projects/Egyzon/app/Partner/Register/page.jsx"],"sourcesContent":["import React from 'react'\n\nfunction RegisterFormPage() {\n  return (\n    <main className=\"flex flex-col items-center justify-center min-h-screen py-2\">\n        <div className=\"w-full max-w-4xl px-4 shadow-2xl shadow-amber-500 dark:shadow-amber-500/50 rounded-lg bg-white dark:bg-gray-800\">\n            <h1 className=\"text-3xl font-bold text-center text-gray-900 dark:text-white mb-6\">Partner Registration</h1>\n        </div>\n    </main>\n  )\n}\n\nexport default RegisterFormPage"],"names":[],"mappings":";;;;;AAAA;;;AAEA,SAAS;IACP,qBACE,8OAAC;QAAK,WAAU;kBACZ,cAAA,8OAAC;YAAI,WAAU;sBACX,cAAA,8OAAC;gBAAG,WAAU;0BAAoE;;;;;;;;;;;;;;;;AAI9F;uCAEe","debugId":null}}]
+}

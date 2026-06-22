@@ -5,7 +5,7 @@ import LoginForm from "@/components/authForms/login-form";
 
 function LoginPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50 flex items-center justify-center p-4 mt-30 shadow-2xl shadow-black/10 rounded-3xl dark:bg-gradient-to-br dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-800 flex items-center justify-center p-4 mt-30 shadow-2xl shadow-black/10 rounded-3xl dark:shadow-black/40">
       <div className="w-full max-w-md">
         {/* Header Section */}
         <div className="text-center mb-12">
