@@ -251,15 +251,15 @@ __turbopack_context__.s([
     "default",
     ()=>useHandleAddToCart
 ]);
-var __TURBOPACK__imported__module__$5b$project$5d2f$context$2f$CartContext$2e$jsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/context/CartContext.jsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$stores$2f$buyer$2f$cartSore$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/stores/buyer/cartSore.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$toastify$2f$dist$2f$react$2d$toastify$2e$esm$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/react-toastify/dist/react-toastify.esm.mjs [app-ssr] (ecmascript)");
 "use client";
 ;
 ;
 function useHandleAddToCart() {
-    const { addtocart } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$context$2f$CartContext$2e$jsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCart"])();
+    const addToCart = (0, __TURBOPACK__imported__module__$5b$project$5d2f$stores$2f$buyer$2f$cartSore$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"])((state)=>state.addToCart);
     const handleAddToCart = (product, quantity = 1)=>{
-        addtocart(product, quantity);
+        addToCart(product, quantity);
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$toastify$2f$dist$2f$react$2d$toastify$2e$esm$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["toast"].success(`${quantity} x ${product.name} added to cart`, {
             position: "bottom-right",
             autoClose: 5000,
@@ -287,7 +287,8 @@ function ProductGrid({ products }) {
     const addToCart = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Hooks$2f$useHandleAddToCart$2e$jsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"])();
     const handleAddToCartClick = (e, product)=>{
         e.preventDefault();
-        addToCart(product, 1);
+        e.stopPropagation();
+        addToCart(product);
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "w-full max-w-6xl mx-auto mt-8 dark:shadow-gray-700",
@@ -298,12 +299,12 @@ function ProductGrid({ products }) {
                 children: "No products found."
             }, void 0, false, {
                 fileName: "[project]/components/product/ProductGrid.jsx",
-                lineNumber: 18,
+                lineNumber: 19,
                 columnNumber: 11
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/product/ProductGrid.jsx",
-            lineNumber: 17,
+            lineNumber: 18,
             columnNumber: 9
         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 dark:shadow-gray-700",
@@ -319,12 +320,12 @@ function ProductGrid({ products }) {
                                 className: "w-full h-full object-contain object-center transform group-hover:scale-105 transition-transform duration-700"
                             }, void 0, false, {
                                 fileName: "[project]/components/product/ProductGrid.jsx",
-                                lineNumber: 31,
+                                lineNumber: 32,
                                 columnNumber: 17
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/product/ProductGrid.jsx",
-                            lineNumber: 30,
+                            lineNumber: 31,
                             columnNumber: 15
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -335,7 +336,7 @@ function ProductGrid({ products }) {
                                     children: product.category
                                 }, void 0, false, {
                                     fileName: "[project]/components/product/ProductGrid.jsx",
-                                    lineNumber: 38,
+                                    lineNumber: 39,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -343,7 +344,7 @@ function ProductGrid({ products }) {
                                     children: product.name
                                 }, void 0, false, {
                                     fileName: "[project]/components/product/ProductGrid.jsx",
-                                    lineNumber: 41,
+                                    lineNumber: 42,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -357,7 +358,7 @@ function ProductGrid({ products }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/product/ProductGrid.jsx",
-                                            lineNumber: 45,
+                                            lineNumber: 46,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -366,35 +367,35 @@ function ProductGrid({ products }) {
                                             children: "Add To Cart"
                                         }, void 0, false, {
                                             fileName: "[project]/components/product/ProductGrid.jsx",
-                                            lineNumber: 48,
+                                            lineNumber: 49,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/product/ProductGrid.jsx",
-                                    lineNumber: 44,
+                                    lineNumber: 45,
                                     columnNumber: 17
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/product/ProductGrid.jsx",
-                            lineNumber: 37,
+                            lineNumber: 38,
                             columnNumber: 15
                         }, this)
                     ]
                 }, product.id, true, {
                     fileName: "[project]/components/product/ProductGrid.jsx",
-                    lineNumber: 25,
+                    lineNumber: 26,
                     columnNumber: 13
                 }, this))
         }, void 0, false, {
             fileName: "[project]/components/product/ProductGrid.jsx",
-            lineNumber: 23,
+            lineNumber: 24,
             columnNumber: 9
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/product/ProductGrid.jsx",
-        lineNumber: 15,
+        lineNumber: 16,
         columnNumber: 5
     }, this);
 }

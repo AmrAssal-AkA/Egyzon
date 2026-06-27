@@ -14,7 +14,6 @@ import {
   ArrowRight,
   Store,
   Users,
-  Briefcase,
   Building2,
   Home,
   StoreIcon,

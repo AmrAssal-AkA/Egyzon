@@ -11,16 +11,23 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { useCart } from "@/context/CartContext";
+import useCartStore from "@/stores/buyer/cartSore";
 
 export default function CartPage() {
   const router = useRouter();
-  const { cartItems, addtocart, removeFromCart, clearCart } = useCart();
+  const cartItems = useCartStore((state) => state.cartItems);
+  const removeFromCart = useCartStore((state) => state.removeFromCart);
+  const clearCart = useCartStore((state) => state.clearCart);
+  const addtocart = useCartStore((state) => state.addToCart);
+
   const subPrice = useMemo(() => {
-    return cartItems.reduce(
-      (total, item) => total + Number(item.price) * item.quantity,
-      0,
-    );
+    return cartItems.reduce((total, item) => {
+      const price = Number(item.price);
+      if (isNaN(price)) {
+        return total;
+      }
+      return total + price * item.quantity;
+    }, 0);
   }, [cartItems]);
 
   const totalPrice = useMemo(() => {

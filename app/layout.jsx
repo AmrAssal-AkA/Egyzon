@@ -3,7 +3,6 @@ import "react-toastify/dist/ReactToastify.css";
 
 import Mainheader from "@/components/headerFooter/MainHeader";
 import { Footer } from "@/components/headerFooter/footer";
-import CartProvider from "@/context/CartContext";
 import { ToastContainer, toast } from "react-toastify";
 import ThemeProvider from "@/providers/themeProvider";
 
@@ -17,12 +16,10 @@ export default async function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <body className="bg-white dark:bg-gray-900 transition-colors">
         <ThemeProvider>
-          <CartProvider>
             <Mainheader />
             {children}
             <ToastContainer />
             <Footer />
-          </CartProvider>
         </ThemeProvider>
       </body>
     </html>

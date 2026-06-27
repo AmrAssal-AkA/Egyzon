@@ -16,7 +16,7 @@ import {
 import Dropdown from "./dropdown";
 
 import Logo from "@/public/Logo/EgyzonLogo.png";
-import { useCart } from "@/context/CartContext";
+import useCartStore from "@/stores/buyer/cartSore";
 import { usePathname } from "next/navigation";
 import ToggleTheme from "./ToggleTheme";
 
@@ -34,7 +34,7 @@ const categoryLinks = [
 export default function Mainheader({ user }) {
   const currentPath = usePathname();
 
-  const { openCart, cartItems } = useCart();
+  const { openCart, cartItems } = useCartStore();
   const totalquantity = cartItems.reduce(
     (Quantity, item) => Quantity + item.quantity,
     0,

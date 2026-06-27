@@ -3,12 +3,12 @@ import React, { useState } from "react";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Quantity from "@/components/product/quantityselector";
-import useHandleAddToCart from "@/Hooks/useHandleAddToCart";
+import useCartStore from "@/stores/buyer/cartSore";
 import ImageGallery from "@/components/product/ImageGallery";
 
 export default function productDetailPage({ product }) {
   const [quantity, setQuantity] = useState(1);
-  const addToCart = useHandleAddToCart();
+  const addToCart = useCartStore((state) => state.addToCart);
 
   const productWithImages = {
     ...product,
@@ -87,7 +87,7 @@ export default function productDetailPage({ product }) {
 
                 <div className="space-y-1">
                   <button
-                    onClick={() => addToCart(product, quantity)}
+                    onClick={() => addToCart(product)}
                     className="w-full flex items-center justify-center gap-3 bg-gray-900 text-white px-5 py-2 rounded-2xl hover:bg-gray-950 transition-all duration-300 font-bold text-base active:scale-95 group shadow-xl shadow-gray-900/30 dark:bg-black dark:hover:bg-gray-900"
                   >
                     <ShoppingCart className="w-6 h-6 transform group-hover:-translate-y-1 transition-transform" />

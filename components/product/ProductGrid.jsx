@@ -7,8 +7,9 @@ export default function ProductGrid({ products }) {
 
   const handleAddToCartClick = (e, product) => {
     e.preventDefault();
+    e.stopPropagation();
 
-    addToCart(product, 1);
+    addToCart(product);
   };
 
   return (

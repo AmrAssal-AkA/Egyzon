@@ -1,35 +1,14 @@
 "use client";
 import { useState, useMemo } from "react";
+import useFilterStore from "@/stores/buyer/filterStore";
 
-export const useFilter = (products) => {
-  const [filters, setFilters] = useState({
-    category: "all",
-    minPrice: "",
-    maxPrice: "",
-    rating: 0,
-    seller: "all",
-    inStock: false,
-  });
-  const [sortOption, setSortOption] = useState("newest");
+const useFilter = (products) => {
+  const filters = useFilterStore((state) => state.filters);
+  const sortOption = useFilterStore((state) => state.sortOption);
+  const setFilter = useFilterStore((state) => state.setFilter);
+  const setSortOption = useFilterStore((state) => state.setSortOption);
+  const clearFilters = useFilterStore((state) => state.clearFilters);
 
-  const setFilter = (filterName, value) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [filterName]: value,
-    }));
-  };
-
-  const clearFilters = () => {
-    setFilters({
-      category: "all",
-      minPrice: "",
-      maxPrice: "",
-      rating: 0,
-      seller: "all",
-      inStock: false,
-    });
-    setSortOption("newest");
-  };
 
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
@@ -103,3 +82,6 @@ export const useFilter = (products) => {
     setSortOption,
   };
 };
+
+export default useFilter;
+

@@ -5,19 +5,12 @@ import { Menu, X } from "lucide-react";
 import ProductGrid from "@/components/product/ProductGrid";
 import { ProductsData } from "@/lib/Products";
 import FilterSidebar from "@/components/filters/filterSlidbar";
-import { useFilter } from "@/Hooks/useFilter";
+import useFilter from "@/Hooks/useFilter";
 
 export default function ProductPageClient() {
-  const {
-    filteredProducts,
-    filters,
-    setFilter,
-    clearFilters,
-    sortOption,
-    setSortOption,
-  } = useFilter(ProductsData);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { filters, setFilter, clearFilters, sortOption, setSortOption, filteredProducts } = useFilter(ProductsData);
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };

@@ -9,13 +9,13 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import Link from "next/link";
-import { useCart } from "@/context/CartContext";
+import useCartStore from "@/stores/buyer/cartSore";
 
 export default function CheckoutPage() {
-  const { cartItems } = useCart();
+  const cartItems = useCartStore((state) => state.cartItems);
   const [paymentMethod, setPaymentMethod] = useState("card");
 
-  // Business logic for pricing reused from CartPage
+
   const subPrice = useMemo(() => {
     return cartItems.reduce(
       (total, item) => total + Number(item.price) * item.quantity,

@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 3, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
-    {"offset": {"line": 23, "column": 0}, "map": {"version":3,"sources":["file:///Users/amrassal/Documents/Git-Projects/Egyzon/app/%28store%29/newArrival/page.jsx"],"sourcesContent":["import React from 'react'\n\nfunction NewArrival() {\n  return (\n    <main className='m-40 text-center'>\n        <h1 className='text-4xl font-bold'>New <span className='text-yellow-500 text-5xl'> Arrival </span></h1>\n        <p className='text-2xl font-medium p-3'>We will anounce soon about <span className='text-yellow-800 text-3xl'>new arrival products</span></p>\n    </main>\n  )\n}\n\nexport default NewArrival"],"names":[],"mappings":";;;;;AAAA;;;AAEA,SAAS;IACP,qBACE,8OAAC;QAAK,WAAU;;0BACZ,8OAAC;gBAAG,WAAU;;oBAAqB;kCAAI,8OAAC;wBAAK,WAAU;kCAA2B;;;;;;;;;;;;0BAClF,8OAAC;gBAAE,WAAU;;oBAA2B;kCAA2B,8OAAC;wBAAK,WAAU;kCAA2B;;;;;;;;;;;;;;;;;;AAGtH;uCAEe","debugId":null}}]
-}

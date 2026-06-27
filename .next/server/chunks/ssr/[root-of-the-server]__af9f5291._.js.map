@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 3, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
-    {"offset": {"line": 23, "column": 0}, "map": {"version":3,"sources":["file:///Users/amrassal/Documents/Git-Projects/Egyzon/app/%28store%29/bestseller/page.jsx"],"sourcesContent":["import React from \"react\";\n\nfunction BestSeller() {\n  return (\n    <div className=\"m-40 text-center bg-white dark:bg-gray-900 min-h-screen\">\n      <h1 className=\"text-4xl font-bold text-gray-900 dark:text-white\">\n        Best{\" \"}\n        <span className=\"text-yellow-500 dark:text-yellow-400 text-5xl\">\n          {\" \"}\n          Seller{\" \"}\n        </span>\n      </h1>\n      <p className=\"text-2xl font-medium p-3 text-gray-700 dark:text-gray-300\">\n        We will anounce soon about{\" \"}\n        <span className=\"text-yellow-800 dark:text-yellow-400 text-3xl\">\n          best seller products\n        </span>\n      </p>\n    </div>\n  );\n}\n\nexport default BestSeller;\n"],"names":[],"mappings":";;;;;AAAA;;;AAEA,SAAS;IACP,qBACE,8OAAC;QAAI,WAAU;;0BACb,8OAAC;gBAAG,WAAU;;oBAAmD;oBAC1D;kCACL,8OAAC;wBAAK,WAAU;;4BACb;4BAAI;4BACE;;;;;;;;;;;;;0BAGX,8OAAC;gBAAE,WAAU;;oBAA4D;oBAC5C;kCAC3B,8OAAC;wBAAK,WAAU;kCAAgD;;;;;;;;;;;;;;;;;;AAMxE;uCAEe","debugId":null}}]
-}
