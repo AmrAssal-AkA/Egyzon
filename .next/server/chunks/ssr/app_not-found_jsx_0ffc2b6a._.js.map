@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/amrassal/Documents/Git-Projects/Egyzon/app/not-found.jsx"],"sourcesContent":["export default function notFound() {\n  return (\n    <div className=\"m-50 bg-white dark:bg-gray-900 min-h-screen flex flex-col items-center justify-center\">\n      <h1 className=\"text-5xl text-center font-bold text-gray-900 dark:text-white\">\n        <span className=\"text-yellow-500 dark:text-yellow-400\">\n          404 not found{\" \"}\n        </span>\n        page!\n      </h1>\n      <p className=\"text-2xl text-center text-gray-700 dark:text-gray-300\">\n        the page you try to open not found!\n      </p>\n    </div>\n  );\n}\n"],"names":[],"mappings":";;;;;;AAAe,SAAS;IACtB,qBACE,8OAAC;QAAI,WAAU;;0BACb,8OAAC;gBAAG,WAAU;;kCACZ,8OAAC;wBAAK,WAAU;;4BAAuC;4BACvC;;;;;;;oBACT;;;;;;;0BAGT,8OAAC;gBAAE,WAAU;0BAAwD;;;;;;;;;;;;AAK3E","debugId":null}}]
-}

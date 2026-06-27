@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/amrassal/Documents/Git-Projects/Egyzon/app/error.jsx"],"sourcesContent":["\"use client\";\n\nimport React from \"react\";\n\nexport default function error() {\n  return (\n    <div className=\"m-50 bg-white dark:bg-gray-900 min-h-screen flex flex-col items-center justify-center\">\n      <h1 className=\"text-5xl text-center font-bold text-gray-900 dark:text-white\">\n        An Error Accoured\n      </h1>\n      <p className=\"text-xl text-center text-gray-700 dark:text-gray-300\">\n        we sorry some error accured while a open the page pleaser try again\n      </p>\n    </div>\n  );\n}\n"],"names":[],"mappings":";;;;;AAEA;AAFA;;;AAIe,SAAS;IACtB,qBACE,6LAAC;QAAI,WAAU;;0BACb,6LAAC;gBAAG,WAAU;0BAA+D;;;;;;0BAG7E,6LAAC;gBAAE,WAAU;0BAAuD;;;;;;;;;;;;AAK1E","debugId":null}}]
-}
