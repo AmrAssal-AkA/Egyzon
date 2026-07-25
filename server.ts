@@ -1,0 +1,46 @@
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import helmet from "helmet";
+dotenv.config();
+
+//imports routes and configs
+import connectDB from "./src/config/db";
+import AuthentaicatingRoute from './src/routes/auth.route';
+import productRoute from './src/routes/product.route';
+import wishlistRoute from './src/routes/wishlist.route';
+import sellerRoute from './src/routes/seller.route';
+import cartRoute from './src/routes/cart.route';
+
+const app = express();
+const PORT = process.env.PORT;
+
+//connect to db
+connectDB();
+//middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(helmet());
+app.use(cors());
+app.use(cookieParser());
+
+
+//routes
+app.use("/api/auth", AuthentaicatingRoute);
+app.use("/api/product", productRoute);
+app.use("/api/wishlist", wishlistRoute);
+app.use("/api/seller", sellerRoute);
+app.use("/api/cart", cartRoute);
+
+//default route
+app.get("/", (req, res) => {
+    res.send("egyzon server is running");
+});
+
+//start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+export default app;
