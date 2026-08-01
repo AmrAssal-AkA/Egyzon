@@ -1,28 +1,27 @@
 import { Request, Response, NextFunction } from "express";
-import { verifyAccessToken, verifyRefreshToken } from "../utils/jwt.util";
+import { verifyAccessToken } from "../utils/jwt.util";
+import {jwtPayload} from "../types/auth.types"
+
+export interface AutheRequest extends Request {
+  user?: jwtPayload;
+}
+
 
 export const isAuthenticated = (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  const sessionToken = req.cookies["session_token"];
-  if (!sessionToken) {
-    return res
-      .status(401)
-      .json({ error: "Unauthanticated: No session token provided" });
-  }
-  const refreshAccessToken = req.cookies["refresh_token"];
-  try {
-    let payload;
-    payload = verifyAccessToken(sessionToken);
-    req.user = payload;
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.startsWith('Bearer')? authHeader.split(' ')[1] : req.cookies?.Access_token;
 
-    payload = verifyRefreshToken(refreshAccessToken);
-    req.user = payload;
-
-    next();
-  } catch (error) {
-    next();
+  if(!token){
+    return res.status(401).json({ success: false, message: "Unauthorized" });
   }
-};
+    try {
+    req.user = verifyAccessToken(token);
+    next();
+  } catch (err) {
+    return res.status(401).json({ success: false, message: "Invalid or expired token" });
+  }
+}

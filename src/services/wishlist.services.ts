@@ -3,7 +3,6 @@ import type { Request, Response } from "express";
 import Wishlist from "../models/wishlistModel";
 import Customer from "../models/customerModel";
 import Product from "../models/productModel";
-import { IWishlist } from "../types/wishlist.types";
 
 export const WishlistServices = {
   addToWishlist: async (userId: string, productId: string) => {

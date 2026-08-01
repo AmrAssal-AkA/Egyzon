@@ -21,13 +21,14 @@ const onBoarding = async (req: Request, res: Response) => {
   if (!customer || existingUser.role !== "customer") {
     return sendErrorResponse(res, 400, "Bad Request", "User is not a customer");
   }
-  customer.phoneNumber = phoneNumber;
+  existingUser.phoneNumber = phoneNumber;
   customer.address = address;
   await customer.save();
+  await existingUser.save();
 
   sendSuccessResponse(res, 200, "Onboarding completed successfully", {
     customerId: customer.customerId,
-    phoneNumber: customer.phoneNumber,
+    phoneNumber: existingUser.phoneNumber,
     address: customer.address,
   });
 }catch (error) {

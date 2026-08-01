@@ -6,8 +6,12 @@ export interface IUser {
     email: string;
     password: string;
     role: 'customer' | 'seller' | 'admin';
+    phoneNumber?: string;
     isBlocked: boolean;
+    isVerified?: boolean;
     refreshToken?: string;
+    emailVerificationToken?: string;
+    emailVerificationTokenExpiration?: Date;
     createdAt: Date;
 }
 
@@ -19,7 +23,6 @@ export interface ICustomer  extends IUser {
     cart: Types.ObjectId[];
     paymentMethods: Types.ObjectId[];
     address?: string[];
-     phoneNumber?: string;
     createdAt: Date;
 }
 export interface ISeller  extends IUser {
@@ -30,7 +33,6 @@ export interface ISeller  extends IUser {
     sellerDocuments: {
         commercialRegisterFile: string[];
         taxCardFile: string[];
-        
     };
     storeName: string;
     storeManagement: {

@@ -7,15 +7,32 @@ import RegisterUser from "../controller/authentication/Register";
 import LoginUser from "../controller/authentication/login";
 import onBoarding from "../controller/authentication/onBoarding";
 import RefreshToken from "../controller/authentication/refresh";
+import verifyEmail from "../controller/authentication/verifyEmail";
 import { sendSuccessResponse, sendErrorResponse } from "../utils/Responses";
 import {verifyRefreshToken} from "../utils/jwt.util";
 import User from "../models/userModel";
 import {isAuthenticated} from "../middleware/Auth.middleware";
+import { AutheRequest } from "../middleware/Auth.middleware";
 
 
 
 
 const router = express.Router();
+
+router.get("/me", isAuthenticated, async (req: AutheRequest, res: Response) => {
+    try{
+        const user = await User.findById(req.user!.userId);
+        if(!user){
+            return sendErrorResponse(res, 404, "User not found");
+        }
+        return res.json({success: true, data: user})
+    }catch(err){
+        return sendErrorResponse(res, 500, "Internal Server Error", err);
+    }
+})
+
+
+
 
 router.post("/register", validate(RegisterSchema), (req: Request, res: Response) => {
     const userData = req.body;
@@ -67,7 +84,7 @@ router.post("/logout", isAuthenticated, async (req: Request, res: Response) => {
     }
 })
 
-
+router.get("/verify-email", verifyEmail);
 
 
 export default router;

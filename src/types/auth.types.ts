@@ -31,3 +31,8 @@ export interface LoginInput {
     email: string;
     password: string;
 }
+
+export interface RefreshTokenInput {
+    refreshToken: string;
+    userId: string;
+}

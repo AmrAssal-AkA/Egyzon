@@ -1,6 +1,4 @@
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -9,15 +7,23 @@ import Customer from "../../models/customerModel";
 import { hashPassword } from "../../utils/password.ustils";
 import { signAccessToken, signRefreshToken } from "../../utils/jwt.util";
 import { sendSuccessResponse, sendErrorResponse } from "../../utils/Responses";
+import sendEmail from "../../config/sendEmail";
+import {
+  generateToken,
+  hashToken,
+  verifyToken,
+} from "../../utils/cryptoTokens";
+import verifyEmailTemplate from "../../templates/verifyEmailTemplate";
+import RefreshTokenModel from "../../models/refreshToken";
 
 const RegisterUser = async (userData: any, res: Response, req: Request) => {
-  const { FirstName, LastName, email, password } = userData;
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    res.status(409).json({ message: "User already exists" });
-    return;
-  }
   try {
+    const { FirstName, LastName, email, password } = userData;
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      res.status(409).json({ message: "User already exists" });
+      return;
+    }
     const hashedPassword = await hashPassword(password);
     const refreshToken = "";
     const newUser = new User({
@@ -38,9 +44,23 @@ const RegisterUser = async (userData: any, res: Response, req: Request) => {
       userId: newUser.id,
       role: newUser.role,
     });
+    const refreshTokenDoc = new RefreshTokenModel({
+      refreshToken: newrefreshToken,
+      userId: newUser.id,
+    });
+    await refreshTokenDoc.save();
 
-    newUser.refreshToken = newrefreshToken;
+    const emailToken = generateToken();
+    const {
+      token: emailTokenValue,
+      haashedToken,
+      expiration,
+    } = JSON.parse(emailToken);
+    newUser.emailVerificationToken = haashedToken;
+    newUser.emailVerificationTokenExpiration = expiration;
     await newUser.save();
+    const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${emailTokenValue}`;
+    await verifyEmailTemplate(email, emailTokenValue, verificationUrl);
 
     res.cookie("Access_token", token, {
       httpOnly: true,

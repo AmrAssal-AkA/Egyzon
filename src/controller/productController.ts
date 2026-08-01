@@ -71,8 +71,23 @@ const getAllProducts = async (req: Request, res: Response) => {
   }
 };
 
+const getProductById = async (req: Request, res: Response) => {
+  const productId = req.params.productId as string ||(process.env.NODE_ENV !== 'production' && req.body.productId);;
+  if (!productId) {
+    return sendErrorResponse(res, 400, "productId not fount");
+  }
+
+  try {
+    const getProduct = await ProductServices.getProductById(productId);
+    return sendSuccessResponse(res, 200, "Product retrieved successfully", getProduct);
+  } catch (error) {
+    sendErrorResponse(res, 500, "Internal Server Error", error);
+  }
+};
+
 export default {
   createProduct,
   applyDiscount,
   getAllProducts,
+  getProductById,
 };

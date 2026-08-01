@@ -24,17 +24,26 @@ const UserSchema = new Schema<IUser>({
     enum: ["customer", "seller", "admin"],
     default: "customer",
   },
+  phoneNumber: {
+    type: String,
+    unique: true,
+    sparse: true,
+    default: null,
+  },
   isBlocked: {
     type: Boolean,
     default: false,
   },
-  refreshToken: {
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+  emailVerificationToken: {
     type: String,
   },
-  createdAt: {
+  emailVerificationTokenExpiration: {
     type: Date,
-    default: Date.now,
   },
-});
+}, { timestamps: true });
 
 export default mongoose.model("User", UserSchema);

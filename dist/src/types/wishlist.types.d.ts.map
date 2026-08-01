@@ -1,0 +1,1 @@
+{"version":3,"file":"wishlist.types.d.ts","sourceRoot":"","sources":["../../../src/types/wishlist.types.ts"],"names":[],"mappings":"AAAA,OAAO,EAAC,KAAK,EAAC,MAAM,UAAU,CAAC;AAE/B,MAAM,WAAW,SAAS;IACtB,MAAM,EAAE,KAAK,CAAC,QAAQ,CAAC;IACvB,SAAS,EAAE,KAAK,CAAC,QAAQ,CAAC;IAC1B,SAAS,EAAE,IAAI,CAAC;CACnB"}

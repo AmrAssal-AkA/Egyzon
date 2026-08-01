@@ -12,6 +12,7 @@ const router = express.Router();
 router.get('/', validate(getAllProductsSchema), productController.getAllProducts);
 router.post('/addProduct', upload.array('image', 3), isAuthenticated, Authorize(userRole.Seller),validate(createProductSchema), productController.createProduct);
 router.patch('/seller/product/:productId', isAuthenticated, Authorize(userRole.Seller), validate(updateProductSchema), productController.applyDiscount);
+router.get("/:productId", productController.getProductById)
 
 
 export default router;

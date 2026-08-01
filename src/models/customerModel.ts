@@ -36,17 +36,9 @@ const CustomerSchema = new Schema<ICustomer>({
         ref: "PaymentMethod",
         default: [],
     },
-    phoneNumber: {
-        type: String,
-        unique: true
-    },
     address: {
         type: [String],
         default: []
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now,
     },
 }, { timestamps: true });
 

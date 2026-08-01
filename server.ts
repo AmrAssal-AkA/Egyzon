@@ -12,6 +12,8 @@ import productRoute from './src/routes/product.route';
 import wishlistRoute from './src/routes/wishlist.route';
 import sellerRoute from './src/routes/seller.route';
 import cartRoute from './src/routes/cart.route';
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./src/docs/swagger";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -32,10 +34,17 @@ app.use("/api/product", productRoute);
 app.use("/api/wishlist", wishlistRoute);
 app.use("/api/seller", sellerRoute);
 app.use("/api/cart", cartRoute);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 //default route
 app.get("/", (req, res) => {
     res.send("egyzon server is running");
+});
+
+app.get("/api-docs.json", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.setHeader("Cache-Control", "public, max-age=0");
+  res.send(swaggerSpec);
 });
 
 //start the server

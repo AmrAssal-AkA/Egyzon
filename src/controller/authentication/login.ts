@@ -7,6 +7,7 @@ import User from "../../models/userModel";
 import { comparePasswords } from "../../utils/password.ustils";
 import { signAccessToken, signRefreshToken } from "../../utils/jwt.util";
 import { sendSuccessResponse, sendErrorResponse } from "../../utils/Responses";
+import refreshTokenModel from "../../models/refreshToken";
 
 const LoginUser = async (req: Request, res: Response) => {
   try {
@@ -35,10 +36,16 @@ const LoginUser = async (req: Request, res: Response) => {
       role: user.role,
     });
 
-    user.refreshToken = refreshToken;
-    await user.save();
+    const refreshTokenDoc = new refreshTokenModel({
+      refreshToken: refreshToken,
+      userId: user.id,
+    });
+    await refreshTokenDoc.save();
 
-    res.cookie("Access_token", token, { httpOnly: true, maxAge: 60 * 60 * 1000 });
+    res.cookie("Access_token", token, {
+      httpOnly: true,
+      maxAge: 60 * 60 * 1000,
+    });
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,

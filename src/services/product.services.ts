@@ -1,4 +1,5 @@
 import Product from "../models/productModel";
+import { IProduct } from "../types/product.types";
 import { AppError } from "../utils/AppError";
 
 // Service function to create a new product by a seller
@@ -62,6 +63,20 @@ export const ProductServices = {
       throw new AppError(500, 'Failed to get products');
     }
   },
+  getProductById: async (productId: string) => {
+    try {
+      const product = await Product.findOne({ productId });
+      if (!product) {
+        throw new AppError(404, 'Product not found');
+      }
 
-  
+      return product;
+    } catch (error) {
+      if(error instanceof AppError) {
+        throw error
+      }
+      console.log(error);
+      throw new AppError(500, "Failed To get the product")
+    }
+  },
 };
