@@ -445,6 +445,18 @@ exports.swaggerSpec = {
                     },
                 },
             },
+            delete: {
+                tags: ["Cart"],
+                summary: "Remove the current user's cart",
+                security: [{ cookieAuth: [] }],
+                responses: {
+                    200: {
+                        description: "Cart removed successfully",
+                    },
+                    401: { description: "Unauthorized" },
+                    404: { description: "Cart not found" },
+                },
+            },
         },
         "/api/wishlist": {
             get: {

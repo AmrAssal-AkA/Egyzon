@@ -1,5 +1,5 @@
 import express from 'express';
-import productController from '../controller/productController';
+import productController from '../controller/product.controller';
 import { validate } from '../middleware/validate';
 import {createProductSchema, getAllProductsSchema, updateProductSchema} from '../validators/product.validate'
 import { isAuthenticated } from '../middleware/Auth.middleware';

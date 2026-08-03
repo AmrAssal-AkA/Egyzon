@@ -6,7 +6,8 @@ import {
   addToWishlist,
   removeFromWishlist,
   getWishlist,
-} from "../controller/wishlistController";
+  moveToCart,
+} from "../controller/wishlist.controller";
 import { isAuthenticated } from "../middleware/Auth.middleware";
 import { Authorize } from "../middleware/Authorization";
 import { userRole } from "../types/auth.types";
@@ -19,5 +20,11 @@ router.delete(
   removeFromWishlist,
 );
 router.get("/", isAuthenticated, Authorize(userRole.Customer), getWishlist);
+router.post(
+  "/move-to-cart",
+  isAuthenticated,
+  Authorize(userRole.Customer),
+  moveToCart,
+);
 
 export default router;

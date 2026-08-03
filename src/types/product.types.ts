@@ -11,5 +11,12 @@ export interface IProduct {
     status: 'active' | 'inactive';
     imageUrl: string[];
     SellerId: Types.ObjectId;
-    createdAt: Date;
+    categoryId: Types.ObjectId;
+}
+
+export interface ICategory {
+    categoryName: string;
+    description: string;
+    imageUrl: string;
+    Products: Types.ObjectId[];
 }

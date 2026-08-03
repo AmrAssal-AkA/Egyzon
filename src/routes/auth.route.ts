@@ -1,90 +1,101 @@
-import { validate } from "../middleware/validate"
-import express, {type  Request, Response } from "express";
+import { validate } from "../middleware/validate";
+import express, { type Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
-import { LoginSchema, RegisterSchema, updateUserSchema } from "../validators/user.validate";
+import {
+  LoginSchema,
+  RegisterSchema,
+  updateUserSchema,
+} from "../validators/user.validate";
 import RegisterUser from "../controller/authentication/Register";
 import LoginUser from "../controller/authentication/login";
 import onBoarding from "../controller/authentication/onBoarding";
 import RefreshToken from "../controller/authentication/refresh";
 import verifyEmail from "../controller/authentication/verifyEmail";
 import { sendSuccessResponse, sendErrorResponse } from "../utils/Responses";
-import {verifyRefreshToken} from "../utils/jwt.util";
+import { verifyRefreshToken } from "../utils/jwt.util";
 import User from "../models/userModel";
-import {isAuthenticated} from "../middleware/Auth.middleware";
+import { isAuthenticated } from "../middleware/Auth.middleware";
 import { AutheRequest } from "../middleware/Auth.middleware";
-
-
-
 
 const router = express.Router();
 
 router.get("/me", isAuthenticated, async (req: AutheRequest, res: Response) => {
-    try{
-        const user = await User.findById(req.user!.userId);
-        if(!user){
-            return sendErrorResponse(res, 404, "User not found");
-        }
-        return res.json({success: true, data: user})
-    }catch(err){
-        return sendErrorResponse(res, 500, "Internal Server Error", err);
+  try {
+    const user = await User.findById(req.user!.userId);
+    if (!user) {
+      return sendErrorResponse(res, 404, "User not found");
     }
-})
-
-
-
-
-router.post("/register", validate(RegisterSchema), (req: Request, res: Response) => {
-    const userData = req.body;
-    RegisterUser(userData, res, req);
+    return res.json({ success: true, data: user });
+  } catch (err) {
+    return sendErrorResponse(res, 500, "Internal Server Error", err);
+  }
 });
 
+// Register route
+router.post(
+  "/register",
+  validate(RegisterSchema),
+  (req: Request, res: Response) => {
+    const userData = req.body;
+    RegisterUser(userData, res, req);
+  },
+);
+// Login route  
 router.post("/login", validate(LoginSchema), LoginUser);
-
-router.patch("/onBoarding", validate(updateUserSchema),onBoarding);
+// Refresh token route
+router.patch(
+  "/onBoarding",
+  validate(updateUserSchema),
+  isAuthenticated,
+  onBoarding,
+);
+// Refresh token route
 router.post("/refresh", RefreshToken);
 
 // Logout route
 router.post("/logout", isAuthenticated, async (req: Request, res: Response) => {
-    const refreshToken = req.cookies["refresh_token"];
-    
-    if (!refreshToken) {
-        res.clearCookie("refresh_token", {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-        });
-        return sendSuccessResponse(res, 200, "Logged out successfully");
-    }
+  const refreshToken = req.cookies["refresh_token"];
+
+  if (!refreshToken) {
+    res.clearCookie("refresh_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+    return sendSuccessResponse(res, 200, "Logged out successfully");
+  }
+  try {
+    let userId: string | undefined;
     try {
-        let userId: string | undefined;
-        try{
-            const decoded = verifyRefreshToken(refreshToken);
-            userId = decoded.userId;
-        }catch(err){
-            const decodedExpire = jwt.decode(refreshToken) as { userId: string, exp: number };
-            if(decodedExpire && decodedExpire.userId){
-                userId = decodedExpire.userId;
-            }
-        }
-        if(userId){
-            await User.updateOne(
-                {_id: userId, refreshToken},
-                {$set: {refreshToken: null}}
-            );
-        }
-        res.clearCookie("refresh_token", {
-                httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-        });
-        return sendSuccessResponse(res, 200, "Logged out successfully");
-    }catch(err){
-        return sendErrorResponse(res, 500, "Internal Server Error", err);
+      const decoded = verifyRefreshToken(refreshToken);
+      userId = decoded.userId;
+    } catch (err) {
+      const decodedExpire = jwt.decode(refreshToken) as {
+        userId: string;
+        exp: number;
+      };
+      if (decodedExpire && decodedExpire.userId) {
+        userId = decodedExpire.userId;
+      }
     }
-})
-
-router.get("/verify-email", verifyEmail);
-
+    if (userId) {
+      await User.updateOne(
+        { _id: userId, refreshToken },
+        { $set: { refreshToken: null } },
+      );
+    }
+    res.clearCookie("refresh_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+    return sendSuccessResponse(res, 200, "Logged out successfully");
+  } catch (err) {
+    return sendErrorResponse(res, 500, "Internal Server Error", err);
+  }
+});
+ // Email verification route
+router.get("/verify-email", isAuthenticated, verifyEmail);
 
 export default router;

@@ -59,7 +59,7 @@ const RegisterUser = async (userData: any, res: Response, req: Request) => {
     newUser.emailVerificationToken = haashedToken;
     newUser.emailVerificationTokenExpiration = expiration;
     await newUser.save();
-    const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${emailTokenValue}`;
+    const verificationUrl = `${process.env.FRONTEND_URL}/verifyEmail?token=${emailTokenValue}`;
     await verifyEmailTemplate(email, emailTokenValue, verificationUrl);
 
     res.cookie("Access_token", token, {

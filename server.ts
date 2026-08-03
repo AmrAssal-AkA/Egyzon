@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
+import swaggerUi from "swagger-ui-express";
 dotenv.config();
 
 //imports routes and configs
@@ -12,7 +13,7 @@ import productRoute from './src/routes/product.route';
 import wishlistRoute from './src/routes/wishlist.route';
 import sellerRoute from './src/routes/seller.route';
 import cartRoute from './src/routes/cart.route';
-import swaggerUi from "swagger-ui-express";
+import CategoryRoute from './src/routes/category.routes';
 import { swaggerSpec } from "./src/docs/swagger";
 
 const app = express();
@@ -23,8 +24,8 @@ connectDB();
 //middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors({ origin: "*", credentials: true }));
 app.use(helmet());
-app.use(cors());
 app.use(cookieParser());
 
 
@@ -34,6 +35,7 @@ app.use("/api/product", productRoute);
 app.use("/api/wishlist", wishlistRoute);
 app.use("/api/seller", sellerRoute);
 app.use("/api/cart", cartRoute);
+app.use("/api/category", CategoryRoute);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 //default route

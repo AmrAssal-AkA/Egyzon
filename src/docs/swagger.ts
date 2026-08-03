@@ -7,7 +7,7 @@ export const swaggerSpec = {
   },
   servers: [
     {
-      url: "http://localhost:3000",
+      url: "http://localhost:8080",
       description: "Local development server",
     },
   ],
@@ -15,7 +15,7 @@ export const swaggerSpec = {
     { name: "Health", description: "Server health and status" },
     { name: "Auth", description: "Authentication and account management" },
     { name: "Products", description: "Product browsing and seller product actions" },
-    { name: "Cart", description: "Cart creation" },
+    { name: "Cart", description: "Cart management" },
     { name: "Wishlist", description: "Wishlist management" },
     { name: "Seller", description: "Seller onboarding and store setup" },
   ],
@@ -53,12 +53,13 @@ export const swaggerSpec = {
       },
       RegisterRequest: {
         type: "object",
-        required: ["FirstName", "LastName", "email", "password"],
+        required: ["FirstName", "LastName", "email", "password", "confirmPassword"],
         properties: {
           FirstName: { type: "string", example: "Ahmed" },
           LastName: { type: "string", example: "Ali" },
           email: { type: "string", format: "email", example: "ahmed@example.com" },
           password: { type: "string", format: "password", example: "password123" },
+          confirmPassword: { type: "string", format: "password", example: "password123" },
         },
       },
       LoginRequest: {
@@ -72,11 +73,13 @@ export const swaggerSpec = {
       OnboardingRequest: {
         type: "object",
         properties: {
+          FirstName: { type: "string", example: "Ahmed" },
+          LastName: { type: "string", example: "Ali" },
+          email: { type: "string", format: "email", example: "ahmed@example.com" },
           phoneNumber: { type: "string", example: "+201001112223" },
           address: {
-            type: "array",
-            items: { type: "string" },
-            example: ["Cairo", "Nasr City", "Street 10"],
+            type: "string",
+            example: "Cairo, Nasr City, Street 10",
           },
           isBlocked: { type: "boolean" },
         },
@@ -84,6 +87,7 @@ export const swaggerSpec = {
       ProductItem: {
         type: "object",
         properties: {
+          _id: { type: "string" },
           productName: { type: "string" },
           productDescription: { type: "string" },
           price: { type: "number" },
@@ -139,6 +143,7 @@ export const swaggerSpec = {
           productId: { type: "string", example: "66a1f2f3d4c5b6a7c8d9e0f1" },
           quantity: { type: "number", example: 2 },
           price: { type: "number", example: 299.99 },
+          name: { type: "string", example: "Wireless Headphones" },
         },
       },
       CartCreateRequest: {
@@ -153,6 +158,7 @@ export const swaggerSpec = {
       },
       WishlistRequest: {
         type: "object",
+        required: ["productId"],
         properties: {
           productId: { type: "string", example: "66a1f2f3d4c5b6a7c8d9e0f1" },
         },
@@ -163,7 +169,6 @@ export const swaggerSpec = {
           "storeName",
           "commercialRegisterNumber",
           "taxCardNumber",
-          "contary",
           "commercialRegisterImage",
           "taxCardImage",
         ],
@@ -171,14 +176,13 @@ export const swaggerSpec = {
           storeName: { type: "string", example: "Egyzon Store" },
           commercialRegisterNumber: { type: "string", example: "CR-123456" },
           taxCardNumber: { type: "string", example: "TC-987654" },
-          contary: { type: "string", example: "Egypt" },
           commercialRegisterImage: { type: "string", format: "binary" },
           taxCardImage: { type: "string", format: "binary" },
         },
       },
       SellerSetupRequest: {
         type: "object",
-        required: ["storeDescription", "storeType", "storephysicalAddress", "storeOnlineAddress", "storeLogo"],
+        required: ["storeDescription", "storeType", "storeLogo", "storeBanner"],
         properties: {
           storeDescription: { type: "string", example: "Modern curated products for everyday life." },
           storeType: { type: "string", enum: ["physical", "online", "both"], example: "both" },
@@ -204,6 +208,25 @@ export const swaggerSpec = {
               },
             },
           },
+        },
+      },
+    },
+    "/api/auth/me": {
+      get: {
+        tags: ["Auth"],
+        summary: "Get current authenticated user profile",
+        security: [{ cookieAuth: [] }],
+        responses: {
+          200: {
+            description: "User profile retrieved successfully",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+              },
+            },
+          },
+          401: { description: "Unauthorized" },
+          404: { description: "User not found" },
         },
       },
     },
@@ -278,7 +301,7 @@ export const swaggerSpec = {
     "/api/auth/onBoarding": {
       patch: {
         tags: ["Auth"],
-        summary: "Complete customer onboarding",
+        summary: "Complete customer onboarding / update user profile",
         security: [{ cookieAuth: [] }],
         requestBody: {
           required: true,
@@ -322,6 +345,7 @@ export const swaggerSpec = {
       get: {
         tags: ["Auth"],
         summary: "Verify user email with token",
+        security: [{ cookieAuth: [] }],
         parameters: [
           {
             name: "token",
@@ -334,6 +358,9 @@ export const swaggerSpec = {
           200: {
             description: "Email verified successfully",
           },
+          400: {
+            description: "Invalid or expired token",
+          },
         },
       },
     },
@@ -345,12 +372,12 @@ export const swaggerSpec = {
           {
             name: "page",
             in: "query",
-            schema: { type: "number", default: 1 },
+            schema: { type: "integer", default: 1 },
           },
           {
             name: "limit",
             in: "query",
-            schema: { type: "number", default: 10 },
+            schema: { type: "integer", default: 10 },
           },
         ],
         responses: {
@@ -398,7 +425,7 @@ export const swaggerSpec = {
     "/api/product/seller/product/{productId}": {
       patch: {
         tags: ["Products"],
-        summary: "Update a seller product",
+        summary: "Update a seller product / apply discount",
         security: [{ cookieAuth: [] }],
         parameters: [
           {
@@ -423,7 +450,51 @@ export const swaggerSpec = {
         },
       },
     },
+    "/api/product/{productId}": {
+      get: {
+        tags: ["Products"],
+        summary: "Get product details by ID",
+        parameters: [
+          {
+            name: "productId",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Product retrieved successfully",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+              },
+            },
+          },
+          400: {
+            description: "Product ID not found",
+          },
+        },
+      },
+    },
     "/api/cart": {
+      get: {
+        tags: ["Cart"],
+        summary: "Get user cart",
+        security: [{ cookieAuth: [] }],
+        responses: {
+          200: {
+            description: "Cart retrieved successfully",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+              },
+            },
+          },
+          401: { description: "Unauthorized" },
+          404: { description: "Cart not found" },
+        },
+      },
       post: {
         tags: ["Cart"],
         summary: "Create a cart",
@@ -440,6 +511,20 @@ export const swaggerSpec = {
           201: {
             description: "Cart created successfully",
           },
+        },
+      },
+    },
+    "/api/cart/remove": {
+      delete: {
+        tags: ["Cart"],
+        summary: "Remove the current user's cart",
+        security: [{ cookieAuth: [] }],
+        responses: {
+          200: {
+            description: "Cart removed successfully",
+          },
+          401: { description: "Unauthorized" },
+          404: { description: "Cart not found" },
         },
       },
     },
@@ -493,6 +578,28 @@ export const swaggerSpec = {
         },
       },
     },
+    "/api/wishlist/move-to-cart": {
+      post: {
+        tags: ["Wishlist"],
+        summary: "Move product from wishlist to cart",
+        security: [{ cookieAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/WishlistRequest" },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Product moved to cart successfully",
+          },
+          400: { description: "Product ID is required" },
+          401: { description: "Unauthorized" },
+        },
+      },
+    },
     "/api/seller/apply": {
       post: {
         tags: ["Seller"],
@@ -535,4 +642,3 @@ export const swaggerSpec = {
     },
   },
 } as const;
-

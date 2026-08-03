@@ -1,16 +1,8 @@
 import mongoose, { Schema } from 'mongoose';
-import {v4 as uuidv4} from 'uuid';
 import {ICustomer} from "../types/User.types";
 
 
 const CustomerSchema = new Schema<ICustomer>({
-    customerId:{
-        type: String,
-        required: true,
-        unique: true,
-        default: () => uuidv4(),
-        index: true,
-    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -23,12 +15,7 @@ const CustomerSchema = new Schema<ICustomer>({
     },
     wishlist: {
         type: [mongoose.Schema.Types.ObjectId],
-        ref: "Product",
-        default: [],
-    },
-    cart: {
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: "Product",
+        ref: "Wishlist",
         default: [],
     },
     paymentMethods: {

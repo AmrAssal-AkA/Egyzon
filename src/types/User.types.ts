@@ -1,4 +1,4 @@
-import {Types} from "mongoose";
+import {HydratedDocument, Types} from "mongoose";
 
 export interface IUser {
     FirstName: string;
@@ -15,8 +15,9 @@ export interface IUser {
     createdAt: Date;
 }
 
+export type UserDocument = HydratedDocument<IUser>;
+
 export interface ICustomer  extends IUser {
-    customerId: string;
     user: Types.ObjectId;
     orders: Types.ObjectId[];
     wishlist: Types.ObjectId[];

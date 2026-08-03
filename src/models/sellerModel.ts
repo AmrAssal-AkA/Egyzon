@@ -1,16 +1,8 @@
 import mongoose, { Schema } from "mongoose";
-import { v4 as uuidv4 } from "uuid";
 import { ISeller } from "../types/User.types";
 
 const SellerSchema = new Schema<ISeller>(
   {
-    sellerId: {
-      type: String,
-      required: true,
-      unique: true,
-      default: () => uuidv4(),
-      index: true,
-    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

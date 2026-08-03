@@ -3,13 +3,8 @@ import {IWallet} from "../types/wallet.types"
 
 
 const walletSchema = new Schema<IWallet>({
-    walletId: {
-        type: String,
-        required: true,
-        unique: true,
-    },
     sellerId: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Seller",
         required: true,
     },

@@ -15,7 +15,6 @@ export const RegisterSchema = z.object({
         LastName: safeTextSchema.min(1, { message: "Last name is required" }),
         email: z.string().email({ message: "Invalid email address" }),
         password: PasswordSchema,
-        confirmPassword: PasswordSchema,
     })
 });
 

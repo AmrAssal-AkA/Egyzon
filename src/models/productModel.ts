@@ -1,54 +1,54 @@
-import mongoose, { Schema } from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
-import { IProduct } from '../types/product.types';
+import mongoose, { Schema } from "mongoose";
+import { v4 as uuidv4 } from "uuid";
+import { IProduct } from "../types/product.types";
 
-const productSchema: Schema<IProduct> = new Schema({
-    productId: {
-        type: String,
-        required: true,
-        unique: true,
-        default: () => uuidv4(),
-        index: true,
-    },
+const productSchema: Schema<IProduct> = new Schema(
+  {
     productName: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     productDescription: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     price: {
-        type: Number,
-        required: true,
+      type: Number,
+      required: true,
     },
     discount: {
-        type: Number,
-        default: 0,
+      type: Number,
+      default: 0,
     },
     stock: {
-        type: Number,
-        required: true,
+      type: Number,
+      required: true,
     },
     AvgRating: {
-        type: Number,
-        default: 0,
+      type: Number,
+      default: 0,
     },
     status: {
-        type: String,
-        enum: ['active', 'inactive'],
-        default: 'active',
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
     },
-    imageUrl: [{
+    imageUrl: [
+      {
         type: String,
         required: true,
-    }],
+      },
+    ],
     SellerId: {
-        type: Schema.Types.ObjectId,
-        ref: 'Seller',
-
+      type: Schema.Types.ObjectId,
+      ref: "Seller",
     },
-}, { timestamps: true
-})
+    categoryId: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
+    },
+  },
+  { timestamps: true },
+);
 
-export default mongoose.model<IProduct>('Product', productSchema);
+export default mongoose.model<IProduct>("Product", productSchema);

@@ -1,5 +1,5 @@
-import mongoose, { Schema } from "mongoose";
-import { IUser } from "../types/User.types";
+import mongoose, { HydratedDocument, Schema } from "mongoose";
+import { IUser, ICustomer, ISeller } from "../types/User.types"; 
 
 const UserSchema = new Schema<IUser>({
   FirstName: {
@@ -45,5 +45,10 @@ const UserSchema = new Schema<IUser>({
     type: Date,
   },
 }, { timestamps: true });
+
+UserSchema.pre("deleteOne", { document: true, query: false }, async function (this: HydratedDocument<IUser>) {
+  await mongoose.model("Customer").deleteOne({ user: this._id });
+  await mongoose.model("Seller").deleteOne({ user: this._id });
+});
 
 export default mongoose.model("User", UserSchema);

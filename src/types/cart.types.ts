@@ -10,6 +10,7 @@ export type CartItem = {
 export interface Cart {
     cartId: string;
     userId: string;
+    userCartKey: string;
     items: CartItem[];
     totalPrice: number;
     createdAt: Date;
