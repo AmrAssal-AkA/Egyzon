@@ -10,7 +10,7 @@ exports.swaggerSpec = {
     },
     servers: [
         {
-            url: "http://localhost:3000",
+            url: "http://localhost:8080",
             description: "Local development server",
         },
     ],
@@ -18,9 +18,11 @@ exports.swaggerSpec = {
         { name: "Health", description: "Server health and status" },
         { name: "Auth", description: "Authentication and account management" },
         { name: "Products", description: "Product browsing and seller product actions" },
-        { name: "Cart", description: "Cart creation" },
+        { name: "Cart", description: "Cart management" },
         { name: "Wishlist", description: "Wishlist management" },
         { name: "Seller", description: "Seller onboarding and store setup" },
+        { name: "Categories", description: "Category management" },
+        { name: "Customer", description: "Customer account settings" },
     ],
     components: {
         securitySchemes: {
@@ -56,12 +58,13 @@ exports.swaggerSpec = {
             },
             RegisterRequest: {
                 type: "object",
-                required: ["FirstName", "LastName", "email", "password"],
+                required: ["FirstName", "LastName", "email", "password", "confirmPassword"],
                 properties: {
                     FirstName: { type: "string", example: "Ahmed" },
                     LastName: { type: "string", example: "Ali" },
                     email: { type: "string", format: "email", example: "ahmed@example.com" },
                     password: { type: "string", format: "password", example: "password123" },
+                    confirmPassword: { type: "string", format: "password", example: "password123" },
                 },
             },
             LoginRequest: {
@@ -77,16 +80,31 @@ exports.swaggerSpec = {
                 properties: {
                     phoneNumber: { type: "string", example: "+201001112223" },
                     address: {
-                        type: "array",
-                        items: { type: "string" },
-                        example: ["Cairo", "Nasr City", "Street 10"],
+                        type: "string",
+                        example: "Cairo, Nasr City, Street 10",
                     },
-                    isBlocked: { type: "boolean" },
+                    userId: { type: "string", example: "66a1f2f3d4c5b6a7c8d9e0f1" },
+                },
+            },
+            ForgetPasswordRequest: {
+                type: "object",
+                required: ["emailAddress"],
+                properties: {
+                    emailAddress: { type: "string", format: "email", example: "ahmed@example.com" },
+                },
+            },
+            ResetPasswordRequest: {
+                type: "object",
+                required: ["newPassword", "confirmNewPassword"],
+                properties: {
+                    newPassword: { type: "string", format: "password", example: "Password_123" },
+                    confirmNewPassword: { type: "string", format: "password", example: "Password_123" },
                 },
             },
             ProductItem: {
                 type: "object",
                 properties: {
+                    _id: { type: "string" },
                     productName: { type: "string" },
                     productDescription: { type: "string" },
                     price: { type: "number" },
@@ -142,6 +160,7 @@ exports.swaggerSpec = {
                     productId: { type: "string", example: "66a1f2f3d4c5b6a7c8d9e0f1" },
                     quantity: { type: "number", example: 2 },
                     price: { type: "number", example: 299.99 },
+                    name: { type: "string", example: "Wireless Headphones" },
                 },
             },
             CartCreateRequest: {
@@ -156,8 +175,18 @@ exports.swaggerSpec = {
             },
             WishlistRequest: {
                 type: "object",
+                required: ["productId"],
                 properties: {
                     productId: { type: "string", example: "66a1f2f3d4c5b6a7c8d9e0f1" },
+                },
+            },
+            CategoryCreateRequest: {
+                type: "object",
+                required: ["name", "description"],
+                properties: {
+                    name: { type: "string", example: "Electronics" },
+                    description: { type: "string", example: "Gadgets, devices, and accessories." },
+                    image: { type: "string", format: "binary" },
                 },
             },
             SellerApplyRequest: {
@@ -166,7 +195,6 @@ exports.swaggerSpec = {
                     "storeName",
                     "commercialRegisterNumber",
                     "taxCardNumber",
-                    "contary",
                     "commercialRegisterImage",
                     "taxCardImage",
                 ],
@@ -174,14 +202,13 @@ exports.swaggerSpec = {
                     storeName: { type: "string", example: "Egyzon Store" },
                     commercialRegisterNumber: { type: "string", example: "CR-123456" },
                     taxCardNumber: { type: "string", example: "TC-987654" },
-                    contary: { type: "string", example: "Egypt" },
                     commercialRegisterImage: { type: "string", format: "binary" },
                     taxCardImage: { type: "string", format: "binary" },
                 },
             },
             SellerSetupRequest: {
                 type: "object",
-                required: ["storeDescription", "storeType", "storephysicalAddress", "storeOnlineAddress", "storeLogo"],
+                required: ["storeDescription", "storeType", "storeLogo", "storeBanner"],
                 properties: {
                     storeDescription: { type: "string", example: "Modern curated products for everyday life." },
                     storeType: { type: "string", enum: ["physical", "online", "both"], example: "both" },
@@ -207,6 +234,25 @@ exports.swaggerSpec = {
                             },
                         },
                     },
+                },
+            },
+        },
+        "/api/auth/me": {
+            get: {
+                tags: ["Auth"],
+                summary: "Get current authenticated user profile",
+                security: [{ cookieAuth: [] }],
+                responses: {
+                    200: {
+                        description: "User profile retrieved successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
+                    },
+                    401: { description: "Unauthorized" },
+                    404: { description: "User not found" },
                 },
             },
         },
@@ -281,7 +327,7 @@ exports.swaggerSpec = {
         "/api/auth/onBoarding": {
             patch: {
                 tags: ["Auth"],
-                summary: "Complete customer onboarding",
+                summary: "Complete customer onboarding / update user profile",
                 security: [{ cookieAuth: [] }],
                 requestBody: {
                     required: true,
@@ -294,6 +340,67 @@ exports.swaggerSpec = {
                 responses: {
                     200: {
                         description: "Onboarding completed successfully",
+                    },
+                    400: {
+                        description: "User is already onboarded or user is not a customer",
+                    },
+                    404: {
+                        description: "User not found",
+                    },
+                },
+            },
+        },
+        "/api/auth/forget-password": {
+            post: {
+                tags: ["Auth"],
+                summary: "Request a password reset email",
+                requestBody: {
+                    required: true,
+                    content: {
+                        "application/json": {
+                            schema: { $ref: "#/components/schemas/ForgetPasswordRequest" },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: "Reset password email sent successfully",
+                    },
+                    404: {
+                        description: "Email address or user not found",
+                    },
+                },
+            },
+        },
+        "/api/auth/reset-password": {
+            patch: {
+                tags: ["Auth"],
+                summary: "Reset a password using a recovery token",
+                requestBody: {
+                    required: true,
+                    content: {
+                        "application/json": {
+                            schema: { $ref: "#/components/schemas/ResetPasswordRequest" },
+                        },
+                    },
+                },
+                parameters: [
+                    {
+                        name: "token",
+                        in: "query",
+                        required: true,
+                        schema: { type: "string" },
+                    },
+                ],
+                responses: {
+                    200: {
+                        description: "Password reset successfully",
+                    },
+                    400: {
+                        description: "Invalid, missing, or expired token",
+                    },
+                    404: {
+                        description: "User or token not found",
                     },
                 },
             },
@@ -325,6 +432,7 @@ exports.swaggerSpec = {
             get: {
                 tags: ["Auth"],
                 summary: "Verify user email with token",
+                security: [{ cookieAuth: [] }],
                 parameters: [
                     {
                         name: "token",
@@ -337,6 +445,34 @@ exports.swaggerSpec = {
                     200: {
                         description: "Email verified successfully",
                     },
+                    400: {
+                        description: "Invalid or expired token",
+                    },
+                },
+            },
+        },
+        "/api/auth/continue-with-google": {
+            get: {
+                tags: ["Auth"],
+                summary: "Start Google OAuth sign-in",
+                responses: {
+                    302: {
+                        description: "Redirects to Google authentication",
+                    },
+                },
+            },
+        },
+        "/api/auth/google/callback": {
+            get: {
+                tags: ["Auth"],
+                summary: "Google OAuth callback",
+                responses: {
+                    302: {
+                        description: "Redirects after successful Google authentication",
+                    },
+                    401: {
+                        description: "Google authentication failed",
+                    },
                 },
             },
         },
@@ -348,12 +484,12 @@ exports.swaggerSpec = {
                     {
                         name: "page",
                         in: "query",
-                        schema: { type: "number", default: 1 },
+                        schema: { type: "integer", default: 1 },
                     },
                     {
                         name: "limit",
                         in: "query",
-                        schema: { type: "number", default: 10 },
+                        schema: { type: "integer", default: 10 },
                     },
                 ],
                 responses: {
@@ -401,7 +537,7 @@ exports.swaggerSpec = {
         "/api/product/seller/product/{productId}": {
             patch: {
                 tags: ["Products"],
-                summary: "Update a seller product",
+                summary: "Update a seller product / apply discount",
                 security: [{ cookieAuth: [] }],
                 parameters: [
                     {
@@ -426,7 +562,51 @@ exports.swaggerSpec = {
                 },
             },
         },
+        "/api/product/{productId}": {
+            get: {
+                tags: ["Products"],
+                summary: "Get product details by ID",
+                parameters: [
+                    {
+                        name: "productId",
+                        in: "path",
+                        required: true,
+                        schema: { type: "string" },
+                    },
+                ],
+                responses: {
+                    200: {
+                        description: "Product retrieved successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
+                    },
+                    400: {
+                        description: "Product ID not found",
+                    },
+                },
+            },
+        },
         "/api/cart": {
+            get: {
+                tags: ["Cart"],
+                summary: "Get user cart",
+                security: [{ cookieAuth: [] }],
+                responses: {
+                    200: {
+                        description: "Cart retrieved successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
+                    },
+                    401: { description: "Unauthorized" },
+                    404: { description: "Cart not found" },
+                },
+            },
             post: {
                 tags: ["Cart"],
                 summary: "Create a cart",
@@ -445,6 +625,8 @@ exports.swaggerSpec = {
                     },
                 },
             },
+        },
+        "/api/cart/remove": {
             delete: {
                 tags: ["Cart"],
                 summary: "Remove the current user's cart",
@@ -508,6 +690,28 @@ exports.swaggerSpec = {
                 },
             },
         },
+        "/api/wishlist/move-to-cart": {
+            post: {
+                tags: ["Wishlist"],
+                summary: "Move product from wishlist to cart",
+                security: [{ cookieAuth: [] }],
+                requestBody: {
+                    required: true,
+                    content: {
+                        "application/json": {
+                            schema: { $ref: "#/components/schemas/WishlistRequest" },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: "Product moved to cart successfully",
+                    },
+                    400: { description: "Product ID is required" },
+                    401: { description: "Unauthorized" },
+                },
+            },
+        },
         "/api/seller/apply": {
             post: {
                 tags: ["Seller"],
@@ -544,6 +748,58 @@ exports.swaggerSpec = {
                 responses: {
                     200: {
                         description: "Store setup successful",
+                    },
+                },
+            },
+        },
+        "/api/category/addCategory": {
+            post: {
+                tags: ["Categories"],
+                summary: "Create a category",
+                security: [{ cookieAuth: [] }],
+                requestBody: {
+                    required: true,
+                    content: {
+                        "multipart/form-data": {
+                            schema: { $ref: "#/components/schemas/CategoryCreateRequest" },
+                        },
+                    },
+                },
+                responses: {
+                    201: {
+                        description: "Category created successfully",
+                    },
+                    401: {
+                        description: "Unauthorized",
+                    },
+                    403: {
+                        description: "Forbidden",
+                    },
+                },
+            },
+        },
+        "/api/customer/change-password": {
+            put: {
+                tags: ["Customer"],
+                summary: "Change the current customer's password",
+                security: [{ cookieAuth: [] }],
+                requestBody: {
+                    required: true,
+                    content: {
+                        "application/json": {
+                            schema: { $ref: "#/components/schemas/ResetPasswordRequest" },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: "Password changed successfully",
+                    },
+                    401: {
+                        description: "Unauthorized",
+                    },
+                    400: {
+                        description: "Validation failed",
                     },
                 },
             },

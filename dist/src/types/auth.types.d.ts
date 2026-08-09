@@ -9,8 +9,7 @@ export declare enum userRole {
 }
 declare global {
     namespace Express {
-        interface Request {
-            user?: jwtPayload;
+        interface User extends jwtPayload {
         }
     }
 }
@@ -24,5 +23,9 @@ export interface RegisterInput {
 export interface LoginInput {
     email: string;
     password: string;
+}
+export interface RefreshTokenInput {
+    refreshToken: string;
+    userId: string;
 }
 //# sourceMappingURL=auth.types.d.ts.map

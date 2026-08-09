@@ -10,41 +10,40 @@ const AppError_1 = require("../../utils/AppError");
 const createRequestToJoin = async (req, res) => {
     try {
         const userId = req.user?.userId ||
-            (process.env.NODE_ENV !== "production" && req.body.userId);
-        if (!userId) {
+            (process.env.NODE_ENV !== "production" && req.body?.userId);
+        if (!userId)
             return (0, Responses_1.sendErrorResponse)(res, 401, "Unauthorized", "User not authenticated");
-        }
-        const { storeName, commercialRegisterNumber, taxCardNumber, contary } = req.body;
+        const { storeName, commercialRegisterNumber, taxCardNumber } = req.body;
         if (!storeName ||
             !commercialRegisterNumber ||
             !taxCardNumber ||
-            !contary ||
             storeName.trim() === "" ||
             commercialRegisterNumber.trim() === "" ||
-            taxCardNumber.trim() === "" ||
-            contary.trim() === "") {
+            taxCardNumber.trim() === "")
             return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "All fields are required");
-        }
-        if (contary !== "Egypt") {
-            return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "Only Egyptian sellers are allowed");
-        }
+        const crNumber = Number(commercialRegisterNumber);
+        const taxNumber = Number(taxCardNumber);
+        if (Number.isNaN(crNumber) || Number.isNaN(taxNumber))
+            return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "Invalid commercialRegisterNumber or taxCardNumber");
         const files = req.files;
-        if (!files || !files.commercialRegisterImage || !files.taxCardImage) {
-            return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "Both images are required");
-        }
+        if (!files || !files.commercialRegisterImage || !files.taxCardImage)
+            return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "All files are required");
         if (files.commercialRegisterImage[0].mimetype !== "image/jpeg" &&
-            files.commercialRegisterImage[0].mimetype !== "image/png") {
-            return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "Invalid commercial register image format");
-        }
+            files.commercialRegisterImage[0].mimetype !== "image/png" &&
+            files.commercialRegisterImage[0].mimetype !== "image/jpg")
+            return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "Invalid CommercialRegister image format");
+        if (files.taxCardImage[0].mimetype !== "image/jpeg" &&
+            files.taxCardImage[0].mimetype !== "image/png" &&
+            files.taxCardImage[0].mimetype !== "image/jpg")
+            return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "Invalid TaxCart image format");
         const [commercialRegisterImageUpload, taxCardImageUpload] = await Promise.all([
             (0, cloudainry_config_1.default)(files.commercialRegisterImage[0].buffer, "Egyzon/Seller/CommercialRegister"),
             (0, cloudainry_config_1.default)(files.taxCardImage[0].buffer, "Egyzon/Seller/TaxCard"),
         ]);
         const sellerData = {
             storeName,
-            contary,
-            commercialRegisterNumber,
-            taxCardNumber,
+            commercialRegisterNumber: crNumber,
+            taxCardNumber: taxNumber,
             commercialRegisterUrl: commercialRegisterImageUpload.secure_url,
             taxCardUrl: taxCardImageUpload.secure_url,
         };
@@ -59,12 +58,14 @@ const createRequestToJoin = async (req, res) => {
         (0, Responses_1.sendErrorResponse)(res, 500, "Internal Server Error");
     }
 };
-{ /*  second step After the seller document Approval */ }
+{
+    /*  second step After the seller document Approval */
+}
 const setupStore = async (req, res) => {
     try {
         // Check if user is authenticated
         const userId = req.user?.userId ||
-            (process.env.NODE_ENV !== "production" && req.body.userId);
+            (process.env.NODE_ENV !== "production" && req.body?.userId);
         if (!userId) {
             return (0, Responses_1.sendErrorResponse)(res, 401, "Unauthorized", "User not authenticated");
         }

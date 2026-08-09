@@ -1,3 +1,3 @@
-declare const sendEmail: (to: string, subject: string, html: string) => Promise<void>;
-export default sendEmail;
+declare const sendnoReplayEmail: (to: string, subject: string, html: string) => Promise<import("resend").CreateEmailResponseSuccess>;
+export default sendnoReplayEmail;
 //# sourceMappingURL=sendEmail.d.ts.map

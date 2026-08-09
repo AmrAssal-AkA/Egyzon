@@ -14,21 +14,14 @@ const LoginUser = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
-    if (!user) {
-      res.status(404).json({ message: "User not found" });
-      return;
-    }
-
-    if (user.isBlocked) {
-      res.status(403).json({ message: "This account has been blocked" });
-      return;
-    }
-
+    // Check if user exists and validate credentials
+    if (!user) return sendErrorResponse(res, 404, "User not found");
+    if (user.isBlocked) return sendErrorResponse(res, 403, "This account has been blocked");
+    if (user.googleId && !user.password) return sendErrorResponse(res, 400, "This account is registered with Google. Please use Google login."); 
+    // Validate password
     const isPasswordValid = await comparePasswords(password, user.password);
-    if (!isPasswordValid) {
-      res.status(401).json({ message: "Invalid password" });
-      return;
-    }
+    if (!isPasswordValid) return sendErrorResponse(res, 401, "Invalid password");
+
 
     const token = await signAccessToken({ userId: user.id, role: user.role });
     const refreshToken = await signRefreshToken({
@@ -50,6 +43,7 @@ const LoginUser = async (req: Request, res: Response) => {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
     });
+    
     sendSuccessResponse(res, 200, "Login successful", { token, refreshToken });
   } catch (err) {
     sendErrorResponse(res, 500, "Something went wrong", (err as Error).message);

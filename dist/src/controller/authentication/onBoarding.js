@@ -9,23 +9,26 @@ const Responses_1 = require("../../utils/Responses");
 const AppError_1 = require("../../utils/AppError");
 const onBoarding = async (req, res) => {
     try {
-        const userId = req.user?.userId || (process.env.NODE_ENV !== "production" && req.body.userId);
+        const userId = req.user?.userId || (process.env.NODE_ENV !== "production" && req.body?.userId);
         const { phoneNumber, address } = req.body;
         const existingUser = await userModel_1.default.findById(userId);
         if (!existingUser) {
             return (0, Responses_1.sendErrorResponse)(res, 404, "User not found", "User not found");
         }
+        if (existingUser.completedOnboarding)
+            return (0, Responses_1.sendErrorResponse)(res, 400, "User is already onboarded", "User is already onboarded");
         const customer = await customerModel_1.default.findOne({ user: userId });
         if (!customer || existingUser.role !== "customer") {
             return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "User is not a customer");
         }
         existingUser.phoneNumber = phoneNumber;
         customer.address = address;
+        existingUser.completedOnboarding = true;
         await customer.save();
         await existingUser.save();
         (0, Responses_1.sendSuccessResponse)(res, 200, "Onboarding completed successfully", {
-            customerId: customer.customerId,
-            phoneNumber: customer.phoneNumber,
+            customerId: customer._id,
+            phoneNumber: existingUser.phoneNumber,
             address: customer.address,
         });
     }

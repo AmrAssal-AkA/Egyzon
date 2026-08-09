@@ -1,9 +1,9 @@
-import sendEmail from "../config/sendEmail";
+import sendnoReplayEmail from "../config/sendEmail";
 
 
 
 const verifyEmailTemplate = async (to: string, token: string, verificationUrl: string) => {
-    return await sendEmail(
+    return await sendnoReplayEmail(
         to,
         "Verify your email",
         `<div style="font-family: Arial, sans-serif; font-size: 16px; color: #333; text-align: center; padding: 20px;">

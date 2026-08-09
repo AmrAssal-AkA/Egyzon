@@ -13,9 +13,7 @@ export enum userRole {
 
 declare global {
     namespace Express {
-        interface Request {
-            user?: jwtPayload;
-        }
+        interface User extends jwtPayload {}
     }
 }
 

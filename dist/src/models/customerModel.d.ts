@@ -1,195 +1,144 @@
 import mongoose, { Schema } from 'mongoose';
 import { ICustomer } from "../types/User.types";
-declare const _default: mongoose.Model<ICustomer, {}, {}, {
-    id: string;
-}, mongoose.Document<unknown, {}, ICustomer, {
-    id: string;
-}, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+declare const _default: mongoose.Model<ICustomer, {}, {}, {}, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
     _id: mongoose.Types.ObjectId;
 } & {
     __v: number;
-}, "id"> & mongoose.HydratedDocumentOverrides<{
-    id: string;
-}>, Schema<ICustomer, mongoose.Model<ICustomer, any, any, any, any, any, ICustomer>, {}, {}, {}, {}, mongoose.DefaultSchemaOptions, ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-    id: string;
-}, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+}, Schema<ICustomer, mongoose.Model<ICustomer, any, any, any, any, any, ICustomer>, {}, {}, {}, {}, mongoose.DefaultSchemaOptions, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
     _id: mongoose.Types.ObjectId;
 } & {
     __v: number;
-}, "id"> & mongoose.HydratedDocumentOverrides<{
-    id: string;
-}>, {
-    FirstName?: mongoose.SchemaDefinitionProperty<string, ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+}, {
+    id?: mongoose.SchemaDefinitionProperty<string, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    LastName?: mongoose.SchemaDefinitionProperty<string, ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+    }>;
+    FirstName?: mongoose.SchemaDefinitionProperty<string, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    email?: mongoose.SchemaDefinitionProperty<string, ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+    }>;
+    LastName?: mongoose.SchemaDefinitionProperty<string, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    password?: mongoose.SchemaDefinitionProperty<string, ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+    }>;
+    email?: mongoose.SchemaDefinitionProperty<string, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    role?: mongoose.SchemaDefinitionProperty<"admin" | "customer" | "seller", ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+    }>;
+    password?: mongoose.SchemaDefinitionProperty<string, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    phoneNumber?: mongoose.SchemaDefinitionProperty<string | undefined, ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+    }>;
+    role?: mongoose.SchemaDefinitionProperty<"admin" | "customer" | "seller", ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    isBlocked?: mongoose.SchemaDefinitionProperty<boolean, ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+    }>;
+    phoneNumber?: mongoose.SchemaDefinitionProperty<string | undefined, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    isVerified?: mongoose.SchemaDefinitionProperty<boolean | undefined, ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+    }>;
+    isBlocked?: mongoose.SchemaDefinitionProperty<boolean, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    refreshToken?: mongoose.SchemaDefinitionProperty<string | undefined, ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+    }>;
+    isVerified?: mongoose.SchemaDefinitionProperty<boolean | undefined, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    emailVerificationToken?: mongoose.SchemaDefinitionProperty<string | undefined, ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+    }>;
+    refreshToken?: mongoose.SchemaDefinitionProperty<string | undefined, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    emailVerificationTokenExpiration?: mongoose.SchemaDefinitionProperty<Date | undefined, ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+    }>;
+    googleId?: mongoose.SchemaDefinitionProperty<string | undefined, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    customerId?: mongoose.SchemaDefinitionProperty<string, ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+    }>;
+    facebookId?: mongoose.SchemaDefinitionProperty<string | undefined, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    user?: mongoose.SchemaDefinitionProperty<mongoose.Types.ObjectId, ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+    }>;
+    resetPasswordToken?: mongoose.SchemaDefinitionProperty<string | undefined, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    orders?: mongoose.SchemaDefinitionProperty<mongoose.Types.ObjectId[], ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+    }>;
+    resetPasswordTokenExpiration?: mongoose.SchemaDefinitionProperty<Date | undefined, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    wishlist?: mongoose.SchemaDefinitionProperty<mongoose.Types.ObjectId[], ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+    }>;
+    emailVerificationToken?: mongoose.SchemaDefinitionProperty<string | undefined, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    cart?: mongoose.SchemaDefinitionProperty<mongoose.Types.ObjectId[], ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+    }>;
+    emailVerificationTokenExpiration?: mongoose.SchemaDefinitionProperty<Date | undefined, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    paymentMethods?: mongoose.SchemaDefinitionProperty<mongoose.Types.ObjectId[], ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+    }>;
+    completedOnboarding?: mongoose.SchemaDefinitionProperty<boolean | undefined, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    address?: mongoose.SchemaDefinitionProperty<string[] | undefined, ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+    }>;
+    forgetPasswordToken?: mongoose.SchemaDefinitionProperty<string | undefined, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    createdAt?: mongoose.SchemaDefinitionProperty<Date, ICustomer, mongoose.Document<unknown, {}, ICustomer, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ICustomer & {
+    }>;
+    forgetPasswordTokenExpiration?: mongoose.SchemaDefinitionProperty<Date | undefined, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
+    }>;
+    user?: mongoose.SchemaDefinitionProperty<mongoose.Types.ObjectId, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    orders?: mongoose.SchemaDefinitionProperty<mongoose.Types.ObjectId[], ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    wishlist?: mongoose.SchemaDefinitionProperty<mongoose.Types.ObjectId[], ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    cart?: mongoose.SchemaDefinitionProperty<mongoose.Types.ObjectId[], ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    paymentMethods?: mongoose.SchemaDefinitionProperty<mongoose.Types.ObjectId[], ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    address?: mongoose.SchemaDefinitionProperty<string[] | undefined, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    createdAt?: mongoose.SchemaDefinitionProperty<Date, ICustomer, mongoose.Document<unknown, {}, ICustomer, {}, mongoose.DefaultSchemaOptions> & ICustomer & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
 }, ICustomer>, ICustomer>;
 export default _default;
 //# sourceMappingURL=customerModel.d.ts.map

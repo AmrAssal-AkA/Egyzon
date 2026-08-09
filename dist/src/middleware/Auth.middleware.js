@@ -3,23 +3,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.isAuthenticated = void 0;
 const jwt_util_1 = require("../utils/jwt.util");
 const isAuthenticated = (req, res, next) => {
-    const sessionToken = req.cookies["session_token"];
-    if (!sessionToken) {
-        return res
-            .status(401)
-            .json({ error: "Unauthanticated: No session token provided" });
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.startsWith('Bearer') ? authHeader.split(' ')[1] : req.cookies?.Access_token;
+    if (!token) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
     }
-    const refreshAccessToken = req.cookies["refresh_token"];
     try {
-        let payload;
-        payload = (0, jwt_util_1.verifyAccessToken)(sessionToken);
-        req.user = payload;
-        payload = (0, jwt_util_1.verifyRefreshToken)(refreshAccessToken);
-        req.user = payload;
+        req.user = (0, jwt_util_1.verifyAccessToken)(token);
         next();
     }
-    catch (error) {
-        next();
+    catch (err) {
+        return res.status(401).json({ success: false, message: "Invalid or expired token" });
     }
 };
 exports.isAuthenticated = isAuthenticated;

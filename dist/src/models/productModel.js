@@ -32,17 +32,13 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const uuid_1 = require("uuid");
+const categoryModel_1 = __importDefault(require("./categoryModel"));
 const productSchema = new mongoose_1.Schema({
-    productId: {
-        type: String,
-        required: true,
-        unique: true,
-        default: () => (0, uuid_1.v4)(),
-        index: true,
-    },
     productName: {
         type: String,
         required: true,
@@ -67,20 +63,44 @@ const productSchema = new mongoose_1.Schema({
         type: Number,
         default: 0,
     },
+    sku: {
+        type: String,
+        required: true,
+        unique: true,
+    },
     status: {
         type: String,
-        enum: ['active', 'inactive'],
-        default: 'active',
+        enum: ["active", "inactive"],
+        default: "active",
     },
-    imageUrl: [{
+    imageUrl: [
+        {
             type: String,
             required: true,
-        }],
+        },
+    ],
     SellerId: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: 'Seller',
+        ref: "Seller",
     },
-}, { timestamps: true
+    categoryId: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Category",
+    },
+}, { timestamps: true });
+productSchema.pre("validate", async function () {
+    if (this.sku)
+        return;
+    if (!this.categoryId)
+        return;
+    const categoryDoc = await categoryModel_1.default.findById(this.categoryId).select("categoryName").exec();
+    if (!categoryDoc)
+        return;
+    const categoryPart = categoryDoc.categoryName.slice(0, 4).toUpperCase();
+    const namePart = this.productName.replace(/\s+/g, "").slice(0, 4).toUpperCase();
+    const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+    const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+    this.sku = `${categoryPart}-${namePart}-${datePart}-${randomPart}`;
 });
-exports.default = mongoose_1.default.model('Product', productSchema);
+exports.default = mongoose_1.default.model("Product", productSchema);
 //# sourceMappingURL=productModel.js.map

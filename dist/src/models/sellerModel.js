@@ -34,15 +34,7 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const uuid_1 = require("uuid");
 const SellerSchema = new mongoose_1.Schema({
-    sellerId: {
-        type: String,
-        required: true,
-        unique: true,
-        default: () => (0, uuid_1.v4)(),
-        index: true,
-    },
     user: {
         type: mongoose_1.default.Schema.Types.ObjectId,
         ref: "User",
@@ -50,13 +42,13 @@ const SellerSchema = new mongoose_1.Schema({
         unique: true,
         index: true,
     },
-    conercialRegisterNumber: {
-        type: Number,
+    commercialRegisterNumber: {
+        type: String,
         required: true,
         unique: true,
     },
     taxCardNumber: {
-        type: Number,
+        type: String,
         required: true,
         unique: true,
     },
@@ -66,12 +58,12 @@ const SellerSchema = new mongoose_1.Schema({
     },
     sellerDocuments: {
         commercialRegisterUrl: {
-            type: [String],
-            default: [],
+            type: String,
+            default: "",
         },
         taxCardUrl: {
-            type: [String],
-            default: [],
+            type: String,
+            default: "",
         },
     },
     applicantStatus: {
@@ -101,11 +93,6 @@ const SellerSchema = new mongoose_1.Schema({
         type: mongoose_1.default.Schema.Types.ObjectId,
         ref: "Wallet",
         required: true,
-    },
-    contary: {
-        type: String,
-        required: true,
-        default: "Egypt",
     },
 }, { timestamps: true });
 exports.default = mongoose_1.default.model("Seller", SellerSchema);

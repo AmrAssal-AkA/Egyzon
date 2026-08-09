@@ -1,8 +1,7 @@
 import { Types } from "mongoose";
 export interface IWallet {
     _id: Types.ObjectId;
-    walletId: string;
-    sellerId: string;
+    sellerId: Types.ObjectId;
     Amount: number;
     currency: string;
     transactionType: string;

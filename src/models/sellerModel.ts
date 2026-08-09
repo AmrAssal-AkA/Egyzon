@@ -10,13 +10,13 @@ const SellerSchema = new Schema<ISeller>(
       unique: true,
       index: true,
     },
-    conercialRegisterNumber: {
-      type: Number,
+    commercialRegisterNumber: {
+      type: String,
       required: true,
       unique: true,
     },
     taxCardNumber: {
-      type: Number,
+      type: String,
       required: true,
       unique: true,
     },
@@ -26,12 +26,12 @@ const SellerSchema = new Schema<ISeller>(
     },
     sellerDocuments: {
       commercialRegisterUrl: {
-        type: [String],
-        default: [],
+        type: String,
+        default: "",
       },
       taxCardUrl: {
-        type: [String],
-        default: [],
+        type: String,
+        default: "",
       },
     },
     applicantStatus: {
@@ -60,12 +60,7 @@ const SellerSchema = new Schema<ISeller>(
     wallet: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Wallet",
-      required: true,
-    },
-    contary: {
-      type: String,
-      required: true,
-      default: "Egypt",
+      default: null,
     },
   },
   { timestamps: true },

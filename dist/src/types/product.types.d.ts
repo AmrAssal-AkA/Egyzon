@@ -8,8 +8,15 @@ export interface IProduct {
     stock: number;
     AvgRating: number;
     status: 'active' | 'inactive';
+    sku: string;
     imageUrl: string[];
     SellerId: Types.ObjectId;
-    createdAt: Date;
+    categoryId: Types.ObjectId;
+}
+export interface ICategory {
+    categoryName: string;
+    description: string;
+    imageUrl: string;
+    Products: Types.ObjectId[];
 }
 //# sourceMappingURL=product.types.d.ts.map

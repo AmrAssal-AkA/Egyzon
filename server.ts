@@ -15,6 +15,7 @@ import sellerRoute from './src/routes/seller.route';
 import cartRoute from './src/routes/cart.route';
 import CategoryRoute from './src/routes/category.routes';
 import { swaggerSpec } from "./src/docs/swagger";
+import customerRoute from "./src/routes/customer.route";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -36,6 +37,9 @@ app.use("/api/wishlist", wishlistRoute);
 app.use("/api/seller", sellerRoute);
 app.use("/api/cart", cartRoute);
 app.use("/api/category", CategoryRoute);
+app.use("/api/customer", customerRoute);
+
+//swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 //default route

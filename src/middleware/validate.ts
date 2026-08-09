@@ -7,6 +7,7 @@ export const validate = (Schema: ZodObject) => (req: Request, res: Response, nex
             body: req.body,
             query: req.query,
             params: req.params,
+            files: req.files,
         })
         next();
     }catch(error){

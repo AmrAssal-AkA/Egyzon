@@ -18,6 +18,8 @@ export const swaggerSpec = {
     { name: "Cart", description: "Cart management" },
     { name: "Wishlist", description: "Wishlist management" },
     { name: "Seller", description: "Seller onboarding and store setup" },
+    { name: "Categories", description: "Category management" },
+    { name: "Customer", description: "Customer account settings" },
   ],
   components: {
     securitySchemes: {
@@ -73,15 +75,27 @@ export const swaggerSpec = {
       OnboardingRequest: {
         type: "object",
         properties: {
-          FirstName: { type: "string", example: "Ahmed" },
-          LastName: { type: "string", example: "Ali" },
-          email: { type: "string", format: "email", example: "ahmed@example.com" },
           phoneNumber: { type: "string", example: "+201001112223" },
           address: {
             type: "string",
             example: "Cairo, Nasr City, Street 10",
           },
-          isBlocked: { type: "boolean" },
+          userId: { type: "string", example: "66a1f2f3d4c5b6a7c8d9e0f1" },
+        },
+      },
+      ForgetPasswordRequest: {
+        type: "object",
+        required: ["emailAddress"],
+        properties: {
+          emailAddress: { type: "string", format: "email", example: "ahmed@example.com" },
+        },
+      },
+      ResetPasswordRequest: {
+        type: "object",
+        required: ["newPassword", "confirmNewPassword"],
+        properties: {
+          newPassword: { type: "string", format: "password", example: "Password_123" },
+          confirmNewPassword: { type: "string", format: "password", example: "Password_123" },
         },
       },
       ProductItem: {
@@ -161,6 +175,15 @@ export const swaggerSpec = {
         required: ["productId"],
         properties: {
           productId: { type: "string", example: "66a1f2f3d4c5b6a7c8d9e0f1" },
+        },
+      },
+      CategoryCreateRequest: {
+        type: "object",
+        required: ["name", "description"],
+        properties: {
+          name: { type: "string", example: "Electronics" },
+          description: { type: "string", example: "Gadgets, devices, and accessories." },
+          image: { type: "string", format: "binary" },
         },
       },
       SellerApplyRequest: {
@@ -315,6 +338,67 @@ export const swaggerSpec = {
           200: {
             description: "Onboarding completed successfully",
           },
+          400: {
+            description: "User is already onboarded or user is not a customer",
+          },
+          404: {
+            description: "User not found",
+          },
+        },
+      },
+    },
+    "/api/auth/forget-password": {
+      post: {
+        tags: ["Auth"],
+        summary: "Request a password reset email",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/ForgetPasswordRequest" },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Reset password email sent successfully",
+          },
+          404: {
+            description: "Email address or user not found",
+          },
+        },
+      },
+    },
+    "/api/auth/reset-password": {
+      patch: {
+        tags: ["Auth"],
+        summary: "Reset a password using a recovery token",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/ResetPasswordRequest" },
+            },
+          },
+        },
+        parameters: [
+          {
+            name: "token",
+            in: "query",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Password reset successfully",
+          },
+          400: {
+            description: "Invalid, missing, or expired token",
+          },
+          404: {
+            description: "User or token not found",
+          },
         },
       },
     },
@@ -360,6 +444,31 @@ export const swaggerSpec = {
           },
           400: {
             description: "Invalid or expired token",
+          },
+        },
+      },
+    },
+    "/api/auth/continue-with-google": {
+      get: {
+        tags: ["Auth"],
+        summary: "Start Google OAuth sign-in",
+        responses: {
+          302: {
+            description: "Redirects to Google authentication",
+          },
+        },
+      },
+    },
+    "/api/auth/google/callback": {
+      get: {
+        tags: ["Auth"],
+        summary: "Google OAuth callback",
+        responses: {
+          302: {
+            description: "Redirects after successful Google authentication",
+          },
+          401: {
+            description: "Google authentication failed",
           },
         },
       },
@@ -636,6 +745,58 @@ export const swaggerSpec = {
         responses: {
           200: {
             description: "Store setup successful",
+          },
+        },
+      },
+    },
+    "/api/category/addCategory": {
+      post: {
+        tags: ["Categories"],
+        summary: "Create a category",
+        security: [{ cookieAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "multipart/form-data": {
+              schema: { $ref: "#/components/schemas/CategoryCreateRequest" },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description: "Category created successfully",
+          },
+          401: {
+            description: "Unauthorized",
+          },
+          403: {
+            description: "Forbidden",
+          },
+        },
+      },
+    },
+    "/api/customer/change-password": {
+      put: {
+        tags: ["Customer"],
+        summary: "Change the current customer's password",
+        security: [{ cookieAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/ResetPasswordRequest" },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Password changed successfully",
+          },
+          401: {
+            description: "Unauthorized",
+          },
+          400: {
+            description: "Validation failed",
           },
         },
       },

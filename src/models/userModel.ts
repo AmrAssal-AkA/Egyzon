@@ -17,7 +17,12 @@ const UserSchema = new Schema<IUser>({
   },
   password: {
     type: String,
-    required: true,
+    required: function(this: IUser) {
+         if (this.googleId || this.facebookId) {
+            return false;
+         }
+         return true;
+    },
   },
   role: {
     type: String,
@@ -38,11 +43,39 @@ const UserSchema = new Schema<IUser>({
     type: Boolean,
     default: false,
   },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true,
+    default: null,
+  },
+  facebookId: {
+    type: String,
+    unique: true,
+    sparse: true,
+    default: null,
+  },
+  resetPasswordToken: {
+    type: String,
+  },
+  resetPasswordTokenExpiration: {
+    type: Date,
+  },
   emailVerificationToken: {
     type: String,
   },
   emailVerificationTokenExpiration: {
     type: Date,
+  },
+  forgetPasswordToken: {
+    type: String,
+  },
+  forgetPasswordTokenExpiration: {
+    type: Date,
+  },
+  completedOnboarding: {
+    type: Boolean,
+    default: false,
   },
 }, { timestamps: true });
 

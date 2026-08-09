@@ -9,6 +9,7 @@ export interface IProduct {
     stock: number;
     AvgRating: number;
     status: 'active' | 'inactive';
+    sku: string;
     imageUrl: string[];
     SellerId: Types.ObjectId;
     categoryId: Types.ObjectId;

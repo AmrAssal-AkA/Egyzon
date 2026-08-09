@@ -1,132 +1,114 @@
 import mongoose, { Schema } from "mongoose";
 import { IUser } from "../types/User.types";
-declare const _default: mongoose.Model<IUser, {}, {}, {
-    id: string;
-}, mongoose.Document<unknown, {}, IUser, {
-    id: string;
-}, mongoose.DefaultSchemaOptions> & Omit<IUser & {
+declare const _default: mongoose.Model<IUser, {}, {}, {}, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
     _id: mongoose.Types.ObjectId;
 } & {
     __v: number;
-}, "id"> & mongoose.HydratedDocumentOverrides<{
-    id: string;
-}>, Schema<IUser, mongoose.Model<IUser, any, any, any, any, any, IUser>, {}, {}, {}, {}, mongoose.DefaultSchemaOptions, IUser, mongoose.Document<unknown, {}, IUser, {
-    id: string;
-}, mongoose.DefaultSchemaOptions> & Omit<IUser & {
+}, Schema<IUser, mongoose.Model<IUser, any, any, any, any, any, IUser>, {}, {}, {}, {}, mongoose.DefaultSchemaOptions, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
     _id: mongoose.Types.ObjectId;
 } & {
     __v: number;
-}, "id"> & mongoose.HydratedDocumentOverrides<{
-    id: string;
-}>, {
-    FirstName?: mongoose.SchemaDefinitionProperty<string, IUser, mongoose.Document<unknown, {}, IUser, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<IUser & {
+}, {
+    id?: mongoose.SchemaDefinitionProperty<string, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    LastName?: mongoose.SchemaDefinitionProperty<string, IUser, mongoose.Document<unknown, {}, IUser, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<IUser & {
+    }>;
+    FirstName?: mongoose.SchemaDefinitionProperty<string, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    email?: mongoose.SchemaDefinitionProperty<string, IUser, mongoose.Document<unknown, {}, IUser, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<IUser & {
+    }>;
+    LastName?: mongoose.SchemaDefinitionProperty<string, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    password?: mongoose.SchemaDefinitionProperty<string, IUser, mongoose.Document<unknown, {}, IUser, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<IUser & {
+    }>;
+    email?: mongoose.SchemaDefinitionProperty<string, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    role?: mongoose.SchemaDefinitionProperty<"admin" | "customer" | "seller", IUser, mongoose.Document<unknown, {}, IUser, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<IUser & {
+    }>;
+    password?: mongoose.SchemaDefinitionProperty<string, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    phoneNumber?: mongoose.SchemaDefinitionProperty<string | undefined, IUser, mongoose.Document<unknown, {}, IUser, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<IUser & {
+    }>;
+    role?: mongoose.SchemaDefinitionProperty<"admin" | "customer" | "seller", IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    isBlocked?: mongoose.SchemaDefinitionProperty<boolean, IUser, mongoose.Document<unknown, {}, IUser, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<IUser & {
+    }>;
+    phoneNumber?: mongoose.SchemaDefinitionProperty<string | undefined, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    isVerified?: mongoose.SchemaDefinitionProperty<boolean | undefined, IUser, mongoose.Document<unknown, {}, IUser, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<IUser & {
+    }>;
+    isBlocked?: mongoose.SchemaDefinitionProperty<boolean, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    refreshToken?: mongoose.SchemaDefinitionProperty<string | undefined, IUser, mongoose.Document<unknown, {}, IUser, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<IUser & {
+    }>;
+    isVerified?: mongoose.SchemaDefinitionProperty<boolean | undefined, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    emailVerificationToken?: mongoose.SchemaDefinitionProperty<string | undefined, IUser, mongoose.Document<unknown, {}, IUser, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<IUser & {
+    }>;
+    refreshToken?: mongoose.SchemaDefinitionProperty<string | undefined, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    emailVerificationTokenExpiration?: mongoose.SchemaDefinitionProperty<Date | undefined, IUser, mongoose.Document<unknown, {}, IUser, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<IUser & {
+    }>;
+    googleId?: mongoose.SchemaDefinitionProperty<string | undefined, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    createdAt?: mongoose.SchemaDefinitionProperty<Date, IUser, mongoose.Document<unknown, {}, IUser, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<IUser & {
+    }>;
+    facebookId?: mongoose.SchemaDefinitionProperty<string | undefined, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
+    }>;
+    resetPasswordToken?: mongoose.SchemaDefinitionProperty<string | undefined, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    resetPasswordTokenExpiration?: mongoose.SchemaDefinitionProperty<Date | undefined, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    emailVerificationToken?: mongoose.SchemaDefinitionProperty<string | undefined, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    emailVerificationTokenExpiration?: mongoose.SchemaDefinitionProperty<Date | undefined, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    completedOnboarding?: mongoose.SchemaDefinitionProperty<boolean | undefined, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    forgetPasswordToken?: mongoose.SchemaDefinitionProperty<string | undefined, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    forgetPasswordTokenExpiration?: mongoose.SchemaDefinitionProperty<Date | undefined, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    createdAt?: mongoose.SchemaDefinitionProperty<Date, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
 }, IUser>, IUser>;
 export default _default;
 //# sourceMappingURL=userModel.d.ts.map

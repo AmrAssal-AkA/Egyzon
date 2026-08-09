@@ -7,7 +7,7 @@ const addToWishlist = async (req: Request, res: Response) => {
   try {
     const user =
       req.user?.userId ||
-      (process.env.NODE_ENV !== "production" && req.body.userId);
+      (process.env.NODE_ENV !== "production" && req.body?.userId);
     const { productId } = req.body;
     if (!user) {
       return sendErrorResponse(
@@ -37,7 +37,7 @@ const removeFromWishlist = async (req: Request, res: Response) => {
   try {
     const user =
       req.user?.userId ||
-      (process.env.NODE_ENV !== "production" && req.body.userId);
+      (process.env.NODE_ENV !== "production" && req.body?.userId);
     const { productId } = req.body;
     if (!user) {
       return sendErrorResponse(
@@ -67,7 +67,7 @@ const getWishlist = async (req: Request, res: Response) => {
   try {
     const user =
       req.user?.userId ||
-      (process.env.NODE_ENV !== "production" && req.body.userId);
+      (process.env.NODE_ENV !== "production" && req.body?.userId);
     if (!user) {
       return sendErrorResponse(
         res,
@@ -87,7 +87,7 @@ const moveToCart = async (req: Request, res: Response) => {
   try {
     const user =
       req.user?.userId ||
-      (process.env.NODE_ENV !== "production" && req.body.userId);
+      (process.env.NODE_ENV !== "production" && req.body?.userId);
     const { productId } = req.body;
     if (!user) {
       return sendErrorResponse(

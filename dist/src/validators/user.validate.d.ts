@@ -17,7 +17,7 @@ export declare const updateUserSchema: z.ZodObject<{
         FirstName: z.ZodOptional<z.ZodString>;
         LastName: z.ZodOptional<z.ZodString>;
         email: z.ZodOptional<z.ZodString>;
-        address: z.ZodOptional<z.ZodArray<z.ZodString>>;
+        address: z.ZodOptional<z.ZodString>;
         phoneNumber: z.ZodOptional<z.ZodString>;
         isBlocked: z.ZodOptional<z.ZodBoolean>;
     }, z.core.$strip>;
@@ -35,8 +35,20 @@ export declare const userResposnseSchema: z.ZodObject<{
         seller: "seller";
     }>;
     address: z.ZodArray<z.ZodString>;
+    phoneNumber: z.ZodArray<z.ZodString>;
     isBlocked: z.ZodBoolean;
     createdAt: z.ZodDate;
+}, z.core.$strip>;
+export declare const forgetPasswordSchema: z.ZodObject<{
+    body: z.ZodObject<{
+        emailAddress: z.ZodString;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+export declare const resetPasswordSchema: z.ZodObject<{
+    body: z.ZodObject<{
+        newPassword: z.ZodString;
+        confirmNewPassword: z.ZodString;
+    }, z.core.$strip>;
 }, z.core.$strip>;
 export type ReagisterSchemaType = z.infer<typeof RegisterSchema>['body'];
 export type LoginSchemaType = z.infer<typeof LoginSchema>['body'];

@@ -7,16 +7,16 @@ import { AppError } from "../../utils/AppError";
 
 const onBoarding = async (req: Request, res: Response) => {
   try{
-  const userId = req.user?.userId || (process.env.NODE_ENV !== "production" && req.body.userId);
+  const userId = req.user?.userId || (process.env.NODE_ENV !== "production" && req.body?.userId);
   const { phoneNumber, address } = req.body;
 
   const existingUser = await User.findById(userId);
   if (!existingUser) {
     return sendErrorResponse(res, 404, "User not found", "User not found");
   }
-  if (!existingUser.isVerified){
-    return sendErrorResponse(res, 400, "User is not verified", "User is not verified");
-  }
+
+  if(existingUser.completedOnboarding)return sendErrorResponse(res, 400, "User is already onboarded", "User is already onboarded");
+
 
   const customer = await Customer.findOne({ user: userId });
   if (!customer || existingUser.role !== "customer") {
@@ -24,6 +24,7 @@ const onBoarding = async (req: Request, res: Response) => {
   }
   existingUser.phoneNumber = phoneNumber;
   customer.address = address;
+  existingUser.completedOnboarding = true;
   await customer.save();
   await existingUser.save();
 

@@ -1,10 +1,10 @@
 import { z } from "zod";
 export declare const sellerBaseSchema: z.ZodObject<{
-    storeName: z.ZodString;
-    commercialRegisterNumber: z.ZodString;
-    taxCardNumber: z.ZodString;
-    commercialRegisterImage: z.ZodCustom<File, File>;
-    taxCardImage: z.ZodCustom<File, File>;
+    body: z.ZodObject<{
+        storeName: z.ZodString;
+        commercialRegisterNumber: z.ZodString;
+        taxCardNumber: z.ZodString;
+    }, z.core.$strip>;
 }, z.core.$strip>;
 export declare const sellerSetupStoreSchema: z.ZodObject<{
     body: z.ZodObject<{

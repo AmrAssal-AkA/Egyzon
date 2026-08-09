@@ -1,6 +1,7 @@
 import {HydratedDocument, Types} from "mongoose";
 
 export interface IUser {
+    id: string;
     FirstName: string;
     LastName: string;
     email: string;
@@ -10,8 +11,15 @@ export interface IUser {
     isBlocked: boolean;
     isVerified?: boolean;
     refreshToken?: string;
+    googleId?: string;
+    facebookId?: string;
+    resetPasswordToken?: string;
+    resetPasswordTokenExpiration?: Date;
     emailVerificationToken?: string;
     emailVerificationTokenExpiration?: Date;
+    completedOnboarding?: boolean;
+    forgetPasswordToken?: string;
+    forgetPasswordTokenExpiration?: Date;
     createdAt: Date;
 }
 
@@ -29,8 +37,8 @@ export interface ICustomer  extends IUser {
 export interface ISeller  extends IUser {
     sellerId: string;
     user: Types.ObjectId;
-    conercialRegisterNumber: number;
-    taxCardNumber: number;
+    commercialRegisterNumber: string;
+    taxCardNumber: string;
     sellerDocuments: {
         commercialRegisterFile: string[];
         taxCardFile: string[];

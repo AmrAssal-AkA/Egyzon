@@ -34,15 +34,7 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const uuid_1 = require("uuid");
 const CustomerSchema = new mongoose_1.Schema({
-    customerId: {
-        type: String,
-        required: true,
-        unique: true,
-        default: () => (0, uuid_1.v4)(),
-        index: true,
-    },
     user: {
         type: mongoose_1.default.Schema.Types.ObjectId,
         ref: "User",
@@ -55,12 +47,7 @@ const CustomerSchema = new mongoose_1.Schema({
     },
     wishlist: {
         type: [mongoose_1.default.Schema.Types.ObjectId],
-        ref: "Product",
-        default: [],
-    },
-    cart: {
-        type: [mongoose_1.default.Schema.Types.ObjectId],
-        ref: "Product",
+        ref: "Wishlist",
         default: [],
     },
     paymentMethods: {
@@ -71,10 +58,6 @@ const CustomerSchema = new mongoose_1.Schema({
     address: {
         type: [String],
         default: []
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now,
     },
 }, { timestamps: true });
 exports.default = mongoose_1.default.model("Customer", CustomerSchema);

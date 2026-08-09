@@ -16,6 +16,7 @@ exports.upload = (0, multer_1.default)({
         if (mimetype && extname) {
             return cb(null, true);
         }
+        console.log("Error: File upload only supports the following filetypes - " + filetypes);
         cb(new Error("Error: File upload only supports the following filetypes - " + filetypes));
     },
     limits: { fileSize: 25 * 1024 * 1024 },

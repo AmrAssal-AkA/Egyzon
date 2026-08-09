@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-import { IProduct } from '../types/product.types';
+import mongoose from "mongoose";
+import { IProduct } from "../types/product.types";
 declare const _default: mongoose.Model<IProduct, {}, {}, {}, mongoose.Document<unknown, {}, IProduct, {}, mongoose.DefaultSchemaOptions> & IProduct & {
     _id: mongoose.Types.ObjectId;
 } & {

@@ -6,7 +6,7 @@ export declare const swaggerSpec: {
         readonly description: "Swagger documentation for the Egyzon server routes and endpoints.";
     };
     readonly servers: readonly [{
-        readonly url: "http://localhost:3000";
+        readonly url: "http://localhost:8080";
         readonly description: "Local development server";
     }];
     readonly tags: readonly [{
@@ -20,13 +20,19 @@ export declare const swaggerSpec: {
         readonly description: "Product browsing and seller product actions";
     }, {
         readonly name: "Cart";
-        readonly description: "Cart creation";
+        readonly description: "Cart management";
     }, {
         readonly name: "Wishlist";
         readonly description: "Wishlist management";
     }, {
         readonly name: "Seller";
         readonly description: "Seller onboarding and store setup";
+    }, {
+        readonly name: "Categories";
+        readonly description: "Category management";
+    }, {
+        readonly name: "Customer";
+        readonly description: "Customer account settings";
     }];
     readonly components: {
         readonly securitySchemes: {
@@ -80,7 +86,7 @@ export declare const swaggerSpec: {
             };
             readonly RegisterRequest: {
                 readonly type: "object";
-                readonly required: readonly ["FirstName", "LastName", "email", "password"];
+                readonly required: readonly ["FirstName", "LastName", "email", "password", "confirmPassword"];
                 readonly properties: {
                     readonly FirstName: {
                         readonly type: "string";
@@ -96,6 +102,11 @@ export declare const swaggerSpec: {
                         readonly example: "ahmed@example.com";
                     };
                     readonly password: {
+                        readonly type: "string";
+                        readonly format: "password";
+                        readonly example: "password123";
+                    };
+                    readonly confirmPassword: {
                         readonly type: "string";
                         readonly format: "password";
                         readonly example: "password123";
@@ -126,20 +137,48 @@ export declare const swaggerSpec: {
                         readonly example: "+201001112223";
                     };
                     readonly address: {
-                        readonly type: "array";
-                        readonly items: {
-                            readonly type: "string";
-                        };
-                        readonly example: readonly ["Cairo", "Nasr City", "Street 10"];
+                        readonly type: "string";
+                        readonly example: "Cairo, Nasr City, Street 10";
                     };
-                    readonly isBlocked: {
-                        readonly type: "boolean";
+                    readonly userId: {
+                        readonly type: "string";
+                        readonly example: "66a1f2f3d4c5b6a7c8d9e0f1";
+                    };
+                };
+            };
+            readonly ForgetPasswordRequest: {
+                readonly type: "object";
+                readonly required: readonly ["emailAddress"];
+                readonly properties: {
+                    readonly emailAddress: {
+                        readonly type: "string";
+                        readonly format: "email";
+                        readonly example: "ahmed@example.com";
+                    };
+                };
+            };
+            readonly ResetPasswordRequest: {
+                readonly type: "object";
+                readonly required: readonly ["newPassword", "confirmNewPassword"];
+                readonly properties: {
+                    readonly newPassword: {
+                        readonly type: "string";
+                        readonly format: "password";
+                        readonly example: "Password_123";
+                    };
+                    readonly confirmNewPassword: {
+                        readonly type: "string";
+                        readonly format: "password";
+                        readonly example: "Password_123";
                     };
                 };
             };
             readonly ProductItem: {
                 readonly type: "object";
                 readonly properties: {
+                    readonly _id: {
+                        readonly type: "string";
+                    };
                     readonly productName: {
                         readonly type: "string";
                     };
@@ -259,6 +298,10 @@ export declare const swaggerSpec: {
                         readonly type: "number";
                         readonly example: 299.99;
                     };
+                    readonly name: {
+                        readonly type: "string";
+                        readonly example: "Wireless Headphones";
+                    };
                 };
             };
             readonly CartCreateRequest: {
@@ -275,6 +318,7 @@ export declare const swaggerSpec: {
             };
             readonly WishlistRequest: {
                 readonly type: "object";
+                readonly required: readonly ["productId"];
                 readonly properties: {
                     readonly productId: {
                         readonly type: "string";
@@ -282,9 +326,27 @@ export declare const swaggerSpec: {
                     };
                 };
             };
+            readonly CategoryCreateRequest: {
+                readonly type: "object";
+                readonly required: readonly ["name", "description"];
+                readonly properties: {
+                    readonly name: {
+                        readonly type: "string";
+                        readonly example: "Electronics";
+                    };
+                    readonly description: {
+                        readonly type: "string";
+                        readonly example: "Gadgets, devices, and accessories.";
+                    };
+                    readonly image: {
+                        readonly type: "string";
+                        readonly format: "binary";
+                    };
+                };
+            };
             readonly SellerApplyRequest: {
                 readonly type: "object";
-                readonly required: readonly ["storeName", "commercialRegisterNumber", "taxCardNumber", "contary", "commercialRegisterImage", "taxCardImage"];
+                readonly required: readonly ["storeName", "commercialRegisterNumber", "taxCardNumber", "commercialRegisterImage", "taxCardImage"];
                 readonly properties: {
                     readonly storeName: {
                         readonly type: "string";
@@ -298,10 +360,6 @@ export declare const swaggerSpec: {
                         readonly type: "string";
                         readonly example: "TC-987654";
                     };
-                    readonly contary: {
-                        readonly type: "string";
-                        readonly example: "Egypt";
-                    };
                     readonly commercialRegisterImage: {
                         readonly type: "string";
                         readonly format: "binary";
@@ -314,7 +372,7 @@ export declare const swaggerSpec: {
             };
             readonly SellerSetupRequest: {
                 readonly type: "object";
-                readonly required: readonly ["storeDescription", "storeType", "storephysicalAddress", "storeOnlineAddress", "storeLogo"];
+                readonly required: readonly ["storeDescription", "storeType", "storeLogo", "storeBanner"];
                 readonly properties: {
                     readonly storeDescription: {
                         readonly type: "string";
@@ -361,6 +419,33 @@ export declare const swaggerSpec: {
                                 };
                             };
                         };
+                    };
+                };
+            };
+        };
+        readonly "/api/auth/me": {
+            readonly get: {
+                readonly tags: readonly ["Auth"];
+                readonly summary: "Get current authenticated user profile";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }];
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "User profile retrieved successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                    };
+                    readonly 404: {
+                        readonly description: "User not found";
                     };
                 };
             };
@@ -442,7 +527,7 @@ export declare const swaggerSpec: {
         readonly "/api/auth/onBoarding": {
             readonly patch: {
                 readonly tags: readonly ["Auth"];
-                readonly summary: "Complete customer onboarding";
+                readonly summary: "Complete customer onboarding / update user profile";
                 readonly security: readonly [{
                     readonly cookieAuth: readonly [];
                 }];
@@ -459,6 +544,71 @@ export declare const swaggerSpec: {
                 readonly responses: {
                     readonly 200: {
                         readonly description: "Onboarding completed successfully";
+                    };
+                    readonly 400: {
+                        readonly description: "User is already onboarded or user is not a customer";
+                    };
+                    readonly 404: {
+                        readonly description: "User not found";
+                    };
+                };
+            };
+        };
+        readonly "/api/auth/forget-password": {
+            readonly post: {
+                readonly tags: readonly ["Auth"];
+                readonly summary: "Request a password reset email";
+                readonly requestBody: {
+                    readonly required: true;
+                    readonly content: {
+                        readonly "application/json": {
+                            readonly schema: {
+                                readonly $ref: "#/components/schemas/ForgetPasswordRequest";
+                            };
+                        };
+                    };
+                };
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Reset password email sent successfully";
+                    };
+                    readonly 404: {
+                        readonly description: "Email address or user not found";
+                    };
+                };
+            };
+        };
+        readonly "/api/auth/reset-password": {
+            readonly patch: {
+                readonly tags: readonly ["Auth"];
+                readonly summary: "Reset a password using a recovery token";
+                readonly requestBody: {
+                    readonly required: true;
+                    readonly content: {
+                        readonly "application/json": {
+                            readonly schema: {
+                                readonly $ref: "#/components/schemas/ResetPasswordRequest";
+                            };
+                        };
+                    };
+                };
+                readonly parameters: readonly [{
+                    readonly name: "token";
+                    readonly in: "query";
+                    readonly required: true;
+                    readonly schema: {
+                        readonly type: "string";
+                    };
+                }];
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Password reset successfully";
+                    };
+                    readonly 400: {
+                        readonly description: "Invalid, missing, or expired token";
+                    };
+                    readonly 404: {
+                        readonly description: "User or token not found";
                     };
                 };
             };
@@ -492,6 +642,9 @@ export declare const swaggerSpec: {
             readonly get: {
                 readonly tags: readonly ["Auth"];
                 readonly summary: "Verify user email with token";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }];
                 readonly parameters: readonly [{
                     readonly name: "token";
                     readonly in: "query";
@@ -504,6 +657,34 @@ export declare const swaggerSpec: {
                     readonly 200: {
                         readonly description: "Email verified successfully";
                     };
+                    readonly 400: {
+                        readonly description: "Invalid or expired token";
+                    };
+                };
+            };
+        };
+        readonly "/api/auth/continue-with-google": {
+            readonly get: {
+                readonly tags: readonly ["Auth"];
+                readonly summary: "Start Google OAuth sign-in";
+                readonly responses: {
+                    readonly 302: {
+                        readonly description: "Redirects to Google authentication";
+                    };
+                };
+            };
+        };
+        readonly "/api/auth/google/callback": {
+            readonly get: {
+                readonly tags: readonly ["Auth"];
+                readonly summary: "Google OAuth callback";
+                readonly responses: {
+                    readonly 302: {
+                        readonly description: "Redirects after successful Google authentication";
+                    };
+                    readonly 401: {
+                        readonly description: "Google authentication failed";
+                    };
                 };
             };
         };
@@ -515,14 +696,14 @@ export declare const swaggerSpec: {
                     readonly name: "page";
                     readonly in: "query";
                     readonly schema: {
-                        readonly type: "number";
+                        readonly type: "integer";
                         readonly default: 1;
                     };
                 }, {
                     readonly name: "limit";
                     readonly in: "query";
                     readonly schema: {
-                        readonly type: "number";
+                        readonly type: "integer";
                         readonly default: 10;
                     };
                 }];
@@ -576,7 +757,7 @@ export declare const swaggerSpec: {
         readonly "/api/product/seller/product/{productId}": {
             readonly patch: {
                 readonly tags: readonly ["Products"];
-                readonly summary: "Update a seller product";
+                readonly summary: "Update a seller product / apply discount";
                 readonly security: readonly [{
                     readonly cookieAuth: readonly [];
                 }];
@@ -605,7 +786,61 @@ export declare const swaggerSpec: {
                 };
             };
         };
+        readonly "/api/product/{productId}": {
+            readonly get: {
+                readonly tags: readonly ["Products"];
+                readonly summary: "Get product details by ID";
+                readonly parameters: readonly [{
+                    readonly name: "productId";
+                    readonly in: "path";
+                    readonly required: true;
+                    readonly schema: {
+                        readonly type: "string";
+                    };
+                }];
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Product retrieved successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 400: {
+                        readonly description: "Product ID not found";
+                    };
+                };
+            };
+        };
         readonly "/api/cart": {
+            readonly get: {
+                readonly tags: readonly ["Cart"];
+                readonly summary: "Get user cart";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }];
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Cart retrieved successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                    };
+                    readonly 404: {
+                        readonly description: "Cart not found";
+                    };
+                };
+            };
             readonly post: {
                 readonly tags: readonly ["Cart"];
                 readonly summary: "Create a cart";
@@ -625,6 +860,26 @@ export declare const swaggerSpec: {
                 readonly responses: {
                     readonly 201: {
                         readonly description: "Cart created successfully";
+                    };
+                };
+            };
+        };
+        readonly "/api/cart/remove": {
+            readonly delete: {
+                readonly tags: readonly ["Cart"];
+                readonly summary: "Remove the current user's cart";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }];
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Cart removed successfully";
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                    };
+                    readonly 404: {
+                        readonly description: "Cart not found";
                     };
                 };
             };
@@ -689,6 +944,36 @@ export declare const swaggerSpec: {
                 };
             };
         };
+        readonly "/api/wishlist/move-to-cart": {
+            readonly post: {
+                readonly tags: readonly ["Wishlist"];
+                readonly summary: "Move product from wishlist to cart";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }];
+                readonly requestBody: {
+                    readonly required: true;
+                    readonly content: {
+                        readonly "application/json": {
+                            readonly schema: {
+                                readonly $ref: "#/components/schemas/WishlistRequest";
+                            };
+                        };
+                    };
+                };
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Product moved to cart successfully";
+                    };
+                    readonly 400: {
+                        readonly description: "Product ID is required";
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                    };
+                };
+            };
+        };
         readonly "/api/seller/apply": {
             readonly post: {
                 readonly tags: readonly ["Seller"];
@@ -733,6 +1018,66 @@ export declare const swaggerSpec: {
                 readonly responses: {
                     readonly 200: {
                         readonly description: "Store setup successful";
+                    };
+                };
+            };
+        };
+        readonly "/api/category/addCategory": {
+            readonly post: {
+                readonly tags: readonly ["Categories"];
+                readonly summary: "Create a category";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }];
+                readonly requestBody: {
+                    readonly required: true;
+                    readonly content: {
+                        readonly "multipart/form-data": {
+                            readonly schema: {
+                                readonly $ref: "#/components/schemas/CategoryCreateRequest";
+                            };
+                        };
+                    };
+                };
+                readonly responses: {
+                    readonly 201: {
+                        readonly description: "Category created successfully";
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                    };
+                    readonly 403: {
+                        readonly description: "Forbidden";
+                    };
+                };
+            };
+        };
+        readonly "/api/customer/change-password": {
+            readonly put: {
+                readonly tags: readonly ["Customer"];
+                readonly summary: "Change the current customer's password";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }];
+                readonly requestBody: {
+                    readonly required: true;
+                    readonly content: {
+                        readonly "application/json": {
+                            readonly schema: {
+                                readonly $ref: "#/components/schemas/ResetPasswordRequest";
+                            };
+                        };
+                    };
+                };
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Password changed successfully";
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                    };
+                    readonly 400: {
+                        readonly description: "Validation failed";
                     };
                 };
             };

@@ -6,29 +6,23 @@ import uploadImage from "../../config/cloudainry.config";
 import { AppError } from "../../utils/AppError";
 
 const createRequestToJoin = async (req: Request, res: Response) => {
+  let uploadedCommercialRegister: { public_id: string } | undefined;
+  let uploadedTaxCard: { public_id: string } | undefined;
   try {
-    const userId =
-      req.user?.userId ||
-      (process.env.NODE_ENV !== "production" && req.body.userId);
-    if (!userId) {
+    const userId = req.user?.userId;
+    if (!userId)
       return sendErrorResponse(
         res,
         401,
         "Unauthorized",
         "User not authenticated",
       );
-    }
-    const { storeName, commercialRegisterNumber, taxCardNumber, contary } =
-      req.body;
+
+    const { storeName, commercialRegisterNumber, taxCardNumber } = req.body;
     if (
-      !storeName ||
-      !commercialRegisterNumber ||
-      !taxCardNumber ||
-      !contary ||
-      storeName.trim() === "" ||
-      commercialRegisterNumber.trim() === "" ||
-      taxCardNumber.trim() === "" ||
-      contary.trim() === ""
+      !storeName?.trim() ||
+      !commercialRegisterNumber?.trim() ||
+      !taxCardNumber?.trim()
     ) {
       return sendErrorResponse(
         res,
@@ -37,82 +31,79 @@ const createRequestToJoin = async (req: Request, res: Response) => {
         "All fields are required",
       );
     }
-    if (contary !== "Egypt") {
-      return sendErrorResponse(
-        res,
-        400,
-        "Bad Request",
-        "Only Egyptian sellers are allowed",
-      );
-    }
+
+      console.log("Request body:", req.body);
     const files = req.files as {
       commercialRegisterImage?: Express.Multer.File[];
       taxCardImage?: Express.Multer.File[];
     };
-    if (!files || !files.commercialRegisterImage || !files.taxCardImage) {
+    if (!files?.commercialRegisterImage?.[0] || !files.taxCardImage?.[0])
       return sendErrorResponse(
         res,
         400,
         "Bad Request",
-        "Both images are required",
+        "Both Commercial Register Image and Tax Card Image are required",
       );
-    }
-    if (
-      files.commercialRegisterImage![0]!.mimetype !== "image/jpeg" &&
-      files.commercialRegisterImage![0]!.mimetype !== "image/png"
-    ) {
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+    const crMime = files.commercialRegisterImage?.[0]?.mimetype ?? "";
+    const taxMime = files.taxCardImage?.[0]?.mimetype ?? "";
+    if (!allowedTypes.includes(crMime))
       return sendErrorResponse(
         res,
         400,
         "Bad Request",
-        "Invalid commercial register image format",
+        "Invalid image format. Only JPE, PNG and JPG are allowed",
       );
-    }
-    const [commercialRegisterImageUpload, taxCardImageUpload] =
-      await Promise.all([
-        uploadImage(
-          files.commercialRegisterImage![0]!.buffer,
-          "Egyzon/Seller/CommercialRegister",
-        ),
-        uploadImage(files.taxCardImage![0]!.buffer, "Egyzon/Seller/TaxCard"),
-      ]);
+    if (!allowedTypes.includes(taxMime))
+      return sendErrorResponse(
+        res,
+        400,
+        "Bad Request",
+        "Invalid image format. Only JPEG and PNG are allowed",
+      );
+
+    await SellerServices.checkExistingSeller(userId);
+    const [crUpload, taxUpload] = await Promise.all([
+      uploadImage(
+        files.commercialRegisterImage[0].buffer,
+        "Egyzon/Seller/CommercialRegister",
+      ),
+      uploadImage(files.taxCardImage[0].buffer, "Egyzon/Seller/TaxCard"),
+    ]);
+    uploadedCommercialRegister = crUpload;
+    uploadedTaxCard = taxUpload;
+
     const sellerData = {
       storeName,
-      contary,
       commercialRegisterNumber,
       taxCardNumber,
-      commercialRegisterUrl: commercialRegisterImageUpload.secure_url,
-      taxCardUrl: taxCardImageUpload.secure_url,
+      sellerDocuments:{
+        commercialRegisterUrl: crUpload.secure_url,
+        taxCardUrl: taxUpload.secure_url,
+      }
     };
-    const sendPaper = await SellerServices.ApplyAsPartner(sellerData, userId);
-    return sendSuccessResponse(
-      res,
-      201,
-      "Request to join sent successfully",
-      sendPaper,
-    );
+
+    await SellerServices.ApplyAsPartner(sellerData, userId);
+    return sendSuccessResponse(res, 200, "Request sent successfully");
   } catch (error) {
-    console.log(error);
     if (error instanceof AppError) {
-      return sendErrorResponse(
-        res,
-        error.statusCode,
-        error.status,
-        error.message,
-      );
+      return sendErrorResponse(res, error.statusCode, "Bad Request", error.message);
     }
-    sendErrorResponse(res, 500, "Internal Server Error");
+
+    console.log(error);
+    return sendErrorResponse(res, 500, "Internal Server Error", "Something went wrong");
   }
 };
 
-
-{/*  second step After the seller document Approval */}
+{
+  /*  second step After the seller document Approval */
+}
 const setupStore = async (req: Request, res: Response) => {
   try {
     // Check if user is authenticated
     const userId =
       req.user?.userId ||
-      (process.env.NODE_ENV !== "production" && req.body.userId);
+      (process.env.NODE_ENV !== "production" && req.body?.userId);
     if (!userId) {
       return sendErrorResponse(
         res,

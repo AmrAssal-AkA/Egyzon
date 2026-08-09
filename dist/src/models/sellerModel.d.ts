@@ -1,180 +1,142 @@
 import mongoose, { Schema } from "mongoose";
 import { ISeller } from "../types/User.types";
-declare const _default: mongoose.Model<ISeller, {}, {}, {
-    id: string;
-}, mongoose.Document<unknown, {}, ISeller, {
-    id: string;
-}, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+declare const _default: mongoose.Model<ISeller, {}, {}, {}, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
     _id: mongoose.Types.ObjectId;
 } & {
     __v: number;
-}, "id"> & mongoose.HydratedDocumentOverrides<{
-    id: string;
-}>, Schema<ISeller, mongoose.Model<ISeller, any, any, any, any, any, ISeller>, {}, {}, {}, {}, mongoose.DefaultSchemaOptions, ISeller, mongoose.Document<unknown, {}, ISeller, {
-    id: string;
-}, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+}, Schema<ISeller, mongoose.Model<ISeller, any, any, any, any, any, ISeller>, {}, {}, {}, {}, mongoose.DefaultSchemaOptions, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
     _id: mongoose.Types.ObjectId;
 } & {
     __v: number;
-}, "id"> & mongoose.HydratedDocumentOverrides<{
-    id: string;
-}>, {
-    FirstName?: mongoose.SchemaDefinitionProperty<string, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+}, {
+    id?: mongoose.SchemaDefinitionProperty<string, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    LastName?: mongoose.SchemaDefinitionProperty<string, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }>;
+    FirstName?: mongoose.SchemaDefinitionProperty<string, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    email?: mongoose.SchemaDefinitionProperty<string, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }>;
+    LastName?: mongoose.SchemaDefinitionProperty<string, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    password?: mongoose.SchemaDefinitionProperty<string, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }>;
+    email?: mongoose.SchemaDefinitionProperty<string, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    role?: mongoose.SchemaDefinitionProperty<"admin" | "customer" | "seller", ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }>;
+    password?: mongoose.SchemaDefinitionProperty<string, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    phoneNumber?: mongoose.SchemaDefinitionProperty<string | undefined, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }>;
+    role?: mongoose.SchemaDefinitionProperty<"admin" | "customer" | "seller", ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    isBlocked?: mongoose.SchemaDefinitionProperty<boolean, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }>;
+    phoneNumber?: mongoose.SchemaDefinitionProperty<string | undefined, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    isVerified?: mongoose.SchemaDefinitionProperty<boolean | undefined, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }>;
+    isBlocked?: mongoose.SchemaDefinitionProperty<boolean, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    refreshToken?: mongoose.SchemaDefinitionProperty<string | undefined, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }>;
+    isVerified?: mongoose.SchemaDefinitionProperty<boolean | undefined, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    emailVerificationToken?: mongoose.SchemaDefinitionProperty<string | undefined, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }>;
+    refreshToken?: mongoose.SchemaDefinitionProperty<string | undefined, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    emailVerificationTokenExpiration?: mongoose.SchemaDefinitionProperty<Date | undefined, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }>;
+    googleId?: mongoose.SchemaDefinitionProperty<string | undefined, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    sellerId?: mongoose.SchemaDefinitionProperty<string, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }>;
+    facebookId?: mongoose.SchemaDefinitionProperty<string | undefined, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    user?: mongoose.SchemaDefinitionProperty<mongoose.Types.ObjectId, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }>;
+    resetPasswordToken?: mongoose.SchemaDefinitionProperty<string | undefined, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    conercialRegisterNumber?: mongoose.SchemaDefinitionProperty<number, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }>;
+    resetPasswordTokenExpiration?: mongoose.SchemaDefinitionProperty<Date | undefined, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    taxCardNumber?: mongoose.SchemaDefinitionProperty<number, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }>;
+    emailVerificationToken?: mongoose.SchemaDefinitionProperty<string | undefined, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
+    }>;
+    emailVerificationTokenExpiration?: mongoose.SchemaDefinitionProperty<Date | undefined, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    completedOnboarding?: mongoose.SchemaDefinitionProperty<boolean | undefined, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    forgetPasswordToken?: mongoose.SchemaDefinitionProperty<string | undefined, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    forgetPasswordTokenExpiration?: mongoose.SchemaDefinitionProperty<Date | undefined, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    sellerId?: mongoose.SchemaDefinitionProperty<string, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    user?: mongoose.SchemaDefinitionProperty<mongoose.Types.ObjectId, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    commercialRegisterNumber?: mongoose.SchemaDefinitionProperty<string, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    taxCardNumber?: mongoose.SchemaDefinitionProperty<string, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
     sellerDocuments?: mongoose.SchemaDefinitionProperty<{
         commercialRegisterFile: string[];
         taxCardFile: string[];
-    }, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    storeName?: mongoose.SchemaDefinitionProperty<string, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }>;
+    storeName?: mongoose.SchemaDefinitionProperty<string, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
+    }>;
     storeManagement?: mongoose.SchemaDefinitionProperty<{
         storeDescription: string;
         storeLogo: string;
@@ -182,51 +144,31 @@ declare const _default: mongoose.Model<ISeller, {}, {}, {
         storeType: 'physical' | 'online' | 'both';
         storephysicalAddress?: string;
         storeOnlineAddress?: string;
-    }, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    wallet?: mongoose.SchemaDefinitionProperty<mongoose.Types.ObjectId, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }>;
+    wallet?: mongoose.SchemaDefinitionProperty<mongoose.Types.ObjectId, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    contary?: mongoose.SchemaDefinitionProperty<string, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }>;
+    contary?: mongoose.SchemaDefinitionProperty<string, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    applicantStatus?: mongoose.SchemaDefinitionProperty<"additional_docs_requested" | "approved" | "pending" | "rejected" | "under-review", ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }>;
+    applicantStatus?: mongoose.SchemaDefinitionProperty<"additional_docs_requested" | "approved" | "pending" | "rejected" | "under-review", ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
-    createdAt?: mongoose.SchemaDefinitionProperty<Date, ISeller, mongoose.Document<unknown, {}, ISeller, {
-        id: string;
-    }, mongoose.DefaultSchemaOptions> & Omit<ISeller & {
+    }>;
+    createdAt?: mongoose.SchemaDefinitionProperty<Date, ISeller, mongoose.Document<unknown, {}, ISeller, {}, mongoose.DefaultSchemaOptions> & ISeller & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
-    }, "id"> & mongoose.HydratedDocumentOverrides<{
-        id: string;
-    }>>;
+    }>;
 }, ISeller>, ISeller>;
 export default _default;
 //# sourceMappingURL=sellerModel.d.ts.map

@@ -60,5 +60,21 @@ exports.ProductServices = {
             throw new AppError_1.AppError(500, 'Failed to get products');
         }
     },
+    getProductById: async (productId) => {
+        try {
+            const product = await productModel_1.default.findOne({ productId });
+            if (!product) {
+                throw new AppError_1.AppError(404, 'Product not found');
+            }
+            return product;
+        }
+        catch (error) {
+            if (error instanceof AppError_1.AppError) {
+                throw error;
+            }
+            console.log(error);
+            throw new AppError_1.AppError(500, "Failed To get the product");
+        }
+    },
 };
 //# sourceMappingURL=product.services.js.map

@@ -50,7 +50,12 @@ const UserSchema = new mongoose_1.Schema({
     },
     password: {
         type: String,
-        required: true,
+        required: function () {
+            if (this.googleId || this.facebookId) {
+                return false;
+            }
+            return true;
+        },
     },
     role: {
         type: String,
@@ -61,6 +66,7 @@ const UserSchema = new mongoose_1.Schema({
         type: String,
         unique: true,
         sparse: true,
+        default: null,
     },
     isBlocked: {
         type: Boolean,
@@ -70,8 +76,23 @@ const UserSchema = new mongoose_1.Schema({
         type: Boolean,
         default: false,
     },
-    refreshToken: {
+    googleId: {
         type: String,
+        unique: true,
+        sparse: true,
+        default: null,
+    },
+    facebookId: {
+        type: String,
+        unique: true,
+        sparse: true,
+        default: null,
+    },
+    resetPasswordToken: {
+        type: String,
+    },
+    resetPasswordTokenExpiration: {
+        type: Date,
     },
     emailVerificationToken: {
         type: String,
@@ -79,10 +100,20 @@ const UserSchema = new mongoose_1.Schema({
     emailVerificationTokenExpiration: {
         type: Date,
     },
-    createdAt: {
-        type: Date,
-        default: Date.now,
+    forgetPasswordToken: {
+        type: String,
     },
+    forgetPasswordTokenExpiration: {
+        type: Date,
+    },
+    completedOnboarding: {
+        type: Boolean,
+        default: false,
+    },
+}, { timestamps: true });
+UserSchema.pre("deleteOne", { document: true, query: false }, async function () {
+    await mongoose_1.default.model("Customer").deleteOne({ user: this._id });
+    await mongoose_1.default.model("Seller").deleteOne({ user: this._id });
 });
 exports.default = mongoose_1.default.model("User", UserSchema);
 //# sourceMappingURL=userModel.js.map
