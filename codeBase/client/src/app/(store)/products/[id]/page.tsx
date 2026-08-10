@@ -1,69 +1,50 @@
 import React from "react";
 import { notFound } from "next/navigation";
 
-import ProductGallery from "@/components/store/product-details/ProductGallery";
-import ProductInfo from "@/components/store/product-details/ProductInfo";
-import ProductTabs from "@/components/store/product-details/ProductTabs";
-import RelatedProducts from "@/components/store/product-details/RelatedProducts";
-import { fetchProductById } from "@/services/product";
-import {fetchProductsByCategory} from '@/services/product'
-import { Product } from "@/components/category/ExpandableProductSection";
+import ProductGallery from "@/components/products/product-Deatail/product-details/ProductGallery";
+import ProductInfo from "@/components/products/product-Deatail/product-details/ProductInfo";
+import ProductTabs from "@/components/products/product-Deatail/product-details/ProductTabs";
+import RelatedProducts from "@/components/products/product-Deatail/product-details/RelatedProducts";
+import { fetchProductById, fetchProducts } from "@/services/product";
+import type { Product } from "@/types/product.type";
 
 export const dynamic = "force-dynamic";
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function ProductDetailPage({ params }: PageProps) {
-  const { id } = params; 
+  const { id } = await params;
 
-
-  const fetchedProduct = await fetchProductById(Number(id));
+  const fetchedProduct = await fetchProductById(id);
   if (!fetchedProduct) {
     notFound();
   }
-  const product: Product = {
-    ...fetchedProduct,
-    inStock: Boolean(fetchedProduct.stock && fetchedProduct.stock > 0),
-    stock: fetchedProduct.stock || 0,
-    images: fetchedProduct.images || [],
-  };
-  const relatedProducts = await fetchProductsByCategory({category: product.category, currentId: product.id});
+  const product: Product = fetchedProduct;
+  const relatedProducts = (await fetchProducts(1, 12)).data.products.filter(
+    (relatedProduct) => (relatedProduct._id || (relatedProduct as any).productId) !== (product._id || (product as any).productId),
+  );
 
   const seller = {
-    name:
-      product.brand ||
-      `${product.category.charAt(0).toUpperCase() + product.category.slice(1)} Store`,
+    name: product.SellerId ? `Seller ${product.SellerId.slice(0, 6)}` : "Egyzon Store",
     feedbackPercentage: 98.6,
     responseTime: "Within 1 hour",
     isVerified: true,
   };
 
   const specifications = [
-    { key: "Brand", value: product.brand || "Unbranded" },
-    {
-      key: "Category",
-      value:
-        product.category.charAt(0).toUpperCase() + product.category.slice(1),
-    },
-    {
-      key: "Warranty",
-      value: product.warrantyInformation || "1 Year Manufacturer Warranty",
-    },
-    { key: "Weight", value: product.weight ? `${product.weight} kg` : "N/A" },
-    {
-      key: "Dimensions",
-      value: product.dimensions
-        ? `${product.dimensions.width} x ${product.dimensions.height} x ${product.dimensions.depth} cm`
-        : "N/A",
-    },
+    { key: "Product ID", value: product._id || (product as any).productId },
+    { key: "Seller", value: product.SellerId || "N/A" },
+    { key: "Status", value: product.status || "active" },
+    { key: "Discount", value: `${product.discount}%` },
+    { key: "Created At", value: product.createdAt ? new Date(product.createdAt).toLocaleDateString() : "N/A" },
   ];
 
   const shipping = {
-    delivery: product.shippingInformation || "Ships in 3-5 business days",
+    delivery: "Ships in 3-5 business days",
     method: "Standard Shipping (Air/Ground)",
-    returns: product.returnPolicy || "30 days return policy",
+    returns: "30 days return policy",
     packaging: "Premium Eco-friendly Box",
   };
 
@@ -75,36 +56,30 @@ export default async function ProductDetailPage({ params }: PageProps) {
           {/* Left Column: Gallery */}
           <div className="w-full">
             <ProductGallery
-              images={product.images || []}
-              title={product.title}
+              images={Array.isArray(product.imageUrl) ? product.imageUrl : [product.imageUrl]}
+              title={product.productName}
             />
           </div>
 
           {/* Right Column: Info & Buy Section */}
           <div className="w-full">
             <ProductInfo
-              id={product.id}
-              title={product.title}
-              category={product.category}
-              brand={product.brand || "Unbranded"}
-              rating={product.rating}
-              reviewCount={product.reviews?.length || 10}
+              id={product._id || (product as any).productId}
+              title={product.productName}
+              rating={product.AvgRating ?? 0}
+              reviewCount={10}
               price={product.price}
-              inStock={product.inStock} 
-              stock={product.stock || 99}
+              inStock={product.status === "active" || product.stock > 0}
+              stock={product.stock}
               seller={seller}
+              thumbnail={(Array.isArray(product.imageUrl) ? product.imageUrl[0] : product.imageUrl) || "/images/placeholder.jpg"}
             />
           </div>
         </div>
 
         {/* Middle Area: Tabs */}
         <div className="w-full">
-          <ProductTabs
-            description={product.description}
-            tags={product.category ? [product.category] : []}
-            specifications={specifications}
-            shipping={shipping}
-          />
+          <ProductTabs description={product.productDescription} tags={[]} specifications={specifications} shipping={shipping} />
         </div>
 
         {/* Bottom Area: Related Products */}

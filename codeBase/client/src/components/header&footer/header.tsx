@@ -1,75 +1,135 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-
 import { IoIosSearch } from "react-icons/io";
-import { FiHeart, FiUser, FiShoppingCart, FiMenu, FiX } from "react-icons/fi";
+import { FiUser, FiMenu, FiX, FiSearch } from "react-icons/fi";
 
 import Model from "./Model";
 import NavLinks from "./nav";
 import { ModeToggle } from "../ui/ModeToggle";
+import WishlistIcon from "./wishlist/WishlistIcon";
+import CartModel from "./CartModel";
 
 export default function Header() {
   const [isMenueOpen, setIsMenueOpen] = useState(false);
   const [isModelOpen, setIsModelOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   const toggleMenue = () => {
     setIsMenueOpen(!isMenueOpen);
+    if (isMobileSearchOpen) setIsMobileSearchOpen(false);
   };
 
   const toggleModel = () => {
     setIsModelOpen(!isModelOpen);
   };
 
+  const toggleMobileSearch = () => {
+    setIsMobileSearchOpen(!isMobileSearchOpen);
+    if (isMenueOpen) setIsMenueOpen(false);
+  };
+
   return (
-    <header className="fixed top-0 left-0 z-50 w-full bg-background/95 shadow-md backdrop-blur supports-backdrop-filter:bg-background/80">
-      <div className="flex items-center justify-between w-full h-20 px-4 md:px-20">
-        <div className="flex items-center justify-start">
-          <Link
-            href="/"
-            className="text-4xl font-bold text-foreground"
-          >
-            Egy<span className="text-blue-600">Zon</span>
-          </Link>
-        </div>
-        <div className="hidden md:flex items-center gap-8">
-          <div className="flex items-center justify-center">
-            <input
-              type="text"
-              placeholder="Search..."
-              className="border border-input rounded-md px-2.5 py-1 w-96 bg-background text-foreground placeholder:text-muted-foreground"
-            />
-            <button className="bg-blue-600 shadow-md text-white rounded-md px-4 py-2 ml-2 cursor-pointer hover:bg-blue-700 transition-colors duration-300 ease-in-out">
-              <IoIosSearch />
-            </button>
-          </div>
-        </div>
-        <div className="flex items-center justify-end gap-2.5">
-          <ModeToggle />
-          <button className="bg-secondary shadow-md text-secondary-foreground rounded-md px-4 py-2 cursor-pointer hover:bg-blue-600 hover:text-white transition-colors duration-300 ease-in-out">
-            <FiHeart />
-          </button>
-          <button className="bg-secondary shadow-md text-secondary-foreground rounded-md px-4 py-2 cursor-pointer hover:bg-blue-600 hover:text-white transition-colors duration-300 ease-in-out">
-            <FiShoppingCart />
-          </button>
-          <div className="relative">
-            <button
-              onClick={toggleModel}
-              className="bg-secondary shadow-md text-secondary-foreground rounded-md px-4 py-2 cursor-pointer hover:bg-blue-600 hover:text-white transition-colors duration-300 ease-in-out"
+    <header className="fixed top-0 left-0 z-50 w-full bg-background/95 border-b border-border shadow-xs backdrop-blur supports-backdrop-filter:bg-background/80 transition-all duration-300">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+        <div className="flex items-center justify-between h-16 sm:h-20 gap-3 sm:gap-6">
+          
+          {/* Logo & Brand */}
+          <div className="flex items-center shrink-0">
+            <Link
+              href="/"
+              className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground hover:opacity-90 transition-opacity flex items-center gap-0.5"
             >
-              <FiUser />
-            </button>
-            {isModelOpen && <Model onClose={toggleModel} />}
+              <span>Egy</span>
+              <span className="text-blue-600">Zon</span>
+              <span className="text-blue-500 font-black">.</span>
+            </Link>
           </div>
-          <div className="flex items-center justify-center md:hidden">
-            <button onClick={toggleMenue} className="text-foreground text-2xl">
-              {isMenueOpen ? <FiX /> : <FiMenu />}
-            </button>
+
+          {/* Desktop Search Bar */}
+          <div className="hidden md:flex flex-1 max-w-md lg:max-w-lg items-center">
+            <form onSubmit={(e) => e.preventDefault()} className="w-full relative flex items-center">
+              <input
+                type="text"
+                placeholder="Search products, brands, categories..."
+                className="w-full pl-4 pr-12 py-2 rounded-full border border-input bg-muted/30 text-foreground placeholder:text-muted-foreground/70 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/40 focus:border-blue-600 transition-all"
+              />
+              <button
+                type="submit"
+                aria-label="Search"
+                className="absolute right-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center shadow-xs"
+              >
+                <IoIosSearch className="w-4 h-4" />
+              </button>
+            </form>
           </div>
+
+          {/* Right Action Icons & Controls */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
+            {/* Mobile Search Toggle */}
+            <button
+              onClick={toggleMobileSearch}
+              aria-label="Toggle search"
+              className="md:hidden p-2 text-foreground/80 hover:text-blue-600 hover:bg-muted rounded-xl transition-colors"
+            >
+              <FiSearch className="w-5 h-5" />
+            </button>
+
+            <ModeToggle />
+            <WishlistIcon />
+            <CartModel />
+
+            {/* User Account Button */}
+            <div className="relative">
+              <button
+                onClick={toggleModel}
+                aria-label="User Account"
+                className="p-2 sm:p-2.5 bg-secondary hover:bg-blue-600 text-secondary-foreground hover:text-white rounded-xl transition-all duration-200 cursor-pointer shadow-2xs flex items-center justify-center"
+              >
+                <FiUser className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+              {isModelOpen && <Model onClose={toggleModel} />}
+            </div>
+
+            {/* Mobile Menu Hamburger Toggle */}
+            <div className="flex items-center md:hidden">
+              <button
+                onClick={toggleMenue}
+                aria-label="Toggle menu"
+                className="p-2 text-foreground hover:text-blue-600 hover:bg-muted rounded-xl transition-colors text-xl"
+              >
+                {isMenueOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
+              </button>
+            </div>
+          </div>
+
         </div>
+
+        {/* Mobile Expandable Search Bar */}
+        {isMobileSearchOpen && (
+          <div className="md:hidden pb-3 pt-1 border-t border-border/50 animate-in fade-in slide-in-from-top-2 duration-200">
+            <form onSubmit={(e) => e.preventDefault()} className="relative flex items-center">
+              <input
+                type="text"
+                placeholder="Search products..."
+                className="w-full pl-4 pr-12 py-2 rounded-xl border border-input bg-muted/40 text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/40"
+                autoFocus
+              />
+              <button
+                type="submit"
+                className="absolute right-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium"
+              >
+                <IoIosSearch className="w-4 h-4" />
+              </button>
+            </form>
+          </div>
+        )}
+
       </div>
 
+      {/* Navigation Sub-header */}
       <NavLinks isOpen={isMenueOpen} onLinkClick={toggleMenue} />
     </header>
   );
 }
+

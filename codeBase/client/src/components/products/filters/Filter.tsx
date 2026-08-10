@@ -8,7 +8,7 @@ import {
   useFilterStore,
   type AvailabilityFilter,
   type DiscountFilter,
-} from "@/stores/seller/filter";
+} from "@/stores/buyer/filter";
 
 import FilterAccordion from "./FilterAccordion";
 
@@ -74,12 +74,11 @@ interface CheckboxOptionProps {
   onChange: () => void;
 }
 
-const formatLabel = (value: string) => (
+const formatLabel = (value: string) =>
   value
     .split("-")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ")
-);
+    .join(" ");
 
 function CheckboxOption({ label, checked, onChange }: CheckboxOptionProps) {
   return (
@@ -118,8 +117,11 @@ function FilterContent({
   const setColor = useFilterStore((state) => state.setColor);
 
   const filteredBrands = useMemo(
-    () => brands.filter((brand) => brand.toLowerCase().includes(brandQuery.toLowerCase())),
-    [brandQuery, brands]
+    () =>
+      brands.filter((brand) =>
+        brand.toLowerCase().includes(brandQuery.toLowerCase()),
+      ),
+    [brandQuery, brands],
   );
   const liveMaxPrice = selectedMaxPrice > 0 ? selectedMaxPrice : maxPrice;
 
@@ -142,7 +144,10 @@ function FilterContent({
         <div className="space-y-3">
           <label className="relative block">
             <span className="sr-only">Search brands</span>
-            <Search aria-hidden="true" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search
+              aria-hidden="true"
+              className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+            />
             <input
               type="search"
               value={brandQuery}
@@ -161,7 +166,9 @@ function FilterContent({
               />
             ))}
             {filteredBrands.length === 0 && (
-              <p className="px-1 py-2 text-sm text-muted-foreground">No brands found.</p>
+              <p className="px-1 py-2 text-sm text-muted-foreground">
+                No brands found.
+              </p>
             )}
           </div>
         </div>
@@ -177,7 +184,12 @@ function FilterContent({
                 min={0}
                 max={liveMaxPrice}
                 value={minPrice}
-                onChange={(event) => setPriceRange(Math.min(Number(event.target.value), liveMaxPrice), liveMaxPrice)}
+                onChange={(event) =>
+                  setPriceRange(
+                    Math.min(Number(event.target.value), liveMaxPrice),
+                    liveMaxPrice,
+                  )
+                }
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-normal text-foreground outline-none transition-colors duration-300 ease-in-out focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
               />
             </label>
@@ -188,7 +200,12 @@ function FilterContent({
                 min={minPrice}
                 max={maxPrice}
                 value={liveMaxPrice}
-                onChange={(event) => setPriceRange(minPrice, Math.max(Number(event.target.value), minPrice))}
+                onChange={(event) =>
+                  setPriceRange(
+                    minPrice,
+                    Math.max(Number(event.target.value), minPrice),
+                  )
+                }
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-normal text-foreground outline-none transition-colors duration-300 ease-in-out focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
               />
             </label>
@@ -200,7 +217,12 @@ function FilterContent({
               max={maxPrice}
               value={minPrice}
               aria-label="Minimum price"
-              onChange={(event) => setPriceRange(Math.min(Number(event.target.value), liveMaxPrice), liveMaxPrice)}
+              onChange={(event) =>
+                setPriceRange(
+                  Math.min(Number(event.target.value), liveMaxPrice),
+                  liveMaxPrice,
+                )
+              }
               className="w-full accent-blue-600"
             />
             <input
@@ -209,7 +231,12 @@ function FilterContent({
               max={maxPrice}
               value={liveMaxPrice}
               aria-label="Maximum price"
-              onChange={(event) => setPriceRange(minPrice, Math.max(Number(event.target.value), minPrice))}
+              onChange={(event) =>
+                setPriceRange(
+                  minPrice,
+                  Math.max(Number(event.target.value), minPrice),
+                )
+              }
               className="w-full accent-blue-600"
             />
           </div>
@@ -223,12 +250,19 @@ function FilterContent({
       <FilterAccordion title="Rating">
         <div className="space-y-1">
           {ratingOptions.map((option) => (
-            <label key={option.value} className="flex cursor-pointer items-center gap-3 rounded-md px-1 py-2 text-sm text-foreground transition-colors duration-300 ease-in-out hover:text-blue-600">
+            <label
+              key={option.value}
+              className="flex cursor-pointer items-center gap-3 rounded-md px-1 py-2 text-sm text-foreground transition-colors duration-300 ease-in-out hover:text-blue-600"
+            >
               <input
                 type="radio"
                 name="rating-filter"
                 checked={selectedRating === option.value}
-                onChange={() => setRating(selectedRating === option.value ? null : option.value)}
+                onChange={() =>
+                  setRating(
+                    selectedRating === option.value ? null : option.value,
+                  )
+                }
                 className="h-4 w-4 border-input text-blue-600 focus:ring-blue-500"
               />
               <span>{option.label}</span>
@@ -277,7 +311,8 @@ function FilterContent({
                   "h-9 w-9 rounded-full border border-border shadow-sm transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                   color.className,
                   color.name === "White" && "border-muted-foreground",
-                  isSelected && "ring-2 ring-blue-600 ring-offset-2 ring-offset-background"
+                  isSelected &&
+                    "ring-2 ring-blue-600 ring-offset-2 ring-offset-background",
                 )}
                 aria-pressed={isSelected}
                 aria-label={`Filter by ${color.name}`}
@@ -297,8 +332,14 @@ function Filterfeature({
 }: FilterfeatureProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const resetFilters = useFilterStore((state) => state.resetFilters);
-  const uniqueCategories = useMemo(() => Array.from(new Set(categories)).sort(), [categories]);
-  const uniqueBrands = useMemo(() => Array.from(new Set(brands)).filter(Boolean).sort(), [brands]);
+  const uniqueCategories = useMemo(
+    () => Array.from(new Set(categories)).sort(),
+    [categories],
+  );
+  const uniqueBrands = useMemo(
+    () => Array.from(new Set(brands)).filter(Boolean).sort(),
+    [brands],
+  );
   const resolvedMaxPrice = Math.max(maxPrice, DEFAULT_MAX_PRICE);
 
   useEffect(() => {
@@ -339,7 +380,9 @@ function Filterfeature({
       <aside className="sticky top-24 hidden max-h-[calc(100vh-7rem)] overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-md lg:block">
         <div className="flex items-center gap-2 border-b border-border px-5 py-4">
           <Filter aria-hidden="true" className="h-5 w-5 text-blue-600" />
-          <h2 className="text-lg font-semibold text-card-foreground">Filters</h2>
+          <h2 className="text-lg font-semibold text-card-foreground">
+            Filters
+          </h2>
         </div>
         <div className="max-h-[calc(100vh-12rem)] overflow-y-auto px-5">
           <FilterContent {...contentProps} />
@@ -363,7 +406,10 @@ function Filterfeature({
             <div className="flex items-center justify-between border-b border-border px-5 py-4">
               <div className="flex items-center gap-2">
                 <Filter aria-hidden="true" className="h-5 w-5 text-blue-600" />
-                <h2 id="mobile-filter-title" className="text-lg font-semibold text-card-foreground">
+                <h2
+                  id="mobile-filter-title"
+                  className="text-lg font-semibold text-card-foreground"
+                >
                   Filters
                 </h2>
               </div>

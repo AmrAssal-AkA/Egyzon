@@ -1,38 +1,7 @@
 "use client";
 import { useState } from "react";
 import ProductGrid from "@/components/products/Product-grid";
-
-export interface Product {
-  id: number;
-  title: string;
-  description: string;
-  price: number;
-  thumbnail: string;
-  images?: string[];
-  category: string;
-  rating: number;
-  brand: string;
-  inStock: boolean;
-  stock: number;
-  availabilityStatus?: string;
-  warrantyInformation?: string;
-  shippingInformation?: string;
-  returnPolicy?: string;
-  dimensions?: {
-    width: number;
-    height: number;
-    depth: number;
-  };
-  weight?: number;
-  reviews?: Array<{
-    rating: number;
-    comment: string;
-    date: string;
-    reviewerName: string;
-    reviewerEmail: string;
-    
-  }>;
-}
+import type { Product } from "@/types/product.type";
 
 interface ExpandableProductSectionProps {
   initialProducts: Product[];

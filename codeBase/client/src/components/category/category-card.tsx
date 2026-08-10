@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React from "react";
 
 export default function CategoryCard({
@@ -12,9 +13,11 @@ export default function CategoryCard({
   return (
     <div className="relative group overflow-hidden rounded-lg shadow-md transition-all duration-300 ease-in-out hover:shadow-lg h-full">
       <div className="relative w-full h-full">
-        <img
+        <Image
           src={image}
           alt={name}
+          width={400}
+          height={400}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
 

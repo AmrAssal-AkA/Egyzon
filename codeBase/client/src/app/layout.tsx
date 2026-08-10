@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 
-import Header from "@/components/header&footer/header";
-import Footer from "@/components/header&footer/footer";
+
+
 import {Toaster} from "@/components/ui/sonner";
 
 import "./globals.css";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/provider/theme-provider";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -27,10 +28,10 @@ export default function RootLayout({children} : Readonly<{children: React.ReactN
             enableSystem
             disableTransitionOnChange
           >
-        <Header />
-        {children}
-        <Footer />
-        <Toaster />
+            <AuthProvider>
+              {children}
+              <Toaster />
+            </AuthProvider>
           </ThemeProvider>
       </body>
     </html>

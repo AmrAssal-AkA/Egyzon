@@ -3,7 +3,11 @@
 import { memo, useMemo } from "react";
 import { X } from "lucide-react";
 
-import { useFilterStore, type DiscountFilter, type AvailabilityFilter } from "@/stores/seller/filter";
+import {
+  useFilterStore,
+  type DiscountFilter,
+  type AvailabilityFilter,
+} from "@/stores/buyer/filter";
 
 const availabilityLabels: Record<AvailabilityFilter, string> = {
   inStock: "In Stock",
@@ -82,7 +86,19 @@ function ActiveFilters() {
     }
 
     return activeChips;
-  }, [availability, brand, category, color, discount, maxPrice, minPrice, rating, removeFilter, setPriceRange, setRating]);
+  }, [
+    availability,
+    brand,
+    category,
+    color,
+    discount,
+    maxPrice,
+    minPrice,
+    rating,
+    removeFilter,
+    setPriceRange,
+    setRating,
+  ]);
 
   if (chips.length === 0) {
     return null;

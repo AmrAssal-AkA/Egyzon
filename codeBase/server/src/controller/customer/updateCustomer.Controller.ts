@@ -1,0 +1,40 @@
+import { Request, Response } from "express";
+
+
+import { AppError } from "../../utils/AppError";
+import User from "../../models/userModel";
+import { hashPassword, comparePasswords } from "../../utils/password.ustils";
+import changePasswordTemplate from "../../templates/changePasswordTemp";
+import { sendSuccessResponse, sendErrorResponse } from "../../utils/Responses";
+
+export const CustomerController = {
+  changePassword: async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.userId;
+      const customer = await User.findById(userId);
+      const { newPassword, confirmPassword } = req.body;
+      if (!userId) return sendErrorResponse(res, 401, "Unauthorized");
+      if (!newPassword || !confirmPassword)
+        return sendErrorResponse(
+          res,
+          400,
+          "New password and confirm password are required",
+        );
+      if (newPassword !== confirmPassword)
+        return sendErrorResponse(res, 400, "Passwords do not match");
+      if (!customer) return sendErrorResponse(res, 404, "Customer not found");
+
+      const hashedPassword = await hashPassword(newPassword);
+      customer.password = hashedPassword;
+
+      await customer.save();
+      await changePasswordTemplate(customer.email, customer.FirstName);
+      return sendSuccessResponse(res, 200, "Password changed successfully");
+    } catch (error) {
+      if (error instanceof AppError) {
+        return sendErrorResponse(res, error.statusCode, error.message);
+      }
+      return sendErrorResponse(res, 500, "Internal Server Error");
+    }
+  },
+};

@@ -1,8 +1,8 @@
 import React from "react";
 import ExpandableProductSection from "@/components/category/ExpandableProductSection";
-import { Product } from "@/components/category/ExpandableProductSection";
 
 import { fetchProductByCategoryName } from "@/services/product";
+import type { Product } from "@/types/product.type";
 
 async function BeveragePart() {
   const products: Product[] = await fetchProductByCategoryName("beverages");

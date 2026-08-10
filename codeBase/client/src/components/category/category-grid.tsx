@@ -1,6 +1,6 @@
 import React from 'react'
 import CategoryCard from './category-card'
-
+import Link from 'next/link'
 export interface Category {
   slug: string;
   url: string;
@@ -11,7 +11,7 @@ export interface Category {
 export default function CategoryGrid({ categories }: { categories: Category[] }) {
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 h-150">
+    <Link href={`/categories/${categories[0]?.slug}`} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 h-150">
        {categories.map((category) => (
         <CategoryCard
             key={category.slug}
@@ -20,6 +20,6 @@ export default function CategoryGrid({ categories }: { categories: Category[] })
           description={category.description}
         />
       ))}
-    </div>
+    </Link>
   )
 }
