@@ -32,7 +32,6 @@ const createRequestToJoin = async (req: Request, res: Response) => {
       );
     }
 
-      console.log("Request body:", req.body);
     const files = req.files as {
       commercialRegisterImage?: Express.Multer.File[];
       taxCardImage?: Express.Multer.File[];

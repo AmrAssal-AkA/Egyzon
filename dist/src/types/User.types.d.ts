@@ -19,21 +19,20 @@ export interface IUser {
     completedOnboarding?: boolean;
     forgetPasswordToken?: string;
     forgetPasswordTokenExpiration?: Date;
+    joinedDate?: Date;
+    lastActiveDate?: Date;
     createdAt: Date;
 }
 export type UserDocument = HydratedDocument<IUser>;
 export interface ICustomer extends IUser {
-    user: Types.ObjectId;
     orders: Types.ObjectId[];
     wishlist: Types.ObjectId[];
     cart: Types.ObjectId[];
     paymentMethods: Types.ObjectId[];
     address?: string[];
-    createdAt: Date;
 }
 export interface ISeller extends IUser {
     sellerId: string;
-    user: Types.ObjectId;
     commercialRegisterNumber: string;
     taxCardNumber: string;
     sellerDocuments: {
@@ -52,12 +51,20 @@ export interface ISeller extends IUser {
     wallet: Types.ObjectId;
     contary: string;
     applicantStatus: 'pending' | 'under-review' | 'additional_docs_requested' | 'approved' | 'rejected';
+    notes: string;
     createdAt: Date;
 }
 export interface IAdmin extends IUser {
-    AdminId: string;
-    user: Types.ObjectId;
+    employeeId: string;
     createdAt: Date;
+    approveSeller(): Promise<ISeller>;
+    rejectSeller(): Promise<ISeller>;
+    requestAdditionalDocuments(): Promise<ISeller>;
+    blockUser(): Promise<IUser>;
+    activateUser(): Promise<IUser>;
+    RequestRemoveProduct(): Promise<IAdmin>;
+    generateReports(): Promise<IAdmin>;
+    verifyPayments(): Promise<IAdmin>;
 }
 export interface IWallet {
     walletId: string;

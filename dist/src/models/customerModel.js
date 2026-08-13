@@ -32,14 +32,13 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
+const userModel_1 = __importDefault(require("./userModel"));
 const CustomerSchema = new mongoose_1.Schema({
-    user: {
-        type: mongoose_1.default.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-    },
     orders: {
         type: [mongoose_1.default.Schema.Types.ObjectId],
         ref: "Order",
@@ -59,6 +58,6 @@ const CustomerSchema = new mongoose_1.Schema({
         type: [String],
         default: []
     },
-}, { timestamps: true });
-exports.default = mongoose_1.default.model("Customer", CustomerSchema);
+});
+exports.default = userModel_1.default.discriminator("customer", CustomerSchema);
 //# sourceMappingURL=customerModel.js.map

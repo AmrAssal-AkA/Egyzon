@@ -23,6 +23,7 @@ exports.swaggerSpec = {
         { name: "Seller", description: "Seller onboarding and store setup" },
         { name: "Categories", description: "Category management" },
         { name: "Customer", description: "Customer account settings" },
+        { name: "Admin", description: "Admin login and seller application review" },
     ],
     components: {
         securitySchemes: {
@@ -30,6 +31,11 @@ exports.swaggerSpec = {
                 type: "apiKey",
                 in: "cookie",
                 name: "Access_token",
+            },
+            bearerAuth: {
+                type: "http",
+                scheme: "bearer",
+                bearerFormat: "JWT",
             },
         },
         schemas: {
@@ -56,15 +62,40 @@ exports.swaggerSpec = {
                     refreshToken: { type: "string" },
                 },
             },
+            RefreshResponseData: {
+                type: "object",
+                properties: {
+                    accessToken: { type: "string" },
+                },
+            },
+            OnboardingResponseData: {
+                type: "object",
+                properties: {
+                    customerId: { type: "string" },
+                    phoneNumber: { type: "string" },
+                    address: { type: "string" },
+                },
+            },
+            VerifyEmailResponseData: {
+                type: "object",
+                properties: {
+                    isVerified: { type: "boolean" },
+                },
+            },
+            ForgetPasswordResponseData: {
+                type: "object",
+                properties: {
+                    token: { type: "string" },
+                },
+            },
             RegisterRequest: {
                 type: "object",
-                required: ["FirstName", "LastName", "email", "password", "confirmPassword"],
+                required: ["FirstName", "LastName", "email", "password"],
                 properties: {
                     FirstName: { type: "string", example: "Ahmed" },
                     LastName: { type: "string", example: "Ali" },
                     email: { type: "string", format: "email", example: "ahmed@example.com" },
-                    password: { type: "string", format: "password", example: "password123" },
-                    confirmPassword: { type: "string", format: "password", example: "password123" },
+                    password: { type: "string", format: "password", example: "Password123" },
                 },
             },
             LoginRequest: {
@@ -75,15 +106,36 @@ exports.swaggerSpec = {
                     password: { type: "string", format: "password", example: "password123" },
                 },
             },
+            AdminLoginRequest: {
+                type: "object",
+                required: ["email", "password"],
+                properties: {
+                    email: { type: "string", format: "email", example: "admin@egyzon.com" },
+                    password: { type: "string", format: "password", example: "AdminPassword123" },
+                },
+            },
+            UserSummary: {
+                type: "object",
+                properties: {
+                    _id: { type: "string" },
+                    FirstName: { type: "string" },
+                    LastName: { type: "string" },
+                    email: { type: "string", format: "email" },
+                    role: { type: "string", enum: ["customer", "seller", "admin"] },
+                    isBlocked: { type: "boolean" },
+                },
+            },
             OnboardingRequest: {
                 type: "object",
                 properties: {
+                    FirstName: { type: "string", example: "Ahmed" },
+                    LastName: { type: "string", example: "Ali" },
+                    email: { type: "string", format: "email", example: "ahmed@example.com" },
                     phoneNumber: { type: "string", example: "+201001112223" },
                     address: {
                         type: "string",
                         example: "Cairo, Nasr City, Street 10",
                     },
-                    userId: { type: "string", example: "66a1f2f3d4c5b6a7c8d9e0f1" },
                 },
             },
             ForgetPasswordRequest: {
@@ -133,10 +185,10 @@ exports.swaggerSpec = {
             ProductUpdateRequest: {
                 type: "object",
                 properties: {
+                    discount: { type: "number" },
                     productName: { type: "string" },
                     productDescription: { type: "string" },
                     price: { type: "number" },
-                    discount: { type: "number" },
                     category: { type: "string" },
                     stock: { type: "number" },
                 },
@@ -173,6 +225,21 @@ exports.swaggerSpec = {
                     },
                 },
             },
+            CartResponse: {
+                type: "object",
+                properties: {
+                    cartId: { type: "string" },
+                    userId: { type: "string" },
+                    userCartKey: { type: "string" },
+                    items: {
+                        type: "array",
+                        items: { $ref: "#/components/schemas/CartItem" },
+                    },
+                    totalPrice: { type: "number" },
+                    createdAt: { type: "string", format: "date-time" },
+                    updatedAt: { type: "string", format: "date-time" },
+                },
+            },
             WishlistRequest: {
                 type: "object",
                 required: ["productId"],
@@ -182,7 +249,7 @@ exports.swaggerSpec = {
             },
             CategoryCreateRequest: {
                 type: "object",
-                required: ["name", "description"],
+                required: ["name", "description", "image"],
                 properties: {
                     name: { type: "string", example: "Electronics" },
                     description: { type: "string", example: "Gadgets, devices, and accessories." },
@@ -218,6 +285,92 @@ exports.swaggerSpec = {
                     storeBanner: { type: "string", format: "binary" },
                 },
             },
+            AdminAdditionalDocumentsRequest: {
+                type: "object",
+                required: ["message"],
+                properties: {
+                    message: {
+                        type: "string",
+                        example: "Please upload a clearer tax card image and add your business address.",
+                    },
+                },
+            },
+            SellerApplicationSummary: {
+                type: "object",
+                properties: {
+                    _id: { type: "string" },
+                    commercialRegisterNumber: { type: "string" },
+                    taxCardNumber: { type: "string" },
+                    storeName: { type: "string" },
+                    applicantStatus: {
+                        type: "string",
+                        enum: ["pending", "under-review", "additional_docs_requested", "approved", "rejected"],
+                    },
+                    notes: { type: "string" },
+                    user: {
+                        type: "object",
+                        properties: {
+                            _id: { type: "string" },
+                            FirstName: { type: "string" },
+                            LastName: { type: "string" },
+                            email: { type: "string", format: "email" },
+                        },
+                    },
+                },
+            },
+            SellerApplicationListResponse: {
+                type: "array",
+                items: { $ref: "#/components/schemas/SellerApplicationSummary" },
+            },
+            AdminSellerSummary: {
+                type: "object",
+                properties: {
+                    _id: { type: "string" },
+                    commercialRegisterNumber: { type: "string" },
+                    taxCardNumber: { type: "string" },
+                    storeName: { type: "string" },
+                    applicantStatus: {
+                        type: "string",
+                        enum: ["pending", "under-review", "additional_docs_requested", "approved", "rejected"],
+                    },
+                    notes: { type: "string" },
+                    storeManagement: {
+                        type: "object",
+                        properties: {
+                            storeLogo: { type: "string" },
+                            storeBanner: { type: "string" },
+                            storeDescription: { type: "string" },
+                            storeType: { type: "string", enum: ["physical", "online", "both"] },
+                            storephysicalAddress: { type: "string" },
+                            storeOnlineAddress: { type: "string" },
+                        },
+                    },
+                    createdAt: { type: "string", format: "date-time" },
+                    updatedAt: { type: "string", format: "date-time" },
+                },
+            },
+            AdminSellerListResponse: {
+                type: "object",
+                properties: {
+                    sellers: {
+                        type: "array",
+                        items: { $ref: "#/components/schemas/AdminSellerSummary" },
+                    },
+                    pagination: {
+                        type: "object",
+                        properties: {
+                            page: { type: "integer", example: 1 },
+                            limit: { type: "integer", example: 10 },
+                            total: { type: "integer", example: 42 },
+                            totalPages: { type: "integer", example: 5 },
+                        },
+                    },
+                },
+            },
+            AdminUserListResponse: {
+                type: "array",
+                items: { $ref: "#/components/schemas/UserSummary" },
+            },
         },
     },
     paths: {
@@ -241,7 +394,7 @@ exports.swaggerSpec = {
             get: {
                 tags: ["Auth"],
                 summary: "Get current authenticated user profile",
-                security: [{ cookieAuth: [] }],
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
                 responses: {
                     200: {
                         description: "User profile retrieved successfully",
@@ -251,8 +404,22 @@ exports.swaggerSpec = {
                             },
                         },
                     },
-                    401: { description: "Unauthorized" },
-                    404: { description: "User not found" },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    404: {
+                        description: "User not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
                 },
             },
         },
@@ -284,6 +451,22 @@ exports.swaggerSpec = {
                                         },
                                     ],
                                 },
+                            },
+                        },
+                    },
+                    409: {
+                        description: "User already exists",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    500: {
+                        description: "Internal Server Error",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
                             },
                         },
                     },
@@ -321,6 +504,38 @@ exports.swaggerSpec = {
                             },
                         },
                     },
+                    400: {
+                        description: "Account registered with Google",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Invalid password",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Account has been blocked",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    404: {
+                        description: "User not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
                 },
             },
         },
@@ -328,7 +543,7 @@ exports.swaggerSpec = {
             patch: {
                 tags: ["Auth"],
                 summary: "Complete customer onboarding / update user profile",
-                security: [{ cookieAuth: [] }],
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
                 requestBody: {
                     required: true,
                     content: {
@@ -340,12 +555,45 @@ exports.swaggerSpec = {
                 responses: {
                     200: {
                         description: "Onboarding completed successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: { $ref: "#/components/schemas/OnboardingResponseData" },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
                     },
                     400: {
                         description: "User is already onboarded or user is not a customer",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                     404: {
                         description: "User not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                 },
             },
@@ -365,9 +613,29 @@ exports.swaggerSpec = {
                 responses: {
                     200: {
                         description: "Reset password email sent successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: { $ref: "#/components/schemas/ForgetPasswordResponseData" },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
                     },
                     404: {
                         description: "Email address or user not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                 },
             },
@@ -395,12 +663,27 @@ exports.swaggerSpec = {
                 responses: {
                     200: {
                         description: "Password reset successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
                     },
                     400: {
                         description: "Invalid, missing, or expired token",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                     404: {
                         description: "User or token not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                 },
             },
@@ -408,10 +691,42 @@ exports.swaggerSpec = {
         "/api/auth/refresh": {
             post: {
                 tags: ["Auth"],
-                summary: "Refresh access token",
+                summary: "Refresh access token using refresh_token cookie",
+                security: [{ cookieAuth: [] }],
                 responses: {
                     200: {
                         description: "Token refreshed successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: { $ref: "#/components/schemas/RefreshResponseData" },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Invalid refresh token",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    404: {
+                        description: "Refresh token not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                 },
             },
@@ -420,10 +735,15 @@ exports.swaggerSpec = {
             post: {
                 tags: ["Auth"],
                 summary: "Logout the current user",
-                security: [{ cookieAuth: [] }],
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
                 responses: {
                     200: {
                         description: "Logged out successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
                     },
                 },
             },
@@ -432,7 +752,7 @@ exports.swaggerSpec = {
             get: {
                 tags: ["Auth"],
                 summary: "Verify user email with token",
-                security: [{ cookieAuth: [] }],
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
                 parameters: [
                     {
                         name: "token",
@@ -444,9 +764,29 @@ exports.swaggerSpec = {
                 responses: {
                     200: {
                         description: "Email verified successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: { $ref: "#/components/schemas/VerifyEmailResponseData" },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
                     },
                     400: {
                         description: "Invalid or expired token",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                 },
             },
@@ -472,6 +812,11 @@ exports.swaggerSpec = {
                     },
                     401: {
                         description: "Google authentication failed",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                 },
             },
@@ -479,16 +824,18 @@ exports.swaggerSpec = {
         "/api/product": {
             get: {
                 tags: ["Products"],
-                summary: "Get all products",
+                summary: "Get all products with pagination",
                 parameters: [
                     {
                         name: "page",
                         in: "query",
+                        required: false,
                         schema: { type: "integer", default: 1 },
                     },
                     {
                         name: "limit",
                         in: "query",
+                        required: false,
                         schema: { type: "integer", default: 10 },
                     },
                 ],
@@ -517,8 +864,8 @@ exports.swaggerSpec = {
         "/api/product/addProduct": {
             post: {
                 tags: ["Products"],
-                summary: "Create a product",
-                security: [{ cookieAuth: [] }],
+                summary: "Create a product (Seller only)",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
                 requestBody: {
                     required: true,
                     content: {
@@ -530,6 +877,35 @@ exports.swaggerSpec = {
                 responses: {
                     201: {
                         description: "Product created successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
+                    },
+                    400: {
+                        description: "Image file required or upload failed",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Forbidden",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                 },
             },
@@ -537,8 +913,8 @@ exports.swaggerSpec = {
         "/api/product/seller/product/{productId}": {
             patch: {
                 tags: ["Products"],
-                summary: "Update a seller product / apply discount",
-                security: [{ cookieAuth: [] }],
+                summary: "Update seller product / apply discount",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
                 parameters: [
                     {
                         name: "productId",
@@ -557,7 +933,28 @@ exports.swaggerSpec = {
                 },
                 responses: {
                     200: {
-                        description: "Discount applied successfully",
+                        description: "Product updated / discount applied successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Forbidden",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                 },
             },
@@ -579,12 +976,35 @@ exports.swaggerSpec = {
                         description: "Product retrieved successfully",
                         content: {
                             "application/json": {
-                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: { $ref: "#/components/schemas/ProductItem" },
+                                            },
+                                        },
+                                    ],
+                                },
                             },
                         },
                     },
                     400: {
                         description: "Product ID not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    404: {
+                        description: "Product not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                 },
             },
@@ -593,24 +1013,48 @@ exports.swaggerSpec = {
             get: {
                 tags: ["Cart"],
                 summary: "Get user cart",
-                security: [{ cookieAuth: [] }],
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
                 responses: {
                     200: {
                         description: "Cart retrieved successfully",
                         content: {
                             "application/json": {
-                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: { $ref: "#/components/schemas/CartResponse" },
+                                            },
+                                        },
+                                    ],
+                                },
                             },
                         },
                     },
-                    401: { description: "Unauthorized" },
-                    404: { description: "Cart not found" },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    404: {
+                        description: "Cart not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
                 },
             },
             post: {
                 tags: ["Cart"],
                 summary: "Create a cart",
-                security: [{ cookieAuth: [] }],
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
                 requestBody: {
                     required: true,
                     content: {
@@ -622,6 +1066,45 @@ exports.swaggerSpec = {
                 responses: {
                     201: {
                         description: "Cart created successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: { $ref: "#/components/schemas/CartResponse" },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    400: {
+                        description: "Items are required and should be a non-empty array",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    409: {
+                        description: "Cart already exists for this user",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                 },
             },
@@ -630,13 +1113,32 @@ exports.swaggerSpec = {
             delete: {
                 tags: ["Cart"],
                 summary: "Remove the current user's cart",
-                security: [{ cookieAuth: [] }],
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
                 responses: {
                     200: {
                         description: "Cart removed successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
                     },
-                    401: { description: "Unauthorized" },
-                    404: { description: "Cart not found" },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    404: {
+                        description: "Cart not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
                 },
             },
         },
@@ -644,17 +1146,30 @@ exports.swaggerSpec = {
             get: {
                 tags: ["Wishlist"],
                 summary: "Get wishlist items",
-                security: [{ cookieAuth: [] }],
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
                 responses: {
                     200: {
                         description: "Wishlist retrieved successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                 },
             },
             post: {
                 tags: ["Wishlist"],
                 summary: "Add product to wishlist",
-                security: [{ cookieAuth: [] }],
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
                 requestBody: {
                     required: true,
                     content: {
@@ -666,6 +1181,27 @@ exports.swaggerSpec = {
                 responses: {
                     201: {
                         description: "Product added to wishlist",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
+                    },
+                    400: {
+                        description: "Product ID is required",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                 },
             },
@@ -674,7 +1210,7 @@ exports.swaggerSpec = {
             delete: {
                 tags: ["Wishlist"],
                 summary: "Remove product from wishlist",
-                security: [{ cookieAuth: [] }],
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
                 requestBody: {
                     required: true,
                     content: {
@@ -686,6 +1222,27 @@ exports.swaggerSpec = {
                 responses: {
                     200: {
                         description: "Product removed from wishlist",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
+                    },
+                    400: {
+                        description: "Product ID is required",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                 },
             },
@@ -694,7 +1251,7 @@ exports.swaggerSpec = {
             post: {
                 tags: ["Wishlist"],
                 summary: "Move product from wishlist to cart",
-                security: [{ cookieAuth: [] }],
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
                 requestBody: {
                     required: true,
                     content: {
@@ -706,9 +1263,28 @@ exports.swaggerSpec = {
                 responses: {
                     200: {
                         description: "Product moved to cart successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
                     },
-                    400: { description: "Product ID is required" },
-                    401: { description: "Unauthorized" },
+                    400: {
+                        description: "Product ID is required",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
                 },
             },
         },
@@ -716,18 +1292,55 @@ exports.swaggerSpec = {
             post: {
                 tags: ["Seller"],
                 summary: "Apply to become a seller",
-                security: [{ cookieAuth: [] }],
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
                 requestBody: {
                     required: true,
                     content: {
                         "multipart/form-data": {
-                            schema: { $ref: "#/components/schemas/SellerApplyRequest" },
+                            schema: {
+                                type: "object",
+                                required: [
+                                    "storeName",
+                                    "commercialRegisterNumber",
+                                    "taxCardNumber",
+                                    "commercialRegisterImage",
+                                    "taxCardImage",
+                                ],
+                                properties: {
+                                    storeName: { type: "string", example: "Egyzon Store" },
+                                    commercialRegisterNumber: { type: "string", example: "CR-123456" },
+                                    taxCardNumber: { type: "string", example: "TC-987654" },
+                                    commercialRegisterImage: { type: "string", format: "binary" },
+                                    taxCardImage: { type: "string", format: "binary" },
+                                },
+                            },
                         },
                     },
                 },
                 responses: {
-                    201: {
-                        description: "Request to join sent successfully",
+                    200: {
+                        description: "Request sent successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
+                    },
+                    400: {
+                        description: "All fields and images are required",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                 },
             },
@@ -736,18 +1349,65 @@ exports.swaggerSpec = {
             post: {
                 tags: ["Seller"],
                 summary: "Set up a seller store",
-                security: [{ cookieAuth: [] }],
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
                 requestBody: {
                     required: true,
                     content: {
                         "multipart/form-data": {
-                            schema: { $ref: "#/components/schemas/SellerSetupRequest" },
+                            schema: {
+                                type: "object",
+                                required: ["storeDescription", "storeType", "storeLogo", "storeBanner"],
+                                properties: {
+                                    storeDescription: {
+                                        type: "string",
+                                        example: "Modern curated products for everyday life.",
+                                    },
+                                    storeType: {
+                                        type: "string",
+                                        enum: ["physical", "online", "both"],
+                                        example: "both",
+                                    },
+                                    storephysicalAddress: { type: "string", example: "Downtown Cairo" },
+                                    storeOnlineAddress: { type: "string", example: "https://store.example.com" },
+                                    storeLogo: { type: "string", format: "binary" },
+                                    storeBanner: { type: "string", format: "binary" },
+                                },
+                            },
                         },
                     },
                 },
                 responses: {
                     200: {
                         description: "Store setup successful",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
+                    },
+                    400: {
+                        description: "Bad request or missing required fields",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Forbidden",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                 },
             },
@@ -756,24 +1416,58 @@ exports.swaggerSpec = {
             post: {
                 tags: ["Categories"],
                 summary: "Create a category",
-                security: [{ cookieAuth: [] }],
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
                 requestBody: {
                     required: true,
                     content: {
                         "multipart/form-data": {
-                            schema: { $ref: "#/components/schemas/CategoryCreateRequest" },
+                            schema: {
+                                type: "object",
+                                required: ["name", "description", "image"],
+                                properties: {
+                                    name: { type: "string", example: "Electronics" },
+                                    description: {
+                                        type: "string",
+                                        example: "Gadgets, devices, and accessories.",
+                                    },
+                                    image: { type: "string", format: "binary" },
+                                },
+                            },
                         },
                     },
                 },
                 responses: {
                     201: {
                         description: "Category created successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
+                    },
+                    400: {
+                        description: "Category name, description, and image are required",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                     401: {
                         description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                     403: {
                         description: "Forbidden",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                 },
             },
@@ -782,7 +1476,7 @@ exports.swaggerSpec = {
             put: {
                 tags: ["Customer"],
                 summary: "Change the current customer's password",
-                security: [{ cookieAuth: [] }],
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
                 requestBody: {
                     required: true,
                     content: {
@@ -794,12 +1488,564 @@ exports.swaggerSpec = {
                 responses: {
                     200: {
                         description: "Password changed successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
+                    },
+                    400: {
+                        description: "Validation failed or passwords do not match",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                     401: {
                         description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/admin/login": {
+            post: {
+                tags: ["Admin"],
+                summary: "Login as an admin",
+                requestBody: {
+                    required: true,
+                    content: {
+                        "application/json": {
+                            schema: { $ref: "#/components/schemas/AdminLoginRequest" },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: "Admin logged in successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Invalid email or password",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Access denied",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/admin/user": {
+            get: {
+                tags: ["Admin"],
+                summary: "List all users",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: "Users retrieved successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: { $ref: "#/components/schemas/AdminUserListResponse" },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Forbidden",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/admin/promoteUserToAdmin/{userId}": {
+            patch: {
+                tags: ["Admin"],
+                summary: "Promote a customer or seller to admin",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: "userId",
+                        in: "path",
+                        required: true,
+                        schema: { type: "string" },
+                    },
+                ],
+                responses: {
+                    200: {
+                        description: "User promoted to admin successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
                     },
                     400: {
-                        description: "Validation failed",
+                        description: "User ID is required",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Forbidden",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    404: {
+                        description: "User not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/admin/BlockTheUser/{userId}": {
+            patch: {
+                tags: ["Admin"],
+                summary: "Block a user",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: "userId",
+                        in: "path",
+                        required: true,
+                        schema: { type: "string" },
+                    },
+                ],
+                responses: {
+                    200: {
+                        description: "User blocked successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
+                    },
+                    400: {
+                        description: "User ID is required",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Forbidden",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    404: {
+                        description: "User not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/admin/acivateUser/{userId}": {
+            patch: {
+                tags: ["Admin"],
+                summary: "Activate a user",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: "userId",
+                        in: "path",
+                        required: true,
+                        schema: { type: "string" },
+                    },
+                ],
+                responses: {
+                    200: {
+                        description: "User activated successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
+                    },
+                    400: {
+                        description: "User ID is required",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Forbidden",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    404: {
+                        description: "User not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/admin/seller-applications/pending": {
+            get: {
+                tags: ["Admin"],
+                summary: "List pending seller applications",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: "Pending seller applications retrieved successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: {
+                                                    $ref: "#/components/schemas/SellerApplicationListResponse",
+                                                },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Forbidden",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/admin/allSellers": {
+            get: {
+                tags: ["Admin"],
+                summary: "List all sellers with pagination",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: "page",
+                        in: "query",
+                        required: false,
+                        schema: { type: "integer", minimum: 1, default: 1 },
+                    },
+                    {
+                        name: "limit",
+                        in: "query",
+                        required: false,
+                        schema: { type: "integer", minimum: 1, default: 10 },
+                    },
+                ],
+                responses: {
+                    200: {
+                        description: "Sellers retrieved successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: {
+                                                    $ref: "#/components/schemas/AdminSellerListResponse",
+                                                },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Forbidden",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/admin/seller-applications/{sellerId}/approve": {
+            post: {
+                tags: ["Admin"],
+                summary: "Approve a seller application",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: "sellerId",
+                        in: "path",
+                        required: true,
+                        schema: { type: "string" },
+                    },
+                ],
+                responses: {
+                    200: {
+                        description: "Seller approved successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
+                    },
+                    400: {
+                        description: "Seller ID is required",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Forbidden",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    404: {
+                        description: "User not found or no pending application found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/admin/seller-applications/{sellerId}/request-additional-documents": {
+            post: {
+                tags: ["Admin"],
+                summary: "Request additional documents from a seller",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: "sellerId",
+                        in: "path",
+                        required: true,
+                        schema: { type: "string" },
+                    },
+                ],
+                requestBody: {
+                    required: true,
+                    content: {
+                        "application/json": {
+                            schema: { $ref: "#/components/schemas/AdminAdditionalDocumentsRequest" },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: "Request for additional documents sent successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
+                    },
+                    400: {
+                        description: "Seller ID or message is required",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Forbidden",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    404: {
+                        description: "No pending seller application found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/admin/seller-applications/{sellerId}/reject": {
+            post: {
+                tags: ["Admin"],
+                summary: "Reject a seller application",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: "sellerId",
+                        in: "path",
+                        required: true,
+                        schema: { type: "string" },
+                    },
+                ],
+                responses: {
+                    200: {
+                        description: "Seller rejected successfully",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                            },
+                        },
+                    },
+                    400: {
+                        description: "Seller ID is required",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Forbidden",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    404: {
+                        description: "User not found or no pending application found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
                     },
                 },
             },

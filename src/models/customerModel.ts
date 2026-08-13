@@ -1,13 +1,9 @@
 import mongoose, { Schema } from 'mongoose';
 import {ICustomer} from "../types/User.types";
-
+import User from "./userModel";
 
 const CustomerSchema = new Schema<ICustomer>({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-    },
+
     orders: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: "Order",
@@ -27,6 +23,9 @@ const CustomerSchema = new Schema<ICustomer>({
         type: [String],
         default: []
     },
-}, { timestamps: true });
+});
 
-export default mongoose.model("Customer", CustomerSchema);
+
+
+export default User.discriminator<ICustomer>("customer", CustomerSchema);
+

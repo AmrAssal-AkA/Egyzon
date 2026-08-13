@@ -56,6 +56,13 @@ export const resetPasswordSchema = z.object({
     })
 })
 
+export const adminLoginSchema = z.object({
+    body: z.object({
+        email: z.string().email({ message: "Invalid email address" }),
+        password: z.string().min(1, 'Password is required'),
+    })
+})
+
 export type ReagisterSchemaType = z.infer<typeof RegisterSchema>['body'];
 export type LoginSchemaType = z.infer<typeof LoginSchema>['body'];
 export type UpdateUserSchemaType = z.infer<typeof updateUserSchema>['body'];

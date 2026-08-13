@@ -50,6 +50,12 @@ export declare const resetPasswordSchema: z.ZodObject<{
         confirmNewPassword: z.ZodString;
     }, z.core.$strip>;
 }, z.core.$strip>;
+export declare const adminLoginSchema: z.ZodObject<{
+    body: z.ZodObject<{
+        email: z.ZodString;
+        password: z.ZodString;
+    }, z.core.$strip>;
+}, z.core.$strip>;
 export type ReagisterSchemaType = z.infer<typeof RegisterSchema>['body'];
 export type LoginSchemaType = z.infer<typeof LoginSchema>['body'];
 export type UpdateUserSchemaType = z.infer<typeof updateUserSchema>['body'];

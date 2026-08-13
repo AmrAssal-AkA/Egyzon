@@ -1,6 +1,9 @@
 import mongoose, { HydratedDocument, Schema } from "mongoose";
 import { IUser, ICustomer, ISeller } from "../types/User.types"; 
 
+const options = {discriminatorKey: 'role', collection: "User", timestamps: true}
+
+
 const UserSchema = new Schema<IUser>({
   FirstName: {
     type: String,
@@ -32,8 +35,7 @@ const UserSchema = new Schema<IUser>({
   phoneNumber: {
     type: String,
     unique: true,
-    sparse: true,
-    default: null,
+    sparse: true, 
   },
   isBlocked: {
     type: Boolean,
@@ -47,13 +49,11 @@ const UserSchema = new Schema<IUser>({
     type: String,
     unique: true,
     sparse: true,
-    default: null,
   },
   facebookId: {
     type: String,
     unique: true,
     sparse: true,
-    default: null,
   },
   resetPasswordToken: {
     type: String,
@@ -77,11 +77,21 @@ const UserSchema = new Schema<IUser>({
     type: Boolean,
     default: false,
   },
-}, { timestamps: true });
+  joinedDate: {type: Date, default: function (){
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    return now;
+  }},
+  lastActiveDate: {
+    type: Date,
+    default: function (){
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return today;
+    }
+  }
+}, options);
 
-UserSchema.pre("deleteOne", { document: true, query: false }, async function (this: HydratedDocument<IUser>) {
-  await mongoose.model("Customer").deleteOne({ user: this._id });
-  await mongoose.model("Seller").deleteOne({ user: this._id });
-});
+
 
 export default mongoose.model("User", UserSchema);

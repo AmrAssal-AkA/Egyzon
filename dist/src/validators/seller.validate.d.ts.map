@@ -1,1 +1,1 @@
-{"version":3,"file":"seller.validate.d.ts","sourceRoot":"","sources":["../../../src/validators/seller.validate.ts"],"names":[],"mappings":"AAAA,OAAO,EAAC,CAAC,EAAC,MAAM,KAAK,CAAC;AAKtB,eAAO,MAAM,gBAAgB;;;;;;iBAM3B,CAAA;AAEF,eAAO,MAAM,sBAAsB;;;;;;;;;;;;;iBASjC,CAAA"}
+{"version":3,"file":"seller.validate.d.ts","sourceRoot":"","sources":["../../../src/validators/seller.validate.ts"],"names":[],"mappings":"AAAA,OAAO,EAAC,CAAC,EAAC,MAAM,KAAK,CAAC;AAWtB,eAAO,MAAM,gBAAgB;;;;;;;;;;;;;;;;;;;;iBAU3B,CAAA;AAEF,eAAO,MAAM,sBAAsB;;;;;;;;;;;;;iBASjC,CAAA"}

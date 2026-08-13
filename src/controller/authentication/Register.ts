@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 dotenv.config();
 // Import necessary modules and utilities
 import User from "../../models/userModel";
-import Customer from "../../models/customerModel";
 import { hashPassword } from "../../utils/password.ustils";
 import { signAccessToken, signRefreshToken } from "../../utils/jwt.util";
 import { sendSuccessResponse, sendErrorResponse } from "../../utils/Responses";
@@ -29,7 +28,6 @@ const RegisterUser = async (userData: any, res: Response, req: Request) => {
     });
     await newUser.save();
 
-    await Customer.create({ user: newUser._id });
     const token = await signAccessToken({
       userId: newUser.id,
       role: newUser.role,

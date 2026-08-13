@@ -17,8 +17,10 @@ const createRequestToJoin = async (req, res) => {
         const { storeName, commercialRegisterNumber, taxCardNumber } = req.body;
         if (!storeName?.trim() ||
             !commercialRegisterNumber?.trim() ||
-            taxCardNumber?.trim)
+            !taxCardNumber?.trim()) {
             return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "All fields are required");
+        }
+        console.log("Request body:", req.body);
         const files = req.files;
         if (!files?.commercialRegisterImage?.[0] || !files.taxCardImage?.[0])
             return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "Both Commercial Register Image and Tax Card Image are required");
@@ -26,7 +28,7 @@ const createRequestToJoin = async (req, res) => {
         const crMime = files.commercialRegisterImage?.[0]?.mimetype ?? "";
         const taxMime = files.taxCardImage?.[0]?.mimetype ?? "";
         if (!allowedTypes.includes(crMime))
-            return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "Invalid image format. Only JPEG and PNG are allowed");
+            return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "Invalid image format. Only JPE, PNG and JPG are allowed");
         if (!allowedTypes.includes(taxMime))
             return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "Invalid image format. Only JPEG and PNG are allowed");
         await seller_services_1.SellerServices.checkExistingSeller(userId);
@@ -41,14 +43,20 @@ const createRequestToJoin = async (req, res) => {
             commercialRegisterNumber,
             taxCardNumber,
             sellerDocuments: {
-                commercialRegisterUrl: crUpload.secure,
-                taxCardUrl: taxUpload.secure,
-            },
+                commercialRegisterUrl: crUpload.secure_url,
+                taxCardUrl: taxUpload.secure_url,
+            }
         };
         await seller_services_1.SellerServices.ApplyAsPartner(sellerData, userId);
         return (0, Responses_1.sendSuccessResponse)(res, 200, "Request sent successfully");
     }
-    catch (error) { }
+    catch (error) {
+        if (error instanceof AppError_1.AppError) {
+            return (0, Responses_1.sendErrorResponse)(res, error.statusCode, "Bad Request", error.message);
+        }
+        console.log(error);
+        return (0, Responses_1.sendErrorResponse)(res, 500, "Internal Server Error", "Something went wrong");
+    }
 };
 {
     /*  second step After the seller document Approval */

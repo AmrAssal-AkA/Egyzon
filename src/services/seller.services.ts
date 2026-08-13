@@ -5,23 +5,21 @@ import { SellerApplyApplicantTemplate } from "../templates/SellerApplyApplicant"
 
 export const SellerServices = {
   ApplyAsPartner: async (sellerData: any, userId: string) => {
-      const user = await User.findById(userId);
-      if (!user) {
-        throw new AppError(404, "User not found");
-      }
-      const existingSeller = await Seller.findOne({ user: user._id });
-      if (existingSeller) {
-        throw new AppError(400, "User has already applied to be a seller");
-      }
-      console.log("Seller data:", sellerData);
-      const SaveSellerData = await Seller.create({
-        user: user._id,
+      const user = await Seller.db.model("User").findById(userId);
+
+      if (!user) throw new AppError(404, "User not found");
+      if (user.role === "seller") throw new AppError(400, "User is already a seller");
+    
+      const SaveSellerData = await Seller.findByIdAndUpdate(userId, {
+        role: "seller",
         storeName: sellerData.storeName,
         commercialRegisterNumber: sellerData.commercialRegisterNumber,
         taxCardNumber: sellerData.taxCardNumber,
         sellerDocuments: sellerData.sellerDocuments,
         applicantStatus: "pending",
-      });
+      },
+      {returnDocument: "after", runValidators: true}
+    );
       try {
         await SellerApplyApplicantTemplate(
           user.email,
@@ -35,9 +33,8 @@ export const SellerServices = {
     
   },
   checkExistingSeller: async (userId: string) => {
-    const user = await User.findById(userId);
+    const user = await Seller.db.model("User").findById(userId);
     if(!user) throw new AppError(404,"user not found");
-
     const existingSeller = await Seller.findOne({ user: user._id });
     if (existingSeller) throw new AppError(400, "User has already applied to be a seller");
     return existingSeller;

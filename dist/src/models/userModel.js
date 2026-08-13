@@ -34,6 +34,7 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
+const options = { discriminatorKey: 'role', collection: "User", timestamps: true };
 const UserSchema = new mongoose_1.Schema({
     FirstName: {
         type: String,
@@ -66,7 +67,6 @@ const UserSchema = new mongoose_1.Schema({
         type: String,
         unique: true,
         sparse: true,
-        default: null,
     },
     isBlocked: {
         type: Boolean,
@@ -80,13 +80,11 @@ const UserSchema = new mongoose_1.Schema({
         type: String,
         unique: true,
         sparse: true,
-        default: null,
     },
     facebookId: {
         type: String,
         unique: true,
         sparse: true,
-        default: null,
     },
     resetPasswordToken: {
         type: String,
@@ -110,10 +108,19 @@ const UserSchema = new mongoose_1.Schema({
         type: Boolean,
         default: false,
     },
-}, { timestamps: true });
-UserSchema.pre("deleteOne", { document: true, query: false }, async function () {
-    await mongoose_1.default.model("Customer").deleteOne({ user: this._id });
-    await mongoose_1.default.model("Seller").deleteOne({ user: this._id });
-});
+    joinedDate: { type: Date, default: function () {
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            return now;
+        } },
+    lastActiveDate: {
+        type: Date,
+        default: function () {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return today;
+        }
+    }
+}, options);
 exports.default = mongoose_1.default.model("User", UserSchema);
 //# sourceMappingURL=userModel.js.map

@@ -16,6 +16,7 @@ import cartRoute from './src/routes/cart.route';
 import CategoryRoute from './src/routes/category.routes';
 import { swaggerSpec } from "./src/docs/swagger";
 import customerRoute from "./src/routes/customer.route";
+import adminRoute from "./src/routes/admin.route";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -25,7 +26,7 @@ connectDB();
 //middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: "*", credentials: true }));
+app.use(cors({ origin: "http://localhost:3000" , credentials: true }));
 app.use(helmet());
 app.use(cookieParser());
 
@@ -38,6 +39,7 @@ app.use("/api/seller", sellerRoute);
 app.use("/api/cart", cartRoute);
 app.use("/api/category", CategoryRoute);
 app.use("/api/customer", customerRoute);
+app.use("/api/admin", adminRoute);
 
 //swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));

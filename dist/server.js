@@ -20,6 +20,7 @@ const cart_route_1 = __importDefault(require("./src/routes/cart.route"));
 const category_routes_1 = __importDefault(require("./src/routes/category.routes"));
 const swagger_1 = require("./src/docs/swagger");
 const customer_route_1 = __importDefault(require("./src/routes/customer.route"));
+const admin_route_1 = __importDefault(require("./src/routes/admin.route"));
 const app = (0, express_1.default)();
 const PORT = process.env.PORT;
 //connect to db
@@ -27,7 +28,7 @@ const PORT = process.env.PORT;
 //middlewares
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
-app.use((0, cors_1.default)({ origin: "*", credentials: true }));
+app.use((0, cors_1.default)({ origin: "http://localhost:3000", credentials: true }));
 app.use((0, helmet_1.default)());
 app.use((0, cookie_parser_1.default)());
 //routes
@@ -38,6 +39,7 @@ app.use("/api/seller", seller_route_1.default);
 app.use("/api/cart", cart_route_1.default);
 app.use("/api/category", category_routes_1.default);
 app.use("/api/customer", customer_route_1.default);
+app.use("/api/admin", admin_route_1.default);
 //swagger
 app.use("/api-docs", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_1.swaggerSpec));
 //default route

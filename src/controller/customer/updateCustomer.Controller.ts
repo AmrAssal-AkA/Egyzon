@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 
-import Customer from "../../models/customerModel";
-import { ICustomer } from "../../types/User.types";
+
 import { AppError } from "../../utils/AppError";
 import User from "../../models/userModel";
 import { hashPassword, comparePasswords } from "../../utils/password.ustils";

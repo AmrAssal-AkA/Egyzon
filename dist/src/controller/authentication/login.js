@@ -43,6 +43,8 @@ const LoginUser = async (req, res) => {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000,
         });
+        user.lastActiveDate = new Date();
+        await user.save();
         (0, Responses_1.sendSuccessResponse)(res, 200, "Login successful", { token, refreshToken });
     }
     catch (err) {

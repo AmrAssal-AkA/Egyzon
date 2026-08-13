@@ -1,28 +1,25 @@
 import mongoose, { Schema } from "mongoose";
 import { ISeller } from "../types/User.types";
+import User from "./userModel";
 
 const SellerSchema = new Schema<ISeller>(
   {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-      unique: true,
-      index: true,
-    },
     commercialRegisterNumber: {
       type: String,
       required: true,
       unique: true,
+      sparse: true,
     },
     taxCardNumber: {
       type: String,
       required: true,
       unique: true,
+      sparse: true,
     },
     storeName: {
       type: String,
       unique: true,
+      sparse: true,
     },
     sellerDocuments: {
       commercialRegisterUrl: {
@@ -62,8 +59,14 @@ const SellerSchema = new Schema<ISeller>(
       ref: "Wallet",
       default: null,
     },
-  },
-  { timestamps: true },
-);
+    notes: {
+      type: String,
+      default: "",
+    },
+    createdAt: {
+      type: Date,
+    }
+  });
 
-export default mongoose.model("Seller", SellerSchema);
+export default User.discriminator<ISeller>("seller", SellerSchema);
+

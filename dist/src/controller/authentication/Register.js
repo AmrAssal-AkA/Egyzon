@@ -7,7 +7,6 @@ const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 // Import necessary modules and utilities
 const userModel_1 = __importDefault(require("../../models/userModel"));
-const customerModel_1 = __importDefault(require("../../models/customerModel"));
 const password_ustils_1 = require("../../utils/password.ustils");
 const jwt_util_1 = require("../../utils/jwt.util");
 const Responses_1 = require("../../utils/Responses");
@@ -30,7 +29,6 @@ const RegisterUser = async (userData, res, req) => {
             password: hashedPassword,
         });
         await newUser.save();
-        await customerModel_1.default.create({ user: newUser._id });
         const token = await (0, jwt_util_1.signAccessToken)({
             userId: newUser.id,
             role: newUser.role,

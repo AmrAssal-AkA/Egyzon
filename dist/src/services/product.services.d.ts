@@ -21,16 +21,7 @@ export declare const ProductServices: {
     } & {
         id: string;
     }>;
-    getAllProducts: (page: number, limit: number) => Promise<{
-        products: (import("mongoose").Document<unknown, {}, IProduct, {}, import("mongoose").DefaultSchemaOptions> & IProduct & {
-            _id: import("mongoose").Types.ObjectId;
-        } & {
-            __v: number;
-        } & {
-            id: string;
-        })[];
-        total: number;
-    }>;
+    getAllProducts: (page: number, limit: number) => Promise<any>;
     getProductById: (productId: string) => Promise<import("mongoose").Document<unknown, {}, IProduct, {}, import("mongoose").DefaultSchemaOptions> & IProduct & {
         _id: import("mongoose").Types.ObjectId;
     } & {

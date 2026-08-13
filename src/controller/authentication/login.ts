@@ -34,7 +34,6 @@ const LoginUser = async (req: Request, res: Response) => {
       userId: user.id,
     });
     await refreshTokenDoc.save();
-
     res.cookie("Access_token", token, {
       httpOnly: true,
       maxAge: 60 * 60 * 1000,
@@ -43,7 +42,8 @@ const LoginUser = async (req: Request, res: Response) => {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
     });
-    
+    user.lastActiveDate = new Date();
+    await user.save();
     sendSuccessResponse(res, 200, "Login successful", { token, refreshToken });
   } catch (err) {
     sendErrorResponse(res, 500, "Something went wrong", (err as Error).message);

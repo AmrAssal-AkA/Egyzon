@@ -5,31 +5,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SellerServices = void 0;
 const sellerModel_1 = __importDefault(require("../models/sellerModel"));
-const userModel_1 = __importDefault(require("../models/userModel"));
 const AppError_1 = require("../utils/AppError");
 const SellerApplyApplicant_1 = require("../templates/SellerApplyApplicant");
 exports.SellerServices = {
     ApplyAsPartner: async (sellerData, userId) => {
-        const user = await userModel_1.default.findById(userId);
-        if (!user) {
+        const existingSeller = await sellerModel_1.default.findById(userId);
+        const user = await sellerModel_1.default.db.model("User").findById(userId);
+        if (!user)
             throw new AppError_1.AppError(404, "User not found");
-        }
-        const existingSeller = await sellerModel_1.default.findOne({ user: user._id });
-        if (existingSeller) {
-            throw new AppError_1.AppError(400, "User has already applied to be a seller");
-        }
-        console.log("Seller data:", sellerData);
-        const SaveSellerData = await sellerModel_1.default.create({
-            user: user._id,
+        if (user.role === "seller")
+            throw new AppError_1.AppError(400, "User is already a seller");
+        const SaveSellerData = await sellerModel_1.default.findByIdAndUpdate(userId, {
+            role: "seller",
             storeName: sellerData.storeName,
             commercialRegisterNumber: sellerData.commercialRegisterNumber,
             taxCardNumber: sellerData.taxCardNumber,
-            sellerDocuments: {
-                commercialRegisterUrl: sellerData.commercialRegisterUrl,
-                taxCardUrl: sellerData.taxCardUrl,
-            },
+            sellerDocuments: sellerData.sellerDocuments,
             applicantStatus: "pending",
-        });
+        }, { new: true });
         try {
             await (0, SellerApplyApplicant_1.SellerApplyApplicantTemplate)(user.email, user.FirstName, sellerData.storeName);
         }
@@ -39,7 +32,7 @@ exports.SellerServices = {
         return SaveSellerData;
     },
     checkExistingSeller: async (userId) => {
-        const user = await userModel_1.default.findById(userId);
+        const user = await sellerModel_1.default.db.model("User").findById(userId);
         if (!user)
             throw new AppError_1.AppError(404, "user not found");
         const existingSeller = await sellerModel_1.default.findOne({ user: user._id });

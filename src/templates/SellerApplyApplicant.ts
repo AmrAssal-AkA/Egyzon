@@ -15,3 +15,19 @@ export const SellerApplyApplicantTemplate = async (to: string, applicantName: st
         </div>`
     )
 }
+
+export const SellerApplyApplovalTemplate = async (to: string, applicantName: string, storeName: string) => {
+    await sendnoReplayEmail (
+        to,
+        "Seller Applicant Approved",
+        `<div style="font-family: Arial, sans-serif; font-size: 16px; color: #333; text-align: center; padding: 20px;">
+        <p>Dear ${applicantName},</p>
+        <p>Congratulations! Your application to become a seller on our platform for the store "${storeName}" has been approved.</p>
+        <p>You can now start selling your products and reach a wider audience.</p>
+        <p>If you have any questions or need assistance, please contact our support team.</p>
+        <p>Best regards,</p>
+        <p>The Team</p>
+        <p>Note: Please do not reply to this email. This is an automated message.</p>
+        </div>`
+    )
+}
