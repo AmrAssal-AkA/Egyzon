@@ -1,8 +1,9 @@
 import axios from "axios";
+import { apiClient } from "@/lib/apiClient";
 
 export const addWishlist = async (productId: string) => {
   try {
-    const response = await axios.post("/api/wishlists/addWishlist", { productId });
+    const response = await apiClient.post("/api/wishlists/addWishlist", { productId });
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -14,7 +15,7 @@ export const addWishlist = async (productId: string) => {
 
 export const removeWishlist = async (productId: string) => {
   try {
-    const response = await axios.delete("/api/wishlists/removeWishlist", { data: { productId } });
+    const response = await apiClient.delete("/api/wishlists/removeWishlist", { data: { productId } });
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -26,7 +27,7 @@ export const removeWishlist = async (productId: string) => {
 
 export const getWishlist = async () => {
   try {
-    const response = await axios.get("/api/wishlists/getWishlist");
+    const response = await apiClient.get("/api/wishlists/getWishlist");
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {

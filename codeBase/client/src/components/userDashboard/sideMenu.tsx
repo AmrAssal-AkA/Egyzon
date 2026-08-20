@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export const Links = [
     {name: "Profile", href: "/dashboard/"},
-    {name: "My Orders", href: "/my-orders"},
+    {name: "My Orders", href: "/dashboard/myOrder"},
     {name: "Wishlist", href: "/dashboard/wishlist"}
 ]
 

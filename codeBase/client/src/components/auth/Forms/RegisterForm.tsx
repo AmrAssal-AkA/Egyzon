@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { FaGoogle, FaFacebook, FaEye, FaEyeSlash } from "react-icons/fa6";
+import { FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa6";
 import { toast } from "sonner";
 
 import { useAuth } from "@/hooks/useAuth";
@@ -27,9 +27,16 @@ function RegisterForm() {
     setLoading(true);
     setError("");
     try {
-      await register({ FirstName: firstName, LastName: lastName, email, password });
+      const res = await register({ FirstName: firstName, LastName: lastName, email, password });
+      if (!res.success) {
+        const message = res.message || "Registration failed";
+        toast.error(message);
+        setError(message);
+        return;
+      }
+      console.log("Registration successful, redirecting to dashboard...", res);
       toast.success("Registration successful!");
-      router.push("/dashboard");
+      router.push("/");
     } catch (error: unknown) {
       const message =
         (error as { response?: { data?: { message?: string } } })?.response
@@ -52,10 +59,7 @@ function RegisterForm() {
           <FaGoogle className="text-base" />
           Continue with Google
         </button>
-        <button className="flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background cursor-pointer">
-          <FaFacebook className="text-base text-[#1877F2]" />
-          Continue with Facebook
-        </button>
+
       </div>
       <div className="relative flex items-center py-1">
         <div className="h-px flex-1 bg-border" />

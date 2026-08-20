@@ -1,7 +1,12 @@
 import {z} from "zod";
 
 const safeTextSchema = z.string().regex(/^[a-zA-Z0-9\s]+$/, { message: "Only alphanumeric characters and spaces are allowed" });
-const PasswordSchema = z.string().min(8, { message: "Password must be at least 8 characters long" }).regex(/^(?=.*[A-Z])(?=.*\d)\S+$/, { message: "Password must contain at least one uppercase letter and one number." });
+const PasswordSchema = z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters long" })
+    .regex(/^(?=.*[A-Z])\S+$/, {
+        message: "Password must contain at least one uppercase letter.",
+    });
 const phoneNumberSchema = z.string().regex(/^\+?[1-9]\d{1,14}$/, { message: "Invalid phone number" });
 
 
@@ -22,7 +27,7 @@ export const RegisterSchema = z.object({
 
 export const updateUserSchema = z.object({
     body: userBaseSchema.partial().extend({
-        address: safeTextSchema.optional(),
+        address: z.union([safeTextSchema, z.array(safeTextSchema).min(1)]).optional(),
         phoneNumber: phoneNumberSchema.optional(),
         isBlocked: z.boolean().optional(),
     })

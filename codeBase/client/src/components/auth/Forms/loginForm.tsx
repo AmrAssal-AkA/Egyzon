@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { FaGoogle, FaFacebook, FaEye, FaEyeSlash } from "react-icons/fa6";
+import { FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa6";
 import { toast } from "sonner";
 
 import { useAuth } from "@/hooks/useAuth";
@@ -32,7 +32,7 @@ function LoginForm() {
       const res = await login({ email: Email, password: Password });
       if (res.success) {
         toast.success("Login Successful");
-        router.push("/dashboard");
+        router.push("/");
       } else {
         toast.error(res.message || "Login failed");
         setError(res.message || "Login failed");
@@ -58,10 +58,6 @@ function LoginForm() {
         >
           <FaGoogle className="text-base" />
           Continue with Google
-        </button>
-        <button className="flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background cursor-pointer">
-          <FaFacebook className="text-base text-[#1877F2]" />
-          Continue with Facebook
         </button>
       </div>
 

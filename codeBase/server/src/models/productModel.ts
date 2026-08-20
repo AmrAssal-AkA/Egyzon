@@ -33,6 +33,13 @@ const productSchema: Schema<IProduct> = new Schema(
       type: String,
       required: true,
       unique: true,
+      default: function (): string {
+        const categoryPart = this.categoryId ? this.categoryId.toString().slice(0, 4).toUpperCase() : "GEN";
+        const namePart = this.productName ? this.productName.replace(/\s+/g, "").slice(0, 4).toUpperCase() : "PROD";
+        const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+        const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+        return `${categoryPart}-${namePart}-${datePart}-${randomPart}`;
+      }
     },
     status: {
       type: String,
@@ -45,7 +52,7 @@ const productSchema: Schema<IProduct> = new Schema(
         required: true,
       },
     ],
-    SellerId: {
+    sellerId: {
       type: Schema.Types.ObjectId,
       ref: "Seller",
     },
@@ -56,6 +63,7 @@ const productSchema: Schema<IProduct> = new Schema(
   },
   { timestamps: true },
 );
+
 
 productSchema.pre("validate", async function () {
   if (this.sku) return;

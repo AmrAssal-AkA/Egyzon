@@ -8,15 +8,18 @@ const SellerSchema = new Schema<ISeller>(
       type: String,
       required: true,
       unique: true,
+      sparse: true,
     },
     taxCardNumber: {
       type: String,
       required: true,
       unique: true,
+      sparse: true,
     },
     storeName: {
       type: String,
       unique: true,
+      sparse: true,
     },
     sellerDocuments: {
       commercialRegisterUrl: {
@@ -59,10 +62,11 @@ const SellerSchema = new Schema<ISeller>(
     notes: {
       type: String,
       default: "",
+    },
+    createdAt: {
+      type: Date,
     }
-  },
+  });
 
-);
-
-export default User.discriminator<ISeller>("seller", SellerSchema);
+export default User.discriminator<ISeller>("Seller", SellerSchema, "seller");
 

@@ -20,7 +20,7 @@ export interface LastOrder {
     tax: number;
     discount: number;
     total: number;
-    orderStatus: "Confirmed";
+    orderStatus: "Confirmed" | string;
     delivery?: {
         method: string;
         estimatedDelivery: string;
@@ -30,7 +30,7 @@ export interface LastOrder {
         type: string;
         provider: string;
         last4: string;
-        status: "Paid";
+        status: "Paid" | "Pending" | string;
     };
     summary?: {
         subtotal: number;
@@ -39,6 +39,16 @@ export interface LastOrder {
         discount: number;
         total: number;
         currency: string;
+    };
+    address?: {
+        id?: string;
+        fullName?: string;
+        phone?: string;
+        street?: string;
+        city?: string;
+        governorate?: string;
+        postalCode?: string;
+        country?: string;
     };
 }
 
@@ -52,6 +62,7 @@ interface CartState {
     clearCart: () => void;
     updateTotalPrice: () => void;
     confirmOrder: () => void;
+    setLastOrder: (order: LastOrder | null) => void;
     syncCartWithServer: () => Promise<void>;
     fetchCartFromServer: () => Promise<void>;
     clearLocalCart: () => void;
@@ -63,6 +74,7 @@ export const useCartStore = create<CartState>()(
             cartItems: [],
             totalPrice: 0,
             lastOrder: null,
+            setLastOrder: (order: LastOrder | null) => set({ lastOrder: order }),
             syncCartWithServer: async () => {
                 try {
                     const cartItems = get().cartItems;

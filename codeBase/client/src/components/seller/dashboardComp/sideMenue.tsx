@@ -17,7 +17,7 @@ import {
 
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import AddProductModel from "./productPage/AddProductModel";
+import AddProductModel from "./productPage/_components/AddProductModel";
 
 type Props = {
   storeName?: string;
@@ -30,10 +30,14 @@ interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 
-export default function SellerSideMenue({ storeName }: Props) {
+export default function SellerSideMenue({ storeName }: Props = {}) {
   const pathname = usePathname();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const displayStoreName =
+    storeName ||
+    user?.storeName ||
+    (user?.FirstName ? `${user.FirstName}'s Store` : "Seller Store");
 
   const dashboardList: NavItem[] = [
     {
@@ -86,12 +90,12 @@ export default function SellerSideMenue({ storeName }: Props) {
           <div className="flex flex-col min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
               <h2 className="text-base font-semibold truncate text-slate-900 dark:text-slate-100">
-                {storeName || "Seller Store"}
+                {displayStoreName}
               </h2>
               <BadgeCheck className="w-4 h-4 text-emerald-500 shrink-0" />
             </div>
             <span className="text-xs text-slate-500 dark:text-slate-400 truncate">
-              Seller Dashboard
+              {user?.email || "No email provided"}
             </span>
           </div>
         </div>

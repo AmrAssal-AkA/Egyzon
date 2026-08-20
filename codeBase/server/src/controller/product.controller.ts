@@ -1,43 +1,108 @@
 import type { Request, Response } from "express";
 
 import { ProductServices } from "../services/product.services";
+import { NotificationServices } from "../services/notification.services";
 import { sendErrorResponse, sendSuccessResponse } from "../utils/Responses";
 import uploadImage from "../config/cloudainry.config";
+import gatSockets from "../socket";
 
 const createProduct = async (req: Request, res: Response) => {
   try {
-    const sellerId = (req as any).user?.id;
+    const sellerId =
+      (req as any).user?.userId ||
+      (req as any).user?._id ||
+      (req as any).user?.id;
     if (!sellerId) {
       return sendErrorResponse(res, 401, "Unauthorized: Seller ID not found");
     }
-    const { productName, productDescription, price, discount, stock } =
-      req.body;
-    const images = req.files as Express.Multer.File[];
-    if (!images || images.length === 0 || !images[0]?.buffer) {
-      return sendErrorResponse(res, 400, "Image file is required");
-    }
-    const imageUrl = await uploadImage(images[0]?.buffer, "Eguzon/Products");
-    if (!imageUrl) {
-      return sendErrorResponse(res, 400, "Image upload failed");
-    }
-    const newProduct = await ProductServices.createProduct(sellerId, {
+    const {
       productName,
       productDescription,
       price,
       discount,
       stock,
-      imageUrl,
+      category,
+    } = req.body;
+
+    if (
+      !productName ||
+      !productDescription ||
+      price === undefined ||
+      stock === undefined
+    ) {
+      return sendErrorResponse(
+        res,
+        400,
+        "All required product fields must be provided",
+      );
+    }
+
+    const images = req.files as Express.Multer.File[];
+    if (!images || images.length === 0 || !images[0]?.buffer) {
+      return sendErrorResponse(res, 400, "Image file is required");
+    }
+    const imageUrl = await Promise.all(
+      images.map((image) => uploadImage(image.buffer, "Egyzon/Products")),
+    );
+    if (!imageUrl || imageUrl.length === 0) {
+      return sendErrorResponse(res, 400, "Image upload failed");
+    }
+
+    const newProduct = await ProductServices.createProduct(sellerId, {
+      productName,
+      productDescription,
+      price: Number(price),
+      discount: discount !== undefined ? Number(discount) : 0,
+      stock: Number(stock),
+      category,
+      imageUrl: imageUrl.map((url) => url.secure_url),
     });
+    await NotificationServices.createNotification({
+      user: sellerId,
+      type: "success",
+      message: `Product "${newProduct.productName}" created successfully.`,
+      isRead: false,
+      createdAt: new Date(),
+    });
+    const socket = gatSockets.getSockets(String(sellerId));
+    socket.forEach((socketId) => {
+      const payload = {
+        id: `product-${newProduct._id}-${Date.now()}`,
+        userId: String(sellerId),
+        type: "product",
+        title: "New Product Added",
+        message: `Product "${newProduct.productName}" created successfully.`,
+        data: {
+          productId: String(newProduct._id),
+        },
+        isRead: false,
+        createdAt: new Date().toISOString(),
+      };
+
+      req.io.to(socketId).emit("product:added", payload);
+      req.io.to(socketId).emit("notification", payload);
+      console.log(
+        `Notification sent to user ${sellerId} on socket ${socketId}`,
+      );
+    });
+
     sendSuccessResponse(res, 201, "Product created successfully", newProduct);
-  } catch (error) {
+  } catch (error: any) {
     console.log(error);
-    sendErrorResponse(res, 500, "Internal Server Error");
+    sendErrorResponse(
+      res,
+      error.statusCode || 500,
+      error.message || "Internal Server Error",
+    );
   }
 };
 
 const applyDiscount = async (req: Request, res: Response) => {
   try {
-    const sellerId = (req as any).user?.id;
+    const sellerId =
+      (req as any).user?.userId ||
+      (req as any).user?._id ||
+      (req as any).user?.id;
     const productId = req.params.productId as string;
     const discount = req.body.discount as number;
 
@@ -72,16 +137,68 @@ const getAllProducts = async (req: Request, res: Response) => {
 };
 
 const getProductById = async (req: Request, res: Response) => {
-  const productId = req.params.productId as string ||(process.env.NODE_ENV !== 'production' && req.body.productId);;
+  const productId =
+    (req.params.productId as string) ||
+    (process.env.NODE_ENV !== "production" && req.body.productId);
   if (!productId) {
     return sendErrorResponse(res, 400, "productId not fount");
   }
 
   try {
     const getProduct = await ProductServices.getProductById(productId);
-    return sendSuccessResponse(res, 200, "Product retrieved successfully", getProduct);
+    return sendSuccessResponse(
+      res,
+      200,
+      "Product retrieved successfully",
+      getProduct,
+    );
   } catch (error) {
     sendErrorResponse(res, 500, "Internal Server Error", error);
+  }
+};
+
+const getSellerProducts = async (req: Request, res: Response) => {
+  try {
+    const sellerId =
+      (req as any).user?.userId ||
+      (req as any).user?._id ||
+      (req as any).user?.id;
+    if (!sellerId) {
+      return sendErrorResponse(res, 401, "Unauthorized: Seller ID not found");
+    }
+    const products = await ProductServices.getSellerProducts(sellerId);
+    sendSuccessResponse(
+      res,
+      200,
+      "Seller products retrieved successfully",
+      products,
+    );
+  } catch (error) {
+    console.log(error);
+    sendErrorResponse(res, 500, "Internal Server Error");
+  }
+};
+
+const deleteProduct = async (req: Request, res: Response) => {
+  try {
+    const sellerId =
+      (req as any).user?.userId ||
+      (req as any).user?._id ||
+      (req as any).user?.id;
+    const productId = req.params.productId as string;
+    const deletedProduct = await ProductServices.deleteProduct(
+      sellerId,
+      productId,
+    );
+    sendSuccessResponse(
+      res,
+      200,
+      "Product deleted successfully",
+      deletedProduct,
+    );
+  } catch (error) {
+    console.log(error);
+    sendErrorResponse(res, 500, "Internal Server Error");
   }
 };
 
@@ -90,4 +207,6 @@ export default {
   applyDiscount,
   getAllProducts,
   getProductById,
+  getSellerProducts,
+  deleteProduct,
 };

@@ -67,6 +67,13 @@ const productSchema = new mongoose_1.Schema({
         type: String,
         required: true,
         unique: true,
+        default: function () {
+            const categoryPart = this.categoryId ? this.categoryId.toString().slice(0, 4).toUpperCase() : "GEN";
+            const namePart = this.productName ? this.productName.replace(/\s+/g, "").slice(0, 4).toUpperCase() : "PROD";
+            const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+            const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+            return `${categoryPart}-${namePart}-${datePart}-${randomPart}`;
+        }
     },
     status: {
         type: String,
@@ -79,7 +86,7 @@ const productSchema = new mongoose_1.Schema({
             required: true,
         },
     ],
-    SellerId: {
+    sellerId: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "Seller",
     },

@@ -8,7 +8,8 @@ export const validate = (Schema: ZodObject) => (req: Request, res: Response, nex
             query: req.query,
             params: req.params,
             files: req.files,
-        })
+            cookies: req.cookies,
+        });
         next();
     }catch(error){
         if(error instanceof ZodError){

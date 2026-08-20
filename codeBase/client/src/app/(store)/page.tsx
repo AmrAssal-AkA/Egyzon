@@ -35,8 +35,8 @@ export default async function Home() {
   const productsResponse = await fetchProducts(1, 3);
   const products = productsResponse.data.products;
   const categories = await fetchCategories();
-
-  const limitedCategories = categories.slice(0, 4);
+  const categoriesList = Array.isArray(categories) ? categories : [];
+  const limitedCategories = categoriesList.slice(0, 4);
 
   return (
     <main className="w-full min-h-screen bg-background flex flex-col items-center justify-start py-15">
@@ -44,18 +44,20 @@ export default async function Home() {
         <HeroCarousel />
       </div>
       {/* Featured Products Section */}
-      <div className="w-full max-w-10xl px-4 md:px-20">
+      <div className="w-full max-w-10xl px-4 md:px-20 mt-10">
         <h2 className="text-3xl font-bold  mt-10 mb-5">Featured Products</h2>
         <p className="text-muted-foreground mb-10">
           Discover our latest and greatest products, carefully selected just for
           you.
         </p>
         {products.length === 0 ? (
-          <p className="text-muted-foreground text-center dark:text-gray-200">
-            No products found.
-          </p>
+          <div className="flex justify-center items-center h-40">
+            <p className="text-muted-foreground">No products found.</p>
+          </div>
         ) : (
-          <ProductGrid products={products} />
+          <div className="flex justify-center items-center md:min-x-max">
+            <ProductGrid products={products} />
+          </div>
         )}
       </div>
       {/* Categories Section */}
@@ -78,11 +80,13 @@ export default async function Home() {
           Check out the latest products that are trending in the market.
         </p>
         {products.length === 0 ? (
-          <p className="text-muted-foreground text-center dark:text-gray-200">
-            No products found.
-          </p>
+          <div className="flex justify-center items-center h-40">
+            <p className="text-muted-foreground">No products found.</p>
+          </div>
         ) : (
-          <ProductGrid products={products} />
+          <div className="flex justify-center">
+            <ProductGrid products={products} />
+          </div>
         )}
       </div>
       {/* Newsletter Section */}

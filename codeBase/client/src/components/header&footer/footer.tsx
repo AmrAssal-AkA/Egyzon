@@ -95,7 +95,7 @@ export default function Footer() {
               href="/"
               className="inline-block text-3xl font-extrabold tracking-tight text-white hover:opacity-90 transition-opacity"
             >
-              Egyzon<span className="text-blue-500">.</span>
+              Egy<span className="text-blue-500">Zon</span>
             </Link>
             <p className="text-sm leading-relaxed text-slate-400 max-w-sm">
               Egyzon is Egypt&apos;s next-generation multi-vendor marketplace connecting customers with trusted local and global sellers. Discover quality products with fast shipping and secure payments.

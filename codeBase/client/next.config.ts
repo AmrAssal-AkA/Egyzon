@@ -10,14 +10,11 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "cdn.dummyjson.com",
-      },
-      {
-        protocol: "https",
-        hostname: "dummyjson.com",
+        hostname: "res.cloudinary.com",
       },
     ],
   },
+  reactStrictMode: true,
 };
 
 export default nextConfig;

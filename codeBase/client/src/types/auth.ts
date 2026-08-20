@@ -11,14 +11,22 @@ export interface LoginPayload {
 }
 
 export interface User {
+    token?: string | null;
     userId: string;
     email: string;
     FirstName: string;
     LastName: string;
     image: string;
     role: "customer" | "seller";
+    storeName?: string;
     isCompleted?: boolean;
-    address?: string | Record<string, unknown>;
+    orders?: Array<{
+        id: string;
+        product: string;
+        date: string;
+        status: string;
+    }>;
+    address?: string[];
     phoneNumber?: string;
 }
 

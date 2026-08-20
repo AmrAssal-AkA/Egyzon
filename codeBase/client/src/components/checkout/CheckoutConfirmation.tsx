@@ -2,110 +2,39 @@
 
 import React from "react";
 
-
-
-
 import { useCartStore } from "@/stores/buyer/useCart";
-import { ConfirmationBanner } from "./confirmBanner";
-import { OrderReview } from "./orderReview";
-import { DeliveryOptions } from "./DeliveryOptions";
-import { PaymentMethods } from "./PaymentMethods";
-import { AddressSection } from "./AddressSection";
-import { ActionBar } from "./ActionBar";
+import { ConfirmationBanner } from "./_components/confirmBanner";
+import { OrderReview } from "./_components/orderReview";
+import { DeliveryOptions } from "./_components/DeliveryOptions";
+import { PaymentMethods } from "./_components/PaymentMethods";
+import { AddressSection } from "./_components/AddressSection";
+import { ActionBar } from "./_components/ActionBar";
 
 // Types and Interfaces
-export interface OrderItem {
-  id: string;
-  image: string;
-  name: string;
-  variant?: string;
-  quantity: number;
-  unitPrice: number;
-  total: number;
-}
+import {
+  CheckoutConfirmationProps,
+  ConfirmationBannerProps,
+  DeliveryOptionsProps,
+  OrderReviewProps,
+  PaymentMethodsProps,
+  AddressSectionProps,
+  ActionBarProps,
+  OrderItem,
+  OrderSummary,
+  DeliveryOption,
+  PaymentMethod,
+  Address,
+} from "@/types/cart.type";
 
-export interface OrderSummary {
-  subtotal: number;
-  shipping: number;
-  tax: number;
-  discount: number;
-  total: number;
-  currency: string;
-}
-
-export interface DeliveryOption {
-  method: string;
-  estimatedDelivery: string;
-  trackingAvailable: boolean;
-}
-
-export interface PaymentMethod {
-  type: string;
-  provider: string;
-  last4: string;
-  status: "Paid";
-}
-
-export interface Address {
-  id: string;
-  fullName: string;
-  phone: string;
-  street: string;
-  city: string;
-  governorate: string;
-  postalCode: string;
-  country: string;
-}
-
-export interface ConfirmationBannerProps {
-  orderNumber: string;
-  orderStatus: "Confirmed";
-  orderDate: string;
-}
-
-export interface OrderReviewProps {
-  orderItems: OrderItem[];
-  summary: OrderSummary;
-}
-
-export interface DeliveryOptionsProps {
-  delivery: DeliveryOption;
-}
-
-export interface PaymentMethodsProps {
-  payment: PaymentMethod;
-}
-
-export interface AddressSectionProps {
-  address: Address;
-  onChooseAddress?: () => void;
-  onAddAddress?: () => void;
-}
-
-export interface ActionBarProps {
-  onBackHome(): void;
-  onPrintReceipt(): void;
-  onDownloadInvoice(): void;
-  onFinalizeConfirmation(): void;
-}
-
-export interface CheckoutConfirmationProps {
-  orderNumber?: string;
-  orderStatus?: "Confirmed";
-  orderDate?: string;
-  orderItems?: OrderItem[];
-  summary?: OrderSummary;
-  delivery?: DeliveryOption;
-  payment?: PaymentMethod;
-  address?: Address;
-  onChooseAddress?: () => void;
-  onAddAddress?: () => void;
-  onBackHome?: () => void;
-  onPrintReceipt?: () => void;
-  onDownloadInvoice?: () => void;
-  onFinalizeConfirmation?: () => void;
-}
-
+export type {
+  CheckoutConfirmationProps,
+  ConfirmationBannerProps,
+  DeliveryOptionsProps,
+  OrderReviewProps,
+  PaymentMethodsProps,
+  AddressSectionProps,
+  ActionBarProps,
+};
 
 export default function CheckoutConfirmation({
   onChooseAddress = () => console.log("Choose address callback triggered"),
@@ -113,14 +42,13 @@ export default function CheckoutConfirmation({
   onBackHome = () => console.log("Back to home callback triggered"),
   onPrintReceipt = () => console.log("Print receipt callback triggered"),
   onDownloadInvoice = () => console.log("Download invoice callback triggered"),
-  onFinalizeConfirmation = () => console.log("Finalize confirmation callback triggered"),
+  onFinalizeConfirmation = () =>
+    console.log("Finalize confirmation callback triggered"),
 }: CheckoutConfirmationProps) {
   const { lastOrder } = useCartStore();
-
-
   const orderNumber = lastOrder?.orderNumber || "N/A";
   const orderStatus = lastOrder?.orderStatus || "Confirmed";
-  const orderDate = lastOrder?.orderDate || new Date().toLocaleDateString(); // Default to current date
+  const orderDate = lastOrder?.orderDate || new Date().toLocaleDateString();
 
   const orderItems: OrderItem[] = lastOrder
     ? lastOrder.orderItems.map((item) => ({
@@ -156,7 +84,7 @@ export default function CheckoutConfirmation({
     status: "Paid" as const,
   };
 
-  const address: Address = {
+  const address: Address = (lastOrder?.address as Address) || {
     id: "default",
     fullName: "Guest User",
     phone: "N/A",

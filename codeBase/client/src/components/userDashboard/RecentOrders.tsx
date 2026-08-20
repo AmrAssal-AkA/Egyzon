@@ -1,10 +1,24 @@
+"use client"
 import React from 'react';
 import Link from 'next/link';
-import { mockRecentOrders } from './mockData';
+
+import { useAuth } from '@/hooks/useAuth';
 
 export default function RecentOrders() {
-
-
+  const { user } = useAuth();
+  if (!user) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Orders</h3>
+          <Link href="/my-orders" className="text-sm text-blue-600 hover:underline dark:text-blue-400">
+            View All
+          </Link>
+        </div>
+        <p className="text-muted-foreground text-center dark:text-gray-200">Please log in to view your recent orders.</p>
+      </div>
+    );
+  }
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
       <div className="flex justify-between items-center mb-4">
@@ -25,7 +39,7 @@ export default function RecentOrders() {
             </tr>
           </thead>
           <tbody>
-            {mockRecentOrders.map((order) => (
+            {user?.orders?.map((order) => (
               <tr key={order.id} className="border-b dark:border-gray-700">
                 <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{order.id}</td>
                 <td className="px-4 py-3 truncate max-w-50 sm:max-w-none">{order.product}</td>

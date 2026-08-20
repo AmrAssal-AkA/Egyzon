@@ -20,7 +20,11 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(
-      { success: true, message: "Wishlist retrieved successfully", data },
+      {
+        success: true,
+        message: "Wishlist retrieved successfully",
+        data: data?.data ?? data,
+      },
       { status: 200 }
     );
   } catch (error) {

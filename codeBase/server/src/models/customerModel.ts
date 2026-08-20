@@ -27,5 +27,5 @@ const CustomerSchema = new Schema<ICustomer>({
 
 
 
-export default User.discriminator<ICustomer>("customer", CustomerSchema);
+export default User.discriminator<ICustomer>("customer", CustomerSchema, "customer");
 

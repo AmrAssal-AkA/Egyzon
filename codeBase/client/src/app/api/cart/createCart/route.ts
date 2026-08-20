@@ -18,6 +18,14 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
 
+    try {
+      await serverClient.delete("/api/cart/remove", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch {
+      // Ignore if cart was already empty
+    }
+
     const { data } = await serverClient.post("/api/cart/", body, {
       headers: { Authorization: `Bearer ${token}` },
     });

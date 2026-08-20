@@ -10,9 +10,10 @@ import {upload} from '../middleware/upload.middleware';
 const router = express.Router();
 
 router.get('/', validate(getAllProductsSchema), productController.getAllProducts);
-router.post('/addProduct', upload.array('image', 3), isAuthenticated, Authorize(userRole.Seller),validate(createProductSchema), productController.createProduct);
+router.post('/addProduct', isAuthenticated, Authorize(userRole.Seller), upload.array('image', 3),validate(createProductSchema), productController.createProduct);
 router.patch('/seller/product/:productId', isAuthenticated, Authorize(userRole.Seller), validate(updateProductSchema), productController.applyDiscount);
 router.get("/:productId", productController.getProductById)
-
+router.get("/seller/products", isAuthenticated, Authorize(userRole.Seller), productController.getSellerProducts);
+router.delete("/seller/product/:productId", isAuthenticated, Authorize(userRole.Seller), productController.deleteProduct);
 
 export default router;

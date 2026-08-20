@@ -104,6 +104,16 @@ declare const _default: mongoose.Model<IUser, {}, {}, {}, mongoose.Document<unkn
     } & {
         __v: number;
     }>;
+    joinedDate?: mongoose.SchemaDefinitionProperty<Date | undefined, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
+    lastActiveDate?: mongoose.SchemaDefinitionProperty<Date | undefined, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
     createdAt?: mongoose.SchemaDefinitionProperty<Date, IUser, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
         _id: mongoose.Types.ObjectId;
     } & {

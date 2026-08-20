@@ -10,6 +10,20 @@ import type { Product } from "@/types/product.type";
 
 export const dynamic = "force-dynamic";
 
+type ProductWithOptionalId = Product & {
+  productId?: string | null;
+  _id?: string | null;
+};
+
+type SellerLike = {
+  storeName?: string;
+  shopName?: string;
+  FirstName?: string;
+  LastName?: string;
+  name?: string;
+  username?: string;
+};
+
 interface PageProps {
   params: Promise<{ id: string }>;
 }
@@ -21,23 +35,61 @@ export default async function ProductDetailPage({ params }: PageProps) {
   if (!fetchedProduct) {
     notFound();
   }
-  const product: Product = fetchedProduct;
-  const relatedProducts = (await fetchProducts(1, 12)).data.products.filter(
-    (relatedProduct) => (relatedProduct._id || (relatedProduct as any).productId) !== (product._id || (product as any).productId),
-  );
+
+  const product = fetchedProduct as ProductWithOptionalId;
+  const productId = product._id ?? product.productId;
+  const relatedProducts = (await fetchProducts(1, 12)).data.products.filter((relatedProduct) => {
+    const relatedProductId = (relatedProduct as ProductWithOptionalId)._id ?? (relatedProduct as ProductWithOptionalId).productId;
+    return relatedProductId !== productId;
+  });
+
+  // Resolve Seller Name & Store Information
+  const rawSeller = product.sellerId || product.seller;
+  let sellerName = "Egyzon Store";
+  let sellerStoreName = "";
+
+  if (rawSeller && typeof rawSeller === "object") {
+    const sellerObject = rawSeller as SellerLike;
+    sellerStoreName = sellerObject.storeName || sellerObject.shopName || "";
+    const fullName = [
+      sellerObject.FirstName,
+      sellerObject.LastName,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+
+    sellerName =
+      sellerStoreName ||
+      fullName ||
+      sellerObject.name ||
+      sellerObject.username ||
+      product.storeName ||
+      product.sellerName 
+      || "Egyzon Store";
+  } else if (typeof rawSeller === "string" && rawSeller.trim() !== "") {
+    sellerName =
+      product.storeName ||
+      product.sellerName ||
+      `Seller #${rawSeller.slice(-6)}`;
+  } else if (product.storeName || product.sellerName) {
+    sellerName = product.storeName || product.sellerName || "Egyzon Store";
+  }
 
   const seller = {
-    name: product.SellerId ? `Seller ${product.SellerId.slice(0, 6)}` : "Egyzon Store",
+    name: sellerName,
+    storeName: sellerStoreName || sellerName,
     feedbackPercentage: 98.6,
     responseTime: "Within 1 hour",
     isVerified: true,
   };
 
   const specifications = [
-    { key: "Product ID", value: product._id || (product as any).productId },
-    { key: "Seller", value: product.SellerId || "N/A" },
+    { key: "Product ID", value: String(product._id || product.productId || "N/A") },
+    { key: "Seller", value: sellerName },
+    { key: "Category", value: product.category || "General" },
     { key: "Status", value: product.status || "active" },
-    { key: "Discount", value: `${product.discount}%` },
+    { key: "Discount", value: `${product.discount ?? 0}%` },
     { key: "Created At", value: product.createdAt ? new Date(product.createdAt).toLocaleDateString() : "N/A" },
   ];
 
@@ -49,7 +101,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
   };
 
   return (
-    <main className="w-full min-h-screen bg-background flex flex-col items-center py-20 px-4 md:px-20 mt-10">
+    <main className="w-full min-h-screen bg-background flex flex-col items-center py-20 px-4 md:px-20 md:mt-20">
       <div className="w-full max-w-7xl flex flex-col gap-12">
         {/* Top Product Details Area */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start">
@@ -64,7 +116,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
           {/* Right Column: Info & Buy Section */}
           <div className="w-full">
             <ProductInfo
-              id={product._id || (product as any).productId}
+              id={product._id || product.productId}
               title={product.productName}
               rating={product.AvgRating ?? 0}
               reviewCount={10}

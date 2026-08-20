@@ -5,9 +5,10 @@ const zod_1 = require("zod");
 exports.productBaseSchema = zod_1.z.object({
     productName: zod_1.z.string().min(1, { message: "Name is required" }),
     productDescription: zod_1.z.string().min(1, { message: "Description is required" }),
-    price: zod_1.z.number().min(0, { message: "Price must be a positive number" }),
+    price: zod_1.z.coerce.number().min(0, { message: "Price must be a positive number" }),
     category: zod_1.z.string().min(1, { message: "Category is required" }),
-    stock: zod_1.z.number().min(0, { message: "Stock must be a positive number" }),
+    stock: zod_1.z.coerce.number().min(0, { message: "Stock must be a positive number" }),
+    discount: zod_1.z.coerce.number().min(0).max(100).optional().default(0),
 });
 exports.createProductSchema = zod_1.z.object({
     body: exports.productBaseSchema,

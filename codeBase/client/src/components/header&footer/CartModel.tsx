@@ -16,11 +16,10 @@ import {
 } from "@/components/ui/cart";
 import { useCartStore } from "@/stores/buyer/useCart";
 import { useRouter } from "next/navigation";
-import { createCart } from "@/services/cartService";
-import {useAuth} from "@/hooks/useAuth"
+import { useAuth } from "@/hooks/useAuth";
 
 export default function CartModel() {
-  const router =useRouter();
+  const router = useRouter();
   const cartItems = useCartStore((state) => state.cartItems);
   const removeFromCart = useCartStore((state) => state.removeFromCart);
   const totalPrice = useCartStore((state) => state.totalPrice);
@@ -28,7 +27,7 @@ export default function CartModel() {
     (total, item) => total + item.quantity,
     0,
   );
-const {user} = useAuth();
+  const { user } = useAuth();
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return;
     useCartStore.getState().updateQuantity(itemId, newQuantity);
@@ -39,20 +38,18 @@ const {user} = useAuth();
   const handleCheckout = async () => {
     try {
       setIsCheckoutLoading(true);
-      if(!user){
-        return toast.error("you not loggedIn you can't use the cart")
+      if (!user) {
+        return toast.error("Please log in to proceed to checkout");
       }
-      const items = cartItems.map(item => ({
-        productId: String(item.id),
-        quantity: item.quantity,
-        price: item.price,
-        name: item.title,
-      }));
-      await createCart({ items });
-      toast.success("Cart created successfully!");
+      if (cartItems.length === 0) {
+        return toast.error("Your cart is empty");
+      }
+      await useCartStore.getState().syncCartWithServer();
       router.push("/checkout");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to create cart");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to proceed to checkout"
+      );
     } finally {
       setIsCheckoutLoading(false);
     }

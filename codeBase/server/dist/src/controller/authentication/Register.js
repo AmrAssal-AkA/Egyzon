@@ -7,7 +7,6 @@ const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 // Import necessary modules and utilities
 const userModel_1 = __importDefault(require("../../models/userModel"));
-const customerModel_1 = __importDefault(require("../../models/customerModel"));
 const password_ustils_1 = require("../../utils/password.ustils");
 const jwt_util_1 = require("../../utils/jwt.util");
 const Responses_1 = require("../../utils/Responses");
@@ -18,10 +17,9 @@ const RegisterUser = async (userData, res, req) => {
     try {
         const { FirstName, LastName, email, password } = userData;
         const existingUser = await userModel_1.default.findOne({ email });
-        if (existingUser) {
-            res.status(409).json({ message: "User already exists" });
-            return;
-        }
+        if (existingUser)
+            return res.status(409).json({ message: "User already exists" });
+        console.log("Registering user:", { FirstName, LastName, email, password });
         const hashedPassword = await (0, password_ustils_1.hashPassword)(password);
         const newUser = new userModel_1.default({
             FirstName,
@@ -30,7 +28,6 @@ const RegisterUser = async (userData, res, req) => {
             password: hashedPassword,
         });
         await newUser.save();
-        await customerModel_1.default.create({ user: newUser._id });
         const token = await (0, jwt_util_1.signAccessToken)({
             userId: newUser.id,
             role: newUser.role,
@@ -63,6 +60,7 @@ const RegisterUser = async (userData, res, req) => {
             sameSite: "strict",
             maxAge: 24 * 60 * 60 * 1000,
         });
+        console.log("User registered successfully:", newUser);
         (0, Responses_1.sendSuccessResponse)(res, 201, "User created successfully", {
             token,
             refreshToken: refreshToken,

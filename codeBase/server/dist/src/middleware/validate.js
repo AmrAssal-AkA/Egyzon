@@ -8,6 +8,8 @@ const validate = (Schema) => (req, res, next) => {
             body: req.body,
             query: req.query,
             params: req.params,
+            files: req.files,
+            cookies: req.cookies,
         });
         next();
     }

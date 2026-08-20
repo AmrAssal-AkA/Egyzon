@@ -14,11 +14,9 @@ const RegisterUser = async (userData: any, res: Response, req: Request) => {
   try {
     const { FirstName, LastName, email, password } = userData;
     const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      res.status(409).json({ message: "User already exists" });
-      return;
-    }
+    if (existingUser) return res.status(409).json({ message: "User already exists" });
 
+    console.log("Registering user:", { FirstName, LastName, email, password });
     const hashedPassword = await hashPassword(password);
     const newUser = new User({
       FirstName,
@@ -50,7 +48,7 @@ const RegisterUser = async (userData: any, res: Response, req: Request) => {
     } = JSON.parse(emailToken);
     newUser.emailVerificationToken = haashedToken;
     newUser.emailVerificationTokenExpiration = expiration;
-
+  
     await newUser.save();
     const verificationUrl = `${process.env.FRONTEND_URL}/verifyEmail?token=${emailTokenValue}`;
     await verifyEmailTemplate(email, emailTokenValue, verificationUrl);
@@ -67,7 +65,7 @@ const RegisterUser = async (userData: any, res: Response, req: Request) => {
       sameSite: "strict",
       maxAge: 24 * 60 * 60 * 1000,
     });
-
+    console.log("User registered successfully:", newUser);
     sendSuccessResponse(res, 201, "User created successfully", {
       token,
       refreshToken: refreshToken,

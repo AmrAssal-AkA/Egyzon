@@ -23,3 +23,58 @@ export interface RegisterAsSellerModalProps {
   onClose: () => void;
   onSubmitSuccess?: (data: SellerFormData) => void;
 }
+
+export interface SellerProduct {
+  _id: string;
+  productName: string;
+  productDescription?: string;
+  price: number;
+  discount?: number;
+  stock: number;
+  category: string;
+  imageUrl: string | string[];
+  status?: "active" | "inactive" | string;
+  createdAt?: string;
+  sku?: string;
+}
+
+export interface SellerProductsResponse {
+  success: boolean;
+  message: string;
+  data: SellerProduct[];
+}
+
+export interface TotalProductsData {
+  totalProductCounts: number;
+}
+
+export interface TotalProductsResponse {
+  success: boolean;
+  message: string;
+  data?: TotalProductsData;
+}
+
+export interface TotalOrdersData {
+  totalOrders?: number;
+  totalOrdersCount?: number;
+  totalOrderCounts?: number;
+}
+
+export interface TotalOrdersResponse {
+  success: boolean;
+  message: string;
+  data?: TotalOrdersData | number;
+}
+
+export interface TotalRevenueData {
+  totalRevenue: number;
+}
+
+export interface TotalRevenueResponse {
+  success: boolean;
+  message: string;
+  data?: TotalRevenueData;
+}
+
+
+

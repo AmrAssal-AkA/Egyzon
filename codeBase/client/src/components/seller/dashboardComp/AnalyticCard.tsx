@@ -6,12 +6,14 @@ export default function AnalyticCard({
   title,
   value,
   change,
-  description
+  description,
+  isLoading = false,
 }: {
   title: string;
   value: string;
   change: string;
   description: string;
+  isLoading?: boolean;
 }) {
   return (
     <div className="w-full h-40 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-4 flex flex-col gap-3">
@@ -34,9 +36,13 @@ export default function AnalyticCard({
           {change}
         </p>
       </div>
-      <p className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-        {value}
-      </p>
+      {isLoading ? (
+        <div className="h-8 w-24 bg-slate-200 dark:bg-slate-800 animate-pulse rounded-md my-0.5" />
+      ) : (
+        <p className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+          {value}
+        </p>
+      )}
       <p className={`text-md font-medium text-slate-700 dark:text-slate-500 `}>
         {description}
       </p>

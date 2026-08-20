@@ -1,0 +1,14 @@
+import { useContext } from "react";
+
+import { AlertContext } from "../context/AlertContext";
+import type { AlertContextValue } from "../types/alert";
+
+export function useAlert(): AlertContextValue {
+  const context = useContext(AlertContext);
+
+  if (!context) {
+    throw new Error("useAlert must be used within an AlertProvider.");
+  }
+
+  return context;
+}

@@ -1,16 +1,17 @@
 import {z} from "zod";
 
-
 export const productBaseSchema = z.object({
     productName: z.string().min(1, { message: "Name is required" }),
     productDescription: z.string().min(1, { message: "Description is required" }),
-    price: z.number().min(0, { message: "Price must be a positive number" }),
+    price: z.coerce.number().min(0, { message: "Price must be a positive number" }),
     category: z.string().min(1, { message: "Category is required" }),
-    stock: z.number().min(0, { message: "Stock must be a positive number" }),
+    stock: z.coerce.number().min(0, { message: "Stock must be a positive number" }),
+    discount: z.coerce.number().min(0).max(100).optional().default(0),
 });
 
 export const createProductSchema = z.object({
     body: productBaseSchema,
+
 });
 
 export const updateProductSchema = z.object({

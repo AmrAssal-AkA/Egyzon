@@ -20,6 +20,8 @@ export interface IUser {
     completedOnboarding?: boolean;
     forgetPasswordToken?: string;
     forgetPasswordTokenExpiration?: Date;
+    joinedDate?: Date;
+    lastActiveDate?: Date;
     createdAt: Date;
 }
 
@@ -68,6 +70,7 @@ export interface IAdmin extends IUser {
     RequestRemoveProduct(): Promise<IAdmin>;
     generateReports(): Promise<IAdmin>;
     verifyPayments(): Promise<IAdmin>;
+    setPlatformFee(feePercentage: number): Promise<IAdmin>;
 }
 
 

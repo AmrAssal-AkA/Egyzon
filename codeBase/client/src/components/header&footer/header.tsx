@@ -7,13 +7,15 @@ import { FiUser, FiMenu, FiX, FiSearch } from "react-icons/fi";
 import Model from "./Model";
 import NavLinks from "./nav";
 import { ModeToggle } from "../ui/ModeToggle";
-import WishlistIcon from "./wishlist/WishlistIcon";
+import WishlistIcon from "@/components/wishlist/WishlistIcon";
 import CartModel from "./CartModel";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Header() {
   const [isMenueOpen, setIsMenueOpen] = useState(false);
   const [isModelOpen, setIsModelOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const { isSeller } = useAuth();
 
   const toggleMenue = () => {
     setIsMenueOpen(!isMenueOpen);
@@ -33,7 +35,6 @@ export default function Header() {
     <header className="fixed top-0 left-0 z-50 w-full bg-background/95 border-b border-border shadow-xs backdrop-blur supports-backdrop-filter:bg-background/80 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
         <div className="flex items-center justify-between h-16 sm:h-20 gap-3 sm:gap-6">
-          
           {/* Logo & Brand */}
           <div className="flex items-center shrink-0">
             <Link
@@ -42,13 +43,15 @@ export default function Header() {
             >
               <span>Egy</span>
               <span className="text-blue-600">Zon</span>
-              <span className="text-blue-500 font-black">.</span>
             </Link>
           </div>
 
           {/* Desktop Search Bar */}
           <div className="hidden md:flex flex-1 max-w-md lg:max-w-lg items-center">
-            <form onSubmit={(e) => e.preventDefault()} className="w-full relative flex items-center">
+            <form
+              onSubmit={(e) => e.preventDefault()}
+              className="w-full relative flex items-center"
+            >
               <input
                 type="text"
                 placeholder="Search products, brands, categories..."
@@ -76,8 +79,12 @@ export default function Header() {
             </button>
 
             <ModeToggle />
-            <WishlistIcon />
-            <CartModel />
+            {!isSeller && (
+              <>
+                <WishlistIcon />
+                <CartModel />
+              </>
+            )}
 
             {/* User Account Button */}
             <div className="relative">
@@ -98,17 +105,23 @@ export default function Header() {
                 aria-label="Toggle menu"
                 className="p-2 text-foreground hover:text-blue-600 hover:bg-muted rounded-xl transition-colors text-xl"
               >
-                {isMenueOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
+                {isMenueOpen ? (
+                  <FiX className="w-6 h-6" />
+                ) : (
+                  <FiMenu className="w-6 h-6" />
+                )}
               </button>
             </div>
           </div>
-
         </div>
 
         {/* Mobile Expandable Search Bar */}
         {isMobileSearchOpen && (
           <div className="md:hidden pb-3 pt-1 border-t border-border/50 animate-in fade-in slide-in-from-top-2 duration-200">
-            <form onSubmit={(e) => e.preventDefault()} className="relative flex items-center">
+            <form
+              onSubmit={(e) => e.preventDefault()}
+              className="relative flex items-center"
+            >
               <input
                 type="text"
                 placeholder="Search products..."
@@ -124,7 +137,6 @@ export default function Header() {
             </form>
           </div>
         )}
-
       </div>
 
       {/* Navigation Sub-header */}
@@ -132,4 +144,3 @@ export default function Header() {
     </header>
   );
 }
-

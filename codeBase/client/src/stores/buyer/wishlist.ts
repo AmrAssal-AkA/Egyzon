@@ -7,7 +7,7 @@ export interface WishlistItem {
   id: string;
   title: string;
   price: number;
-  thumbnail: string;
+  image: string;
 }
 
 interface WishlistState {
@@ -31,7 +31,14 @@ export const useWishlistStore = create<WishlistState>()(
         if (currentItems.some((i) => i.id === item.id)) {
           return;
         }
-        set({ items: [...currentItems, item] });
+        const image = item.image || (item as any).thumbnail || "/images/placeholder.jpg";
+        const normalizedItem: WishlistItem = {
+          id: item.id,
+          title: item.title,
+          price: item.price,
+          image,
+        };
+        set({ items: [...currentItems, normalizedItem] });
         
         try {
           await addWishlist(item.id);
@@ -48,7 +55,19 @@ export const useWishlistStore = create<WishlistState>()(
           console.error("Failed to remove from server wishlist:", error);
         }
       },
-      clearWishlist: () => set({ items: [] }),
+      clearWishlist: async () => {
+        const currentItems = get().items;
+        set({ items: [] });
+        if (currentItems.length > 0) {
+          try {
+            await Promise.allSettled(
+              currentItems.map((item) => removeWishlist(item.id))
+            );
+          } catch (error) {
+            console.error("Failed to clear wishlist on server:", error);
+          }
+        }
+      },
       clearItems: () => set({ items: [] }),
       containsItem: (id) => get().items.some((item) => item.id === id),
       isItemInWishlist: (id) => get().items.some((item) => item.id === id),
@@ -62,9 +81,42 @@ export const useWishlistStore = create<WishlistState>()(
       fetchWishlistFromServer: async () => {
         try {
           const response = await getWishlist();
-          if (response.success && response.data) {
-            const items = Array.isArray(response.data) ? response.data : response.data.items || [];
+          if (response?.success && response?.data) {
+            let rawItems: any[] = [];
+            const data = response.data;
+            if (Array.isArray(data)) {
+              rawItems = data;
+            } else if (Array.isArray(data.productId)) {
+              rawItems = data.productId;
+            } else if (Array.isArray(data.items)) {
+              rawItems = data.items;
+            } else if (data.data) {
+              if (Array.isArray(data.data)) {
+                rawItems = data.data;
+              } else if (Array.isArray(data.data.productId)) {
+                rawItems = data.data.productId;
+              } else if (Array.isArray(data.data.items)) {
+                rawItems = data.data.items;
+              }
+            }
+
+            const items: WishlistItem[] = rawItems
+              .map((p: any) => {
+                if (!p) return null;
+                const id = p._id || p.id || p.productId || (typeof p === "string" ? p : "");
+                if (!id) return null;
+                const title = p.productName || p.title || p.name || "Product";
+                const price = typeof p.price === "number" ? p.price : Number(p.price) || 0;
+                const image = Array.isArray(p.imageUrl)
+                  ? p.imageUrl[0]
+                  : p.imageUrl || p.image || p.thumbnail || "/images/placeholder.jpg";
+                return { id: String(id), title, price, image };
+              })
+              .filter(Boolean) as WishlistItem[];
+
             set({ items });
+          } else if (response?.success && !response?.data) {
+            set({ items: [] });
           }
         } catch (error) {
           console.error("Failed to fetch wishlist from server:", error);

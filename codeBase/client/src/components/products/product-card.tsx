@@ -43,7 +43,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const isAvailable = stockStatus !== "out";
 
-  const { user } = useAuth();
+  const { user, isSeller } = useAuth();
   const addToCart = useCartStore((state) => state.addToCart);
   const {
     addItem: addToWishlist,
@@ -62,6 +62,11 @@ export default function ProductCard({ product }: ProductCardProps) {
       return;
     }
 
+    if (isSeller) {
+      toast.error("Seller accounts cannot use wishlist");
+      return;
+    }
+
     if (isAvailable) {
       if (isWishlisted) {
         removeFromWishlist(productId);
@@ -71,6 +76,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           id: productId,
           title,
           price,
+          image,
           thumbnail: image,
         });
         toast.success(`Added "${title}" to your wishlist.`);
@@ -90,9 +96,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             height={400}
             className="w-full h-64 object-cover"
           />
-          <div className="absolute top-2 left-2 bg-blue-500 text-white dark:bg-blue-600 dark:text-white px-2 py-1 rounded">
-            #{productId.slice(0, 8)}
-          </div>
+         
         </div>
         <div className="p-4 pb-0">
           <h3 className="text-lg font-semibold">{title}</h3>
@@ -141,6 +145,10 @@ export default function ProductCard({ product }: ProductCardProps) {
               onClick={() => {
                 if (!user) {
                   toast.error("Please login to add items to your cart");
+                  return;
+                }
+                if (isSeller) {
+                  toast.error("Seller accounts cannot use cart");
                   return;
                 }
                 addToCart({

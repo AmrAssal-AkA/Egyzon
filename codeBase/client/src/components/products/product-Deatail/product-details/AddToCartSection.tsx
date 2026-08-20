@@ -28,7 +28,7 @@ export default function AddToCartSection({
   onAddToWishlist,
   isAvailable = true,
 }: AddToCartSectionProps) {
-  const { user } = useAuth();
+  const { user, isSeller } = useAuth();
   const { addItem, removeItem, items } = useWishlistStore();
 
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
@@ -40,6 +40,10 @@ export default function AddToCartSection({
       toast.error("Please login to manage your wishlist");
       return;
     }
+    if (isSeller) {
+      toast.error("Seller accounts cannot use wishlist");
+      return;
+    }
 
     const itemId = productId;
     if (isWishlisted) {
@@ -49,6 +53,7 @@ export default function AddToCartSection({
         id: itemId,
         title: productTitle,
         price: productPrice,
+        image: productThumbnail,
         thumbnail: productThumbnail,
       });
     }
@@ -63,6 +68,10 @@ export default function AddToCartSection({
         onClick={() => {
           if (!user) {
             toast.error("Please login to add items to your cart");
+            return;
+          }
+          if (isSeller) {
+            toast.error("Seller accounts cannot use cart");
             return;
           }
           addToCart({

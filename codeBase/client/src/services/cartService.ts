@@ -1,9 +1,10 @@
 import axios from "axios";
+import { apiClient } from "@/lib/apiClient";
 import { CreateCartRequest } from "@/types/cart.type";
 
 export const createCart = async (data: CreateCartRequest) => {
   try {
-    const response = await axios.post("/api/cart/createCart", data);
+    const response = await apiClient.post("/api/cart/createCart", data);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -15,7 +16,7 @@ export const createCart = async (data: CreateCartRequest) => {
 
 export const emptyCart = async () => {
   try {
-    const response = await axios.delete("/api/cart/emptyCart");
+    const response = await apiClient.delete("/api/cart/emptyCart");
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -27,7 +28,7 @@ export const emptyCart = async () => {
 
 export const getCart = async () => {
   try {
-    const response = await axios.get("/api/cart/getCart");
+    const response = await apiClient.get("/api/cart/getCart");
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {

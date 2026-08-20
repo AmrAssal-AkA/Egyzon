@@ -34,6 +34,7 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
+const uuid_1 = require("uuid");
 const order_type_1 = require("../types/order.type");
 const orderItemSchema = new mongoose_1.Schema({
     product: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Product', required: true },
@@ -42,8 +43,8 @@ const orderItemSchema = new mongoose_1.Schema({
     subtotal: { type: Number, required: true },
 });
 const orderSchema = new mongoose_1.Schema({
-    orderNumber: { type: Number, required: true, unique: true },
-    custtomer: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Customer', required: true },
+    orderNumber: { type: String, required: true, unique: true, default: () => `ORD-${(0, uuid_1.v4)()}` },
+    customer: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Customer', required: true },
     orderDate: { type: Date, default: Date.now },
     orderStatus: { type: String, enum: Object.values(order_type_1.OrderStatus), default: order_type_1.OrderStatus.pending },
     subTotal: { type: Number, required: true },
@@ -53,7 +54,19 @@ const orderSchema = new mongoose_1.Schema({
     totalAmount: { type: Number, required: true },
     paymentStatus: { type: String, enum: Object.values(order_type_1.PaymentStatus), default: order_type_1.PaymentStatus.pending },
     payment: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Payment' },
-    note: { type: String, default: '' },
+    paymentMethod: {
+        method: { type: String, enum: ['cashOnDelivery', 'creditCard'], required: true },
+        details: { type: String }
+    },
+    Address: {
+        address1: { type: String, required: true },
+        address2: { type: String },
+        city: { type: String, required: true },
+        state: { type: String, required: true },
+        postalCode: { type: String, required: true },
+        country: { type: String, required: true }
+    },
+    notes: { type: String, default: '' },
     orderItems: { type: [orderItemSchema], default: [] },
 }, {
     timestamps: true,

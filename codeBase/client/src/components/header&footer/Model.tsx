@@ -13,14 +13,20 @@ interface AccountLink {
   href: string;
   requiresAuth: boolean;
   requiresIncompleteOnboarding?: boolean;
+  role?: "customer" | "seller";
+}
+
+interface UserWithOnboardingStatus {
+  isOnboarded?: boolean;
 }
 
 const allAccountLinks: AccountLink[] = [
-  { id: 1, name: "Complete Your Profile", href: "/onBoarding", requiresAuth: true, requiresIncompleteOnboarding: true },
-  { id: 2, name: "Profile", href: "/dashboard", requiresAuth: true },
-  { id: 3, name: "My Orders", href: "/orders", requiresAuth: true },
-  { id: 4, name: "Login", href: "/login", requiresAuth: false },
-  { id: 5, name: "Register", href: "/Register", requiresAuth: false },
+  { id: 1, name: "Complete Your Profile", href: "/onBoarding", requiresAuth: true, requiresIncompleteOnboarding: true, role: "customer" },
+  { id: 2, name: "Profile", href: "/dashboard", requiresAuth: true, role: "customer" },
+  { id: 3, name: "manage Store", href: "/sellerDashboard", requiresAuth: true, role: "seller" },
+  { id: 4, name: "My Orders", href: "/dashboard/myOrder", requiresAuth: true, role: "customer" },
+  { id: 5, name: "Login", href: "/login", requiresAuth: false },
+  { id: 6, name: "Register", href: "/Register", requiresAuth: false },
 ];
 
 export default function Model({ onClose }: { onClose: () => void }) {
@@ -28,13 +34,14 @@ export default function Model({ onClose }: { onClose: () => void }) {
 
   const isCompleted =
     user?.isCompleted === true ||
-    (user as any)?.isOnboarded === true ||
+    (user as UserWithOnboardingStatus)?.isOnboarded === true ||
     Boolean(user?.address && user?.phoneNumber);
 
   const displayedLinks = allAccountLinks.filter((link) => {
     if (user) {
       if (!link.requiresAuth) return false;
       if (link.requiresIncompleteOnboarding && isCompleted) return false;
+      if (link.role && user.role !== link.role) return false;
       return true;
     } else {
       return !link.requiresAuth;

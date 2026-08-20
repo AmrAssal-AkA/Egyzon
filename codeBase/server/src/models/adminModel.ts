@@ -16,4 +16,4 @@ const AdminSchema = new Schema<IAdmin>({
 
 })
 
-export default User.discriminator<IAdmin>("admin", AdminSchema);
+export default User.discriminator<IAdmin>("admin", AdminSchema, "admin");

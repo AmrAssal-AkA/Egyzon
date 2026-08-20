@@ -8,31 +8,33 @@ const onBoarding = async (req: Request, res: Response) => {
   try{
   const userId = req.user?.userId || (process.env.NODE_ENV !== "production" && req.body?.userId);
   const { phoneNumber, address } = req.body;
+    console.log("Onboarding request received for user:", userId, { phoneNumber, address });
+
+  if (!userId) return sendErrorResponse(res, 401, "Unauthorized", "Missing user id");
 
   const customer = await Customer.findById(userId);
-  if (!customer) {
-    return sendErrorResponse(res, 404, "User not found", "User not found");
-  }
-
+  if (!customer) return sendErrorResponse(res, 404, "User not found", "User not found");
   if(customer.completedOnboarding)return sendErrorResponse(res, 400, "User is already onboarded", "User is already onboarded");
 
-
   customer.phoneNumber = phoneNumber;
-  customer.address = address;
+  customer.address = Array.isArray(address) ? address : [address];
   customer.completedOnboarding = true;
   await customer.save();
-  await customer.save();
-
-  sendSuccessResponse(res, 200, "Onboarding completed successfully", {
+  console.log("Onboarding completed for user:", customer._id);
+  return sendSuccessResponse(res, 200, "Onboarding completed successfully", {
     customerId: customer._id,
     phoneNumber: customer.phoneNumber,
     address: customer.address,
   });
 }catch (error) {
+  console.error("Onboarding failed:", error);
+  if ((error as { code?: number })?.code === 11000) {
+    return sendErrorResponse(res, 409, "Phone number is already in use", error);
+  }
   if (error instanceof AppError) {
-    sendErrorResponse(res, error.statusCode, error.message);
+    return sendErrorResponse(res, error.statusCode, error.message);
   } else {
-    sendErrorResponse(res, 500, "Internal Server Error", error);
+    return sendErrorResponse(res, 500, "Internal Server Error", error);
   }
 }
 };

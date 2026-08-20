@@ -1,8 +1,11 @@
 import React from 'react'
 
+import OrderHolderComponent from "@/components/order/orderHoldercomp"
+
+
 function MyOrderPage() {
   return (
-    <div>MyOrderPage</div>
+      <OrderHolderComponent />
   )
 }
 

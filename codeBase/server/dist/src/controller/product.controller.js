@@ -4,41 +4,79 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const product_services_1 = require("../services/product.services");
+const notification_services_1 = require("../services/notification.services");
 const Responses_1 = require("../utils/Responses");
 const cloudainry_config_1 = __importDefault(require("../config/cloudainry.config"));
+const socket_1 = __importDefault(require("../socket"));
 const createProduct = async (req, res) => {
     try {
-        const sellerId = req.user?.id;
+        const sellerId = req.user?.userId ||
+            req.user?._id ||
+            req.user?.id;
         if (!sellerId) {
             return (0, Responses_1.sendErrorResponse)(res, 401, "Unauthorized: Seller ID not found");
         }
-        const { productName, productDescription, price, discount, stock } = req.body;
+        const { productName, productDescription, price, discount, stock, category, } = req.body;
+        if (!productName ||
+            !productDescription ||
+            price === undefined ||
+            stock === undefined) {
+            return (0, Responses_1.sendErrorResponse)(res, 400, "All required product fields must be provided");
+        }
         const images = req.files;
         if (!images || images.length === 0 || !images[0]?.buffer) {
             return (0, Responses_1.sendErrorResponse)(res, 400, "Image file is required");
         }
-        const imageUrl = await (0, cloudainry_config_1.default)(images[0]?.buffer, "Eguzon/Products");
-        if (!imageUrl) {
+        const imageUrl = await Promise.all(images.map((image) => (0, cloudainry_config_1.default)(image.buffer, "Egyzon/Products")));
+        if (!imageUrl || imageUrl.length === 0) {
             return (0, Responses_1.sendErrorResponse)(res, 400, "Image upload failed");
         }
         const newProduct = await product_services_1.ProductServices.createProduct(sellerId, {
             productName,
             productDescription,
-            price,
-            discount,
-            stock,
-            imageUrl,
+            price: Number(price),
+            discount: discount !== undefined ? Number(discount) : 0,
+            stock: Number(stock),
+            category,
+            imageUrl: imageUrl.map((url) => url.secure_url),
+        });
+        await notification_services_1.NotificationServices.createNotification({
+            user: sellerId,
+            type: "success",
+            message: `Product "${newProduct.productName}" created successfully.`,
+            isRead: false,
+            createdAt: new Date(),
+        });
+        const socket = socket_1.default.getSockets(String(sellerId));
+        socket.forEach((socketId) => {
+            const payload = {
+                id: `product-${newProduct._id}-${Date.now()}`,
+                userId: String(sellerId),
+                type: "product",
+                title: "New Product Added",
+                message: `Product "${newProduct.productName}" created successfully.`,
+                data: {
+                    productId: String(newProduct._id),
+                },
+                isRead: false,
+                createdAt: new Date().toISOString(),
+            };
+            req.io.to(socketId).emit("product:added", payload);
+            req.io.to(socketId).emit("notification", payload);
+            console.log(`Notification sent to user ${sellerId} on socket ${socketId}`);
         });
         (0, Responses_1.sendSuccessResponse)(res, 201, "Product created successfully", newProduct);
     }
     catch (error) {
         console.log(error);
-        (0, Responses_1.sendErrorResponse)(res, 500, "Internal Server Error");
+        (0, Responses_1.sendErrorResponse)(res, error.statusCode || 500, error.message || "Internal Server Error");
     }
 };
 const applyDiscount = async (req, res) => {
     try {
-        const sellerId = req.user?.id;
+        const sellerId = req.user?.userId ||
+            req.user?._id ||
+            req.user?.id;
         const productId = req.params.productId;
         const discount = req.body.discount;
         const updatedProduct = await product_services_1.ProductServices.ApplyDiscount(sellerId, productId, discount);
@@ -60,8 +98,8 @@ const getAllProducts = async (req, res) => {
     }
 };
 const getProductById = async (req, res) => {
-    const productId = req.params.productId || (process.env.NODE_ENV !== 'production' && req.body.productId);
-    ;
+    const productId = req.params.productId ||
+        (process.env.NODE_ENV !== "production" && req.body.productId);
     if (!productId) {
         return (0, Responses_1.sendErrorResponse)(res, 400, "productId not fount");
     }
@@ -73,10 +111,42 @@ const getProductById = async (req, res) => {
         (0, Responses_1.sendErrorResponse)(res, 500, "Internal Server Error", error);
     }
 };
+const getSellerProducts = async (req, res) => {
+    try {
+        const sellerId = req.user?.userId ||
+            req.user?._id ||
+            req.user?.id;
+        if (!sellerId) {
+            return (0, Responses_1.sendErrorResponse)(res, 401, "Unauthorized: Seller ID not found");
+        }
+        const products = await product_services_1.ProductServices.getSellerProducts(sellerId);
+        (0, Responses_1.sendSuccessResponse)(res, 200, "Seller products retrieved successfully", products);
+    }
+    catch (error) {
+        console.log(error);
+        (0, Responses_1.sendErrorResponse)(res, 500, "Internal Server Error");
+    }
+};
+const deleteProduct = async (req, res) => {
+    try {
+        const sellerId = req.user?.userId ||
+            req.user?._id ||
+            req.user?.id;
+        const productId = req.params.productId;
+        const deletedProduct = await product_services_1.ProductServices.deleteProduct(sellerId, productId);
+        (0, Responses_1.sendSuccessResponse)(res, 200, "Product deleted successfully", deletedProduct);
+    }
+    catch (error) {
+        console.log(error);
+        (0, Responses_1.sendErrorResponse)(res, 500, "Internal Server Error");
+    }
+};
 exports.default = {
     createProduct,
     applyDiscount,
     getAllProducts,
     getProductById,
+    getSellerProducts,
+    deleteProduct,
 };
 //# sourceMappingURL=product.controller.js.map

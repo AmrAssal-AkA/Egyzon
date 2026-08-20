@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import Card from "../../components/Card";
-import { PoundSterling, Users, ShieldAlert, PackageCheck, LayoutGrid, BarChart2 } from "lucide-react";
-import { RevenueData, SellerDistributionData, CategorySalesData } from "../../types/charts";
+import { PoundSterling, Users, ShieldAlert, PackageCheck } from "lucide-react";
+import { RevenueData, SellerDistributionData } from "../../types/charts";
 import RevenueChart from "../../components/RevenueChart";
 import SellerDistributionChart from "../../components/SellerDistributionChart";
-import CategorySalesChart from "../../components/CategorySalesChart";
+import ContactCard from "../../components/contactCard";
+
 
 // Example mock datasets for periods
 const revenueData7D: RevenueData[] = [
@@ -43,17 +44,10 @@ const sellerDistributionData: SellerDistributionData[] = [
   { category: "Home Goods", value: 360, percentage: 30 },
 ];
 
-const categorySalesData: CategorySalesData[] = [
-  { category: "Electronics", sales: 125000 },
-  { category: "Fashion", sales: 92000 },
-  { category: "Home Goods", sales: 76000 },
-  { category: "Beauty", sales: 58000 },
-  { category: "Sports", sales: 43000 },
-];
 
 function DashBoardPage() {
   const [period, setPeriod] = useState<string>("30D");
-  const [salesOrientation, setSalesOrientation] = useState<"horizontal" | "vertical">("horizontal");
+
 
   // Get active revenue data based on selected period
   const activeRevenueData = (() => {
@@ -161,7 +155,7 @@ function DashBoardPage() {
           ariaLabel="Sellers distribution by category donut chart"
         />
 
-      
+      <ContactCard className="lg:col-span-3 w-full" />
       </div>
     </main>
   );

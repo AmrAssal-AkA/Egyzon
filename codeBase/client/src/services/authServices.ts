@@ -1,12 +1,20 @@
 import axios, { AxiosError, AxiosInstance } from "axios";
+import { getBaseUrl } from "@/lib/apiClient";
 import { RegisterPayload, LoginPayload, User, ApiResponse, OnboardingPayload, ForgetPasswordPayload, ResetPasswordPayload } from "../types/auth";
 
 export const ApiCall: AxiosInstance = axios.create({
-    baseURL: "/api",
+    baseURL: typeof window !== "undefined" ? "/api" : `${getBaseUrl()}/api`,
     withCredentials: true,
     headers: {
         "Content-Type": "application/json",
     },
+});
+
+ApiCall.interceptors.request.use((config) => {
+    if (typeof window === "undefined" && (!config.baseURL || config.baseURL.startsWith("/"))) {
+        config.baseURL = `${getBaseUrl()}/api`;
+    }
+    return config;
 });
 
 const getErrorMessage = (error: unknown, fallback: string): string => {
@@ -18,7 +26,7 @@ const getErrorMessage = (error: unknown, fallback: string): string => {
 
 export const authServices = {
     register: async (payload: RegisterPayload): Promise<ApiResponse<User>> => {
-        try {
+        try { 
             const { data } = await ApiCall.post<ApiResponse<User>>("/auth/register", payload);
             console.log("Register Data: ", data)
             return data;
@@ -64,6 +72,7 @@ export const authServices = {
     completeOnboarding: async (payload: OnboardingPayload): Promise<ApiResponse<unknown>> => {
         try {
             const { data } = await ApiCall.patch<ApiResponse<unknown>>("/auth/onBoarding", payload);
+            console.log("Onboarding Data: ", data)
             return data;
         } catch (error: unknown) {
             return { success: false, message: getErrorMessage(error, "Onboarding failed") };

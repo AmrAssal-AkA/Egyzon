@@ -1,0 +1,18 @@
+import React from 'react'
+
+import {PrivateRoute} from "@/components/auth/PrivateRoute";
+import SideMenu from "@/components/userDashboard/sideMenu";
+import {Roles} from "@/lib/auth/roles";
+
+export default function CustomerDashBoardLayout({children}: {children: React.ReactNode}) {
+  return (
+    <PrivateRoute allowedRoles={[Roles.CUSTOMER]}>
+      <div className="flex flex-col md:flex-row min-h-screen mt-14 md:mt-40 w-full gap-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+      <SideMenu />
+      <main className="flex-1 bg-background flex flex-col items-center md:py-10 px-0 w-full">
+        {children}
+      </main>
+    </div>
+    </PrivateRoute>
+  )
+}

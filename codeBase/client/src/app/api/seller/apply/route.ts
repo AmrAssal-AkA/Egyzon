@@ -30,7 +30,6 @@ export async function POST(req: NextRequest) {
       method: "POST",
       headers: { 
         Authorization: `Bearer ${token}`
-        // Do not forward original content-type, let fetch generate a new one with correct boundary for the outgoing FormData
       },
       body: outgoing,
     });

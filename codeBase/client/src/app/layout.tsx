@@ -30,7 +30,7 @@ export default function RootLayout({children} : Readonly<{children: React.ReactN
           >
             <AuthProvider>
               {children}
-              <Toaster />
+              <Toaster position="top-right" />
             </AuthProvider>
           </ThemeProvider>
       </body>

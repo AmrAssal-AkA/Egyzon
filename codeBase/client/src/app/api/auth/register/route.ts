@@ -6,12 +6,13 @@ import axios from "axios";
 export async function POST(req: NextRequest) {
     try{
         const {FirstName, LastName, email, password} = await req.json();
-
+        console.log("Received registration data:", { FirstName, LastName, email, password });
         const {data} = await serverClient.post("/api/auth/register", { FirstName, LastName, email, password }, {withCredentials: true});
         const {token, refreshToken} = data.data;
         const meRes = await serverClient.get("/api/auth/me", {
             headers: { Authorization: `Bearer ${token}` },
         });
+        console.log("User data fetched successfully:", meRes.data.data);
         const res = NextResponse.json({ success: true, message: "Registration successful", data: meRes.data.data });
         res.cookies.set("token", token, {
             httpOnly: true,

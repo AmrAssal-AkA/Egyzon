@@ -3,7 +3,10 @@ import Link from "next/link";
 import { BadgeCheck, Store } from "lucide-react";
 
 interface Seller {
-  name: string;
+  storeName?: string;
+  FirstName?: string;
+  LastName?: string;
+  name?: string;
   feedbackPercentage: number;
   responseTime: string;
   isVerified: boolean;
@@ -14,8 +17,15 @@ interface SellerCardProps {
 }
 
 export default function SellerCard({ seller }: SellerCardProps) {
+  const displayName =
+    seller.storeName ||
+    (seller.FirstName || seller.LastName ? `${seller.FirstName ?? ""} ${seller.LastName ?? ""}`.trim() : "") ||
+    seller.name ||
+    "Egyzon Store";
+
+
   // Get initials for avatar placeholder
-  const initials = seller.name
+  const initials = displayName
     .split(" ")
     .map((n) => n[0])
     .join("")
@@ -33,7 +43,7 @@ export default function SellerCard({ seller }: SellerCardProps) {
       <div className="flex flex-col min-w-0">
         <div className="flex items-center gap-1.5">
           <span className="font-semibold text-foreground text-sm truncate">
-            {seller.name}
+            {displayName}
           </span>
           {seller.isVerified && (
             <BadgeCheck className="w-4.5 h-4.5 text-blue-600 shrink-0" aria-label="Verified Seller" />

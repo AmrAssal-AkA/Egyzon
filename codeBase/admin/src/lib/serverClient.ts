@@ -5,9 +5,14 @@ declare const process: {
 };
 
 
+const apiBaseUrl =
+    process.env.REACT_APP_API_BASE_URL ?? "http://localhost:8080/api";
+
 export const serverClient = axios.create({
-    baseURL: process.env.SERVER_URL,
+    baseURL: `${apiBaseUrl}/admin`,
     headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
     },
+    withCredentials: true,
 });

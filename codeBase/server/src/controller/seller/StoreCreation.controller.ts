@@ -4,6 +4,7 @@ import { SellerServices } from "../../services/seller.services";
 import { sendSuccessResponse, sendErrorResponse } from "../../utils/Responses";
 import uploadImage from "../../config/cloudainry.config";
 import { AppError } from "../../utils/AppError";
+import gatSockets  from "../../socket";
 
 const createRequestToJoin = async (req: Request, res: Response) => {
   let uploadedCommercialRegister: { public_id: string } | undefined;
@@ -31,8 +32,6 @@ const createRequestToJoin = async (req: Request, res: Response) => {
         "All fields are required",
       );
     }
-
-      console.log("Request body:", req.body);
     const files = req.files as {
       commercialRegisterImage?: Express.Multer.File[];
       taxCardImage?: Express.Multer.File[];
@@ -72,7 +71,7 @@ const createRequestToJoin = async (req: Request, res: Response) => {
     ]);
     uploadedCommercialRegister = crUpload;
     uploadedTaxCard = taxUpload;
-
+    console.log("Uploaded images:", crUpload.secure_url, taxUpload.secure_url);
     const sellerData = {
       storeName,
       commercialRegisterNumber,
@@ -82,8 +81,21 @@ const createRequestToJoin = async (req: Request, res: Response) => {
         taxCardUrl: taxUpload.secure_url,
       }
     };
-
     await SellerServices.ApplyAsPartner(sellerData, userId);
+    const socket = gatSockets.getSockets(String(userId));
+    socket.forEach((socket) => {
+      req.io.to(socket).emit("notification", {
+        id: `seller-${userId}-${new Date().getTime()}`,
+        user: String(userId),
+        type: "success",
+        message: "Your request to join as a seller has been submitted successfully.",
+        data: {
+          sellerId: userId,
+        },
+        isRead: false,
+        createdAt: new Date(),
+      });
+    })
     return sendSuccessResponse(res, 200, "Request sent successfully");
   } catch (error) {
     if (error instanceof AppError) {

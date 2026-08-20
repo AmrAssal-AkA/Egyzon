@@ -1,44 +1,9 @@
-"use client";
-
-import React from "react";
-import { useRouter } from "next/navigation";
-import CheckoutConfirmation from "@/components/checkout/CheckoutConfirmation";
+import CheckoutConfirmationClientPage from "@/components/checkout/checkoutConfimationClientPage";
 
 export default function ConfirmationPage() {
-  const router = useRouter();
-
-  const handleFinalize = () => {
-    router.push("/");
-  };
-
-  const handleBackHome = () => {
-    router.push("/");
-  };
-
-  const handlePrint = () => {
-    window.print();
-  };
-
-  const handleDownload = () => {
-    console.log("Download invoice triggered");
-  };
-
-  const handleChooseAddress = () => {
-    console.log("Choose Address callback from parent");
-  };
-
-  const handleAddAddress = () => {
-    console.log("Add Address callback from parent");
-  };
-
   return (
-    <CheckoutConfirmation
-      onFinalizeConfirmation={handleFinalize}
-      onBackHome={handleBackHome}
-      onPrintReceipt={handlePrint}
-      onDownloadInvoice={handleDownload}
-      onChooseAddress={handleChooseAddress}
-      onAddAddress={handleAddAddress}
-    />
+    <main className="w-full min-h-screen bg-background flex flex-col items-center py-20 px-4 md:px-20 mt-2.5">
+      <CheckoutConfirmationClientPage />
+    </main>
   );
 }

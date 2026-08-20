@@ -13,8 +13,10 @@ const auth_types_1 = require("../types/auth.types");
 const upload_middleware_1 = require("../middleware/upload.middleware");
 const router = express_1.default.Router();
 router.get('/', (0, validate_1.validate)(product_validate_1.getAllProductsSchema), product_controller_1.default.getAllProducts);
-router.post('/addProduct', upload_middleware_1.upload.array('image', 3), Auth_middleware_1.isAuthenticated, (0, Authorization_1.Authorize)(auth_types_1.userRole.Seller), (0, validate_1.validate)(product_validate_1.createProductSchema), product_controller_1.default.createProduct);
+router.post('/addProduct', Auth_middleware_1.isAuthenticated, (0, Authorization_1.Authorize)(auth_types_1.userRole.Seller), upload_middleware_1.upload.array('image', 3), (0, validate_1.validate)(product_validate_1.createProductSchema), product_controller_1.default.createProduct);
 router.patch('/seller/product/:productId', Auth_middleware_1.isAuthenticated, (0, Authorization_1.Authorize)(auth_types_1.userRole.Seller), (0, validate_1.validate)(product_validate_1.updateProductSchema), product_controller_1.default.applyDiscount);
 router.get("/:productId", product_controller_1.default.getProductById);
+router.get("/seller/products", Auth_middleware_1.isAuthenticated, (0, Authorization_1.Authorize)(auth_types_1.userRole.Seller), product_controller_1.default.getSellerProducts);
+router.delete("/seller/product/:productId", Auth_middleware_1.isAuthenticated, (0, Authorization_1.Authorize)(auth_types_1.userRole.Seller), product_controller_1.default.deleteProduct);
 exports.default = router;
 //# sourceMappingURL=product.route.js.map

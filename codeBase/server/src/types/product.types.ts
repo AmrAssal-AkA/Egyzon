@@ -11,7 +11,7 @@ export interface IProduct {
     status: 'active' | 'inactive';
     sku: string;
     imageUrl: string[];
-    SellerId: Types.ObjectId;
+    sellerId: Types.ObjectId;
     categoryId: Types.ObjectId;
 }
 

@@ -1,4 +1,4 @@
-import types, { Document } from 'mongoose';
+import { Document, Types} from 'mongoose';
 
 export enum OrderStatus {
     pending = 'pending',
@@ -14,18 +14,21 @@ export enum PaymentStatus {
     refunded = 'refunded',
 }
 
-export interface OrderItem {
-    product: types.ObjectId;
+export interface IOrderItem {
+    product: Types.ObjectId;
     quantity: number;
     unitPrice: number;
     subtotal: number;
 }
 
-
+export interface PaymentMethod{
+    method: "cashOnDelivery" | "creditCard";
+    details?: string;
+}
 
 export interface IOrder extends Document{
-    orderNumber: number;
-    custtomer: types.ObjectId;
+    orderNumber: string;
+    customer: Types.ObjectId;
     orderDate: Date;
     orderStatus: OrderStatus;
     subTotal: number;
@@ -34,9 +37,18 @@ export interface IOrder extends Document{
     taxAmount: number;
     totalAmount: number;
     paymentStatus: PaymentStatus;
-    payment?: types.ObjectId
-    note: string;
-    orderItems: OrderItem[];
+    paymentMethod: PaymentMethod;
+    payment?: Types.ObjectId
+    notes: string;
+    Address: {
+        address1: string;
+        address2?: string;
+        city: string;
+        state: string;
+        postalCode: string;
+        country: string;
+    };
+    orderItems: IOrderItem[];
 
  // Order methods
     placeOrder() : Promise<IOrder>;
@@ -44,8 +56,8 @@ export interface IOrder extends Document{
     updateOrderStatus(status: OrderStatus): Promise<IOrder>;
     calculateSubTotal(): number;
     calculateFullTolal(): number;
-    addOrderItem(item: Omit<OrderItem, "subTotal">): Promise<IOrder>; 
-    removeOrderItem(productId: types.ObjectId): Promise<IOrder>;
+    addOrderItem(item: Omit<IOrderItem, "subTotal">): Promise<IOrder>; 
+    removeOrderItem(productId: Types.ObjectId): Promise<IOrder>;
     getTotalItems(): number;
     setIsPaid(): Promise<IOrder>;
     isShipped(): boolean;

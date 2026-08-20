@@ -10,7 +10,10 @@ import AddToCartSection from "./AddToCartSection";
 import SellerCard from "./SellerCard";
 
 interface Seller {
-  name: string;
+  name?: string;
+  storeName?: string;
+  FirstName?: string;
+  LastName?: string;
   feedbackPercentage: number;
   responseTime: string;
   isVerified: boolean;
@@ -98,7 +101,7 @@ export default function ProductInfo({
           <span className="text-3xl font-bold text-foreground tracking-tight">
             {price.toFixed(2)} EGP
           </span>
-        </div>
+        </div>0
       </div>
 
       {/* Selector & Actions */}

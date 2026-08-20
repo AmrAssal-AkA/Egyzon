@@ -11,16 +11,22 @@ const AdminLoggingin = async (req: Request, res: Response) => {
         if (!email || !password) {
             return sendErrorResponse(res, 400, "Bad Request", "Email and password are required");
         }
-        const {accessToken, refreshToken, user} = await AdminService.AdminLoggingin(email, password);
+        const { accessToken, refreshToken, user } = await AdminService.AdminLoggingin(email, password);
 
-        res.cookie("refreshToken", refreshToken, {
+        res.cookie("Access_token", accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 15 * 60 * 1000, // 15 minutes
+        });
+        res.cookie("refresh_token", refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         })
 
-        return sendSuccessResponse(res, 200, "Admin logged in successfully", { accessToken, user });
+        return sendSuccessResponse(res, 200, "Admin logged in successfully", { user });
     }catch (error) {
         if (error instanceof Error) {
             return sendErrorResponse(res, 500, "Internal Server Error", error.message);

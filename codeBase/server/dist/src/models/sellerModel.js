@@ -32,29 +32,29 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
+const userModel_1 = __importDefault(require("./userModel"));
 const SellerSchema = new mongoose_1.Schema({
-    user: {
-        type: mongoose_1.default.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-        unique: true,
-        index: true,
-    },
     commercialRegisterNumber: {
         type: String,
         required: true,
         unique: true,
+        sparse: true,
     },
     taxCardNumber: {
         type: String,
         required: true,
         unique: true,
+        sparse: true,
     },
     storeName: {
         type: String,
         unique: true,
+        sparse: true,
     },
     sellerDocuments: {
         commercialRegisterUrl: {
@@ -92,8 +92,15 @@ const SellerSchema = new mongoose_1.Schema({
     wallet: {
         type: mongoose_1.default.Schema.Types.ObjectId,
         ref: "Wallet",
-        required: true,
+        default: null,
     },
-}, { timestamps: true });
-exports.default = mongoose_1.default.model("Seller", SellerSchema);
+    notes: {
+        type: String,
+        default: "",
+    },
+    createdAt: {
+        type: Date,
+    }
+});
+exports.default = userModel_1.default.discriminator("Seller", SellerSchema, "seller");
 //# sourceMappingURL=sellerModel.js.map

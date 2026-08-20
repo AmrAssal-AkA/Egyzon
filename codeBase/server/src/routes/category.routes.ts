@@ -9,8 +9,9 @@ import { upload } from '../middleware/upload.middleware';
 
 const router = express.Router();
 
-router.post("/addCategory", isAuthenticated, Authorize(userRole.Seller), validate(createCategorySchema), upload.single("image"),CategoryController.createCategory);
-
-
+router.post("/addCategory", upload.single("image"), isAuthenticated, Authorize(userRole.Seller), validate(createCategorySchema), CategoryController.createCategory);
+router.get("/getAllCategories", CategoryController.getAllCategories);
+router.post("/addProductToCategory", isAuthenticated, Authorize(userRole.Seller), CategoryController.addProductToCategory);
+router.get("/getProductsByCategory/:categoryId", CategoryController.getProductsByCategory);
 
 export default router;

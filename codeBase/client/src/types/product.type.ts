@@ -1,14 +1,54 @@
 export interface Product {
-  _id: string;
-  productName: string;
-  productDescription: string;
+  _id?: string;
+  id?: string | number;
+  productName?: string;
+  name?: string;
+  productDescription?: string;
+  description?: string;
   price: number;
-  discount: number;
+  discount?: number;
+  discountPercentage?: number;
   stock: number;
+  maxStock?: number;
+  sku?: string;
   AvgRating?: number;
-  status?: "active" | "inactive";
-  imageUrl: string[] | string;
-  SellerId?: string;
+  rating?: number;
+  status?:
+    | "active"
+    | "inactive"
+    | "low_stock"
+    | "out_of_stock"
+    | "Active"
+    | "Inactive"
+    | "Low Stock"
+    | "Out of Stock"
+    | string;
+  imageUrl?: string[] | string;
+  image?: string;
+  thumbnail?: string;
+  images?: string[];
+  sellerId?:
+    | string
+    | {
+        _id?: string;
+        id?: string;
+        storeName?: string;
+        shopName?: string;
+        FirstName?: string;
+        LastName?: string;
+        name?: string;
+        username?: string;
+        email?: string;
+      };
+  seller?: {
+    _id?: string;
+    id?: string;
+    storeName?: string;
+    shopName?: string;
+    name?: string;
+  };
+  sellerName?: string;
+  storeName?: string;
   createdAt?: string;
   category?: string;
   brand?: string;
@@ -39,4 +79,16 @@ export interface productListResponse {
     total: number;
     length: number;
   };
+}
+
+export interface ProductFormData {
+  name: string;
+  description: string;
+  category: string;
+  price: number;
+  discount: number;
+  stock: number;
+  sku?: string;
+  status?: Product["status"];
+  images?: File[];
 }
