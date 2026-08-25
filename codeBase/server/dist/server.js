@@ -7,9 +7,8 @@ const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const http_1 = require("http");
+const http_1 = __importDefault(require("http"));
 const helmet_1 = __importDefault(require("helmet"));
-const socket_io_1 = require("socket.io");
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 dotenv_1.default.config();
 //imports routes and configs
@@ -23,20 +22,14 @@ const category_routes_1 = __importDefault(require("./src/routes/category.routes"
 const swagger_1 = require("./src/docs/swagger");
 const customer_route_1 = __importDefault(require("./src/routes/customer.route"));
 const admin_route_1 = __importDefault(require("./src/routes/admin.route"));
-const socket_1 = require("./src/socket");
+const socket_1 = require("./src/config/socket");
 const attachTo_1 = require("./src/middleware/attachTo");
 const order_route_1 = __importDefault(require("./src/routes/order.route"));
+const notifaication_routes_1 = __importDefault(require("./src/routes/notifaication.routes"));
 const app = (0, express_1.default)();
-const server = (0, http_1.createServer)(app);
+const httpServer = http_1.default.createServer(app);
+const io = (0, socket_1.initSocket)(httpServer);
 const allowedOrigin = "http://localhost:3000";
-const io = new socket_io_1.Server(server, {
-    cors: {
-        origin: allowedOrigin,
-        credentials: true,
-        methods: ["GET", "POST"],
-    },
-});
-(0, socket_1.initSocket)(io);
 const PORT = process.env.PORT;
 //connect to db
 (0, db_1.default)();
@@ -52,7 +45,6 @@ app.use((0, helmet_1.default)());
 app.use((0, cookie_parser_1.default)());
 app.use((0, attachTo_1.attachTo)(io));
 //routes
-app.set("io", io);
 app.use("/api/auth", auth_route_1.default);
 app.use("/api/product", product_route_1.default);
 app.use("/api/wishlist", wishlist_route_1.default);
@@ -62,6 +54,7 @@ app.use("/api/category", category_routes_1.default);
 app.use("/api/customer", customer_route_1.default);
 app.use("/api/admin", admin_route_1.default);
 app.use('/api/order', order_route_1.default);
+app.use('/api/notifications', notifaication_routes_1.default);
 //swagger
 app.use("/api-docs", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_1.swaggerSpec));
 //default route
@@ -74,7 +67,7 @@ app.get("/api-docs.json", (req, res) => {
     res.send(swagger_1.swaggerSpec);
 });
 //start the server
-server.listen(PORT, () => {
+httpServer.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
 exports.default = app;

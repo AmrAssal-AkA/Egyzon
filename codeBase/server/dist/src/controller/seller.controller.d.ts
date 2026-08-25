@@ -6,5 +6,6 @@ export declare const SellerController: {
     getTopSellingProducts: (req: Request, res: Response) => Promise<void>;
     getAllOrders: (req: Request, res: Response) => Promise<void>;
     totalInventoryValue: (req: Request, res: Response) => Promise<void>;
+    changeOrderStatus: (req: Request, res: Response) => Promise<void>;
 };
 //# sourceMappingURL=seller.controller.d.ts.map

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 
 
-import { ClipboardList, Trash2 } from "lucide-react";
+import { ClipboardList } from "lucide-react";
 import { toast } from "sonner";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { useCartStore, LastOrder } from "@/stores/buyer/useCart";
@@ -56,14 +56,6 @@ export default function OrderHolderComponent() {
     }
   };
 
-  const handleClearAllOrders = () => {
-    if (confirm("Are you sure you want to clear your entire order history?")) {
-      setOrders([]);
-      localStorage.removeItem("egyzon-orders");
-      toast.success("Cleared all order history.");
-    }
-  };
-
   if (!mounted) {
     return (
       <div className="w-full flex flex-col gap-6">
@@ -109,13 +101,6 @@ export default function OrderHolderComponent() {
         <span className="text-sm font-normal text-muted-foreground bg-muted px-3 py-1 rounded-full">
           {orders.length} {orders.length === 1 ? "order" : "orders"}
         </span>
-        <button
-          onClick={handleClearAllOrders}
-          className="inline-flex items-center justify-center gap-2 bg-destructive/10 hover:bg-destructive hover:text-white text-destructive border border-destructive/25 transition-all text-xs font-semibold px-4 py-2.5 rounded-lg active:scale-[0.99] cursor-pointer"
-        >
-          <Trash2 className="w-4 h-4" />
-          Clear History
-        </button>
       </div>
 
       <div className="flex flex-col gap-6">

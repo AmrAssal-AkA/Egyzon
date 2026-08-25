@@ -95,7 +95,9 @@ export default function ProductTabs({
                     {spec.key}
                   </span>
                   <span className="text-muted-foreground">
-                    {spec.value}
+                    {typeof spec.value === "object" && spec.value !== null
+                      ? (spec.value as any).categoryName || (spec.value as any).name || JSON.stringify(spec.value)
+                      : String(spec.value ?? "")}
                   </span>
                 </div>
               ))}

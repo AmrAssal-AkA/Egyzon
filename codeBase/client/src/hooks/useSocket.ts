@@ -1,44 +1,48 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { socket } from "../lib/socket.instance";
-import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
+import { useNotificationStore } from "@/stores/useNotificationStore";
+import { getNotifications } from "@/services/notificationService";
+import { useAuth } from "./useAuth";
 
 export function useSocket() {
-  const [isConnected, setIsConnected] = useState(false);
-  const { token } = useAuth();
-
+  const connect = useNotificationStore((state) => state.connect);
+  const disconnect = useNotificationStore((state) => state.disconnect);
+  const initialNotifications = useNotificationStore((state) => state.setInitialNotifications);
+  const setLoading = useNotificationStore((state) => state.setLoading);
+  const { user } = useAuth();
+  
+  const notifications = useNotificationStore((state) => state.notifications);
+  const isConnected = useNotificationStore((state) => state.isConnected);
+  const isLoading = useNotificationStore((state) => state.isLoading);
+  const markAsRead = useNotificationStore((state) => state.markAsRead);
+  const markAllAsRead = useNotificationStore((state) => state.markAllAsRead);
+  
   useEffect(() => {
-    const handleConnect = () => setIsConnected(true);
-    const handleDisconnect = () => setIsConnected(false);
-    const handleConnectError = () => setIsConnected(false);
-
-    socket.on("connect", handleConnect);
-    socket.on("disconnect", handleDisconnect);
-    socket.on("connect_error", handleConnectError);
-
-    if (!token) {
-      socket.disconnect();
-      return () => {
-        socket.off("connect", handleConnect);
-        socket.off("disconnect", handleDisconnect);
-        socket.off("connect_error", handleConnectError);
-      };
+    let cancelled = false;
+    if (!user) return;
+    async function fetchInitialNotifications() {
+      setLoading(true);
+      try {
+        const response = await getNotifications();
+        if (!cancelled && response?.data) {
+          initialNotifications(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch initial notifications:", error);
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
     }
-
-    socket.auth = { token };
-
-    if (!socket.connected) {
-      socket.connect();
-    }
-
+    fetchInitialNotifications();
+    connect();
     return () => {
-      socket.off("connect", handleConnect);
-      socket.off("disconnect", handleDisconnect);
-      socket.off("connect_error", handleConnectError);
-      socket.disconnect();
+      cancelled = true;
+      disconnect();
     };
-  }, [token]);
+  }, [connect, disconnect, initialNotifications, setLoading, user]);
 
-  return { socket, isConnected };
+  return {notifications, isConnected, isLoading, markAsRead, markAllAsRead};
 }

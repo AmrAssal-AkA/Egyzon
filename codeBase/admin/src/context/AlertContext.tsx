@@ -42,9 +42,13 @@ interface AlertProviderProps {
   children: React.ReactNode;
 }
 
-export function AlertProvider({ children }: AlertProviderProps): React.ReactElement {
+export function AlertProvider({
+  children,
+}: AlertProviderProps): React.ReactElement {
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
-  const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(
+    new Map(),
+  );
 
   const clearTimer = useCallback((id: string) => {
     const timer = timersRef.current.get(id);
@@ -59,7 +63,7 @@ export function AlertProvider({ children }: AlertProviderProps): React.ReactElem
       clearTimer(id);
       setAlerts((current) => current.filter((alert) => alert.id !== id));
     },
-    [clearTimer]
+    [clearTimer],
   );
 
   const scheduleDismiss = useCallback(
@@ -74,7 +78,7 @@ export function AlertProvider({ children }: AlertProviderProps): React.ReactElem
 
       timersRef.current.set(alert.id, timer);
     },
-    [dismissAlert]
+    [dismissAlert],
   );
 
   const showAlert = useCallback(
@@ -84,31 +88,39 @@ export function AlertProvider({ children }: AlertProviderProps): React.ReactElem
       scheduleDismiss(alert);
       return alert.id;
     },
-    [scheduleDismiss]
+    [scheduleDismiss],
   );
 
   const showSuccess = useCallback(
-    (message: string, options?: Omit<AlertOptions, "message" | "variant">): string =>
-      showAlert({ ...options, message, variant: "success" }),
-    [showAlert]
+    (
+      message: string,
+      options?: Omit<AlertOptions, "message" | "variant">,
+    ): string => showAlert({ ...options, message, variant: "success" }),
+    [showAlert],
   );
 
   const showError = useCallback(
-    (message: string, options?: Omit<AlertOptions, "message" | "variant">): string =>
-      showAlert({ ...options, message, variant: "error" }),
-    [showAlert]
+    (
+      message: string,
+      options?: Omit<AlertOptions, "message" | "variant">,
+    ): string => showAlert({ ...options, message, variant: "error" }),
+    [showAlert],
   );
 
   const showWarning = useCallback(
-    (message: string, options?: Omit<AlertOptions, "message" | "variant">): string =>
-      showAlert({ ...options, message, variant: "warning" }),
-    [showAlert]
+    (
+      message: string,
+      options?: Omit<AlertOptions, "message" | "variant">,
+    ): string => showAlert({ ...options, message, variant: "warning" }),
+    [showAlert],
   );
 
   const showInfo = useCallback(
-    (message: string, options?: Omit<AlertOptions, "message" | "variant">): string =>
-      showAlert({ ...options, message, variant: "info" }),
-    [showAlert]
+    (
+      message: string,
+      options?: Omit<AlertOptions, "message" | "variant">,
+    ): string => showAlert({ ...options, message, variant: "info" }),
+    [showAlert],
   );
 
   const clearAlerts = useCallback(() => {
@@ -137,15 +149,15 @@ export function AlertProvider({ children }: AlertProviderProps): React.ReactElem
       showInfo,
       dismissAlert,
       clearAlerts,
-    ]
+    ],
   );
 
   useEffect(() => {
     registerAlertHandlers(value);
+    const timers = timersRef.current;
 
     return () => {
       unregisterAlertHandlers();
-      const timers = timersRef.current;
       timers.forEach((timer) => clearTimeout(timer));
       timers.clear();
     };

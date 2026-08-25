@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useEffect } from "react";
+
 import {
   XIcon,
   BellIcon,
   CheckCheckIcon,
-  Trash2Icon,
   PackageIcon,
   ShoppingBagIcon,
   AlertTriangleIcon,
@@ -13,8 +13,9 @@ import {
   XCircleIcon,
   InfoIcon,
 } from "lucide-react";
+
 import { useNotificationStore } from "@/stores/seller/useNotificationStore";
-import type { NotificationPayload } from "@/types/socket-events";
+import type { Notification } from "@/types/notification.types";
 
 interface NotificationModalProps {
   isOpen: boolean;
@@ -56,8 +57,11 @@ function formatRelativeTime(dateString?: string): string {
 }
 
 export default function NotificationModal({ isOpen, onClose }: NotificationModalProps) {
-  const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications } =
-    useNotificationStore();
+  const notifications = useNotificationStore((state) => state.notifications);
+  const markAsRead = useNotificationStore((state) => state.markAsRead);
+  const markAllAsRead = useNotificationStore((state) => state.markAllAsRead);
+
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -118,13 +122,9 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
               <CheckCheckIcon className="w-4 h-4" />
               Mark all read
             </button>
-            <button
-              onClick={clearNotifications}
-              className="flex items-center gap-1.5 font-medium text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer transition-colors"
-            >
-              <Trash2Icon className="w-4 h-4" />
-              Clear all
-            </button>
+            <span className="text-slate-400 text-[11px]">
+              {notifications.length} total
+            </span>
           </div>
         )}
 
@@ -143,42 +143,49 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
               </p>
             </div>
           ) : (
-            notifications.map((item: NotificationPayload) => (
-              <div
-                key={item.id}
-                onClick={() => markAsRead(item.id)}
-                className={`p-4 flex items-start gap-3.5 transition-colors cursor-pointer ${
-                  !item.isRead
-                    ? "bg-blue-50/40 dark:bg-blue-950/20 hover:bg-blue-50/70 dark:hover:bg-blue-950/30"
-                    : "hover:bg-slate-50 dark:hover:bg-slate-800/50"
-                }`}
-              >
-                <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 shrink-0 mt-0.5">
-                  {getNotificationIcon(item.type)}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2 mb-1">
-                    <h3 className={`text-xs font-semibold truncate ${!item.isRead ? "text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"}`}>
-                      {item.title}
-                    </h3>
-                    <span className="text-[10px] text-slate-400 shrink-0 whitespace-nowrap">
-                      {formatRelativeTime(item.createdAt)}
-                    </span>
+            notifications.map((item: Notification) => {
+              const notifId = item.id || item._id || "";
+              return (
+                <div
+                  key={notifId || item.createdAt}
+                  onClick={() => {
+                    if (!item.isRead && notifId) {
+                      markAsRead(notifId);
+                    }
+                  }}
+                  className={`p-4 flex items-start gap-3.5 transition-colors cursor-pointer ${
+                    !item.isRead
+                      ? "bg-blue-50/40 dark:bg-blue-950/20 hover:bg-blue-50/70 dark:hover:bg-blue-950/30"
+                      : "hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                  }`}
+                >
+                  <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 shrink-0 mt-0.5">
+                    {getNotificationIcon(item.type)}
                   </div>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                    {item.message}
-                  </p>
-                </div>
 
-                {!item.isRead && (
-                  <span
-                    className="w-2 h-2 rounded-full bg-blue-600 shrink-0 mt-2"
-                    title="Unread"
-                  />
-                )}
-              </div>
-            ))
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <h3 className={`text-xs font-semibold truncate ${!item.isRead ? "text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"}`}>
+                        {item.title}
+                      </h3>
+                      <span className="text-[10px] text-slate-400 shrink-0 whitespace-nowrap">
+                        {formatRelativeTime(item.createdAt)}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                      {item.message}
+                    </p>
+                  </div>
+
+                  {!item.isRead && (
+                    <span
+                      className="w-2 h-2 rounded-full bg-blue-600 shrink-0 mt-2"
+                      title="Unread notification - Click to mark as read"
+                    />
+                  )}
+                </div>
+              );
+            })
           )}
         </div>
       </div>

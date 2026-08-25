@@ -19,7 +19,6 @@ const RegisterUser = async (userData, res, req) => {
         const existingUser = await userModel_1.default.findOne({ email });
         if (existingUser)
             return res.status(409).json({ message: "User already exists" });
-        console.log("Registering user:", { FirstName, LastName, email, password });
         const hashedPassword = await (0, password_ustils_1.hashPassword)(password);
         const newUser = new userModel_1.default({
             FirstName,
@@ -60,7 +59,6 @@ const RegisterUser = async (userData, res, req) => {
             sameSite: "strict",
             maxAge: 24 * 60 * 60 * 1000,
         });
-        console.log("User registered successfully:", newUser);
         (0, Responses_1.sendSuccessResponse)(res, 201, "User created successfully", {
             token,
             refreshToken: refreshToken,

@@ -61,7 +61,16 @@ function ShopProductsClient({
   const derivedCategories = useMemo(
     () =>
       Array.from(
-        new Set(products.map((p) => p.category).filter(Boolean) as string[]),
+        new Set(
+          products
+            .map((p) => {
+              if (typeof p.category === "object" && p.category !== null) {
+                return (p.category as any).categoryName || (p.category as any).name || "";
+              }
+              return typeof p.category === "string" ? p.category : "";
+            })
+            .filter(Boolean) as string[],
+        ),
       ).sort(),
     [products],
   );
@@ -78,7 +87,7 @@ function ShopProductsClient({
     () =>
       products.filter((product) => {
         const matchesSearch = searchQuery
-          ? product.productName
+          ? (product.productName || product.name || "")
               .toLowerCase()
               .includes(searchQuery.toLowerCase())
           : true;
@@ -100,7 +109,7 @@ function ShopProductsClient({
         const matchesDiscount =
           discount.length > 0
             ? discount.some((value) => {
-                if (value === "onSale") return product.discount > 0;
+                if (value === "onSale") return (product.discount ?? 0) > 0;
                 if (value === "featured") return (product.AvgRating ?? 0) >= 4.5;
                 // "newArrival" — products created in the last 30 days
                 if (value === "newArrival") {
@@ -113,10 +122,17 @@ function ShopProductsClient({
               })
             : true;
 
+        const prodCat =
+          typeof product.category === "object" && product.category !== null
+            ? (product.category as any).categoryName || (product.category as any).name || ""
+            : typeof product.category === "string"
+              ? product.category
+              : "";
+
         const matchesCategory =
           selectedCategories.length > 0
-            ? product.category
-              ? selectedCategories.includes(product.category)
+            ? prodCat
+              ? selectedCategories.includes(prodCat)
               : false
             : true;
 

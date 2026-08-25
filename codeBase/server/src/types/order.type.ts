@@ -1,17 +1,13 @@
 import { Document, Types} from 'mongoose';
 
+import { PaymentStatus } from './payment.type';
+
 export enum OrderStatus {
     pending = 'pending',
     processing = 'processing',
     shipped = 'shipped',
     delivered = 'delivered',
     cancelled = 'cancelled',
-}
-export enum PaymentStatus {
-    pending = 'pending',
-    completed = 'completed',
-    failed = 'failed',
-    refunded = 'refunded',
 }
 
 export interface IOrderItem {
@@ -40,7 +36,7 @@ export interface IOrder extends Document{
     paymentMethod: PaymentMethod;
     payment?: Types.ObjectId
     notes: string;
-    Address: {
+    address: {
         address1: string;
         address2?: string;
         city: string;
@@ -49,18 +45,4 @@ export interface IOrder extends Document{
         country: string;
     };
     orderItems: IOrderItem[];
-
- // Order methods
-    placeOrder() : Promise<IOrder>;
-    cancelOrder(): Promise<IOrder>;
-    updateOrderStatus(status: OrderStatus): Promise<IOrder>;
-    calculateSubTotal(): number;
-    calculateFullTolal(): number;
-    addOrderItem(item: Omit<IOrderItem, "subTotal">): Promise<IOrder>; 
-    removeOrderItem(productId: Types.ObjectId): Promise<IOrder>;
-    getTotalItems(): number;
-    setIsPaid(): Promise<IOrder>;
-    isShipped(): boolean;
-    requestCancellation(): Promise<IOrder>;
-    requestRefund(): Promise<IOrder>;
 }

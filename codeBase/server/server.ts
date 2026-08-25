@@ -2,9 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { createServer } from "http";
+import http from "http";
 import helmet from "helmet";
-import { Server } from "socket.io";
 import swaggerUi from "swagger-ui-express";
 dotenv.config();
 
@@ -19,22 +18,19 @@ import CategoryRoute from "./src/routes/category.routes";
 import { swaggerSpec } from "./src/docs/swagger";
 import customerRoute from "./src/routes/customer.route";
 import adminRoute from "./src/routes/admin.route";
-import { initSocket } from "./src/socket";
+import { initSocket } from "./src/config/socket";
 import { attachTo } from "./src/middleware/attachTo";
 import orderRoute from "./src/routes/order.route";
+import NotificationRoute from "./src/routes/notifaication.routes";
+import PaymentRoute from "./src/routes/payment.route";
+
 
 const app = express();
-const server = createServer(app);
+const httpServer = http.createServer(app);
+const io = initSocket(httpServer);
 const allowedOrigin = "http://localhost:3000";
 
-const io = new Server(server, {
-  cors: {
-    origin: allowedOrigin,
-    credentials: true,
-    methods: ["GET", "POST"],
-  },
-});
-initSocket(io);
+
 
 const PORT = process.env.PORT;
 //connect to db
@@ -53,8 +49,8 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(attachTo(io));
 
+
 //routes
-app.set("io", io);
 app.use("/api/auth", AuthentaicatingRoute);
 app.use("/api/product", productRoute);
 app.use("/api/wishlist", wishlistRoute);
@@ -64,7 +60,8 @@ app.use("/api/category", CategoryRoute);
 app.use("/api/customer", customerRoute);
 app.use("/api/admin", adminRoute);
 app.use('/api/order', orderRoute);
-
+app.use('/api/notifications', NotificationRoute);
+app.use('/api/payment', PaymentRoute);
 //swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -80,7 +77,7 @@ app.get("/api-docs.json", (req, res) => {
 });
 
 //start the server
-server.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 

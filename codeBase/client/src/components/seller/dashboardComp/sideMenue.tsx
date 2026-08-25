@@ -54,12 +54,18 @@ export default function SellerSideMenue({ storeName }: Props = {}) {
     },
     {
       id: 3,
+      name: "Orders",
+      path: "/sellerDashboard/orders",
+      icon: Package,
+    },
+    {
+      id: 4,
       name: "Analytics",
       path: "/sellerDashboard/analytics",
       icon: BarChart3,
     },
     {
-      id: 4,
+      id: 5,
       name: "Wallet",
       path: "/sellerDashboard/wallet",
       icon: Wallet2,
@@ -174,7 +180,7 @@ export default function SellerSideMenue({ storeName }: Props = {}) {
         <AddProductModel
           onClose={() => setIsAddModalOpen(false)}
           onSave={(data) => {
-            toast.success(`Product "${data.name}" added successfully!`);
+            toast.success(`Product "${data?.name || "New Product"}" added successfully!`);
             setIsAddModalOpen(false);
           }}
         />

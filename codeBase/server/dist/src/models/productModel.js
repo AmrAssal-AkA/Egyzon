@@ -68,7 +68,7 @@ const productSchema = new mongoose_1.Schema({
         required: true,
         unique: true,
         default: function () {
-            const categoryPart = this.categoryId ? this.categoryId.toString().slice(0, 4).toUpperCase() : "GEN";
+            const categoryPart = this.category ? this.category.toString().slice(0, 4).toUpperCase() : "GEN";
             const namePart = this.productName ? this.productName.replace(/\s+/g, "").slice(0, 4).toUpperCase() : "PROD";
             const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, "");
             const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
@@ -90,17 +90,17 @@ const productSchema = new mongoose_1.Schema({
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "Seller",
     },
-    categoryId: {
+    category: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "Category",
-    },
+    }
 }, { timestamps: true });
 productSchema.pre("validate", async function () {
     if (this.sku)
         return;
-    if (!this.categoryId)
+    if (!this.category)
         return;
-    const categoryDoc = await categoryModel_1.default.findById(this.categoryId).select("categoryName").exec();
+    const categoryDoc = await categoryModel_1.default.findById(this.category).select("categoryName").exec();
     if (!categoryDoc)
         return;
     const categoryPart = categoryDoc.categoryName.slice(0, 4).toUpperCase();

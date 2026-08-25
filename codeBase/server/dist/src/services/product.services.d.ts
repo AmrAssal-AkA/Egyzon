@@ -15,13 +15,13 @@ export declare const ProductServices: {
     } & {
         id: string;
     }>;
-    UpdateProduct: (sellerId: string, productId: string, productData: any) => Promise<mongoose.Document<unknown, {}, IProduct, {}, mongoose.DefaultSchemaOptions> & IProduct & {
+    UpdateProduct: (sellerId: string, productId: string, productData: any) => Promise<(mongoose.Document<unknown, {}, IProduct, {}, mongoose.DefaultSchemaOptions> & IProduct & {
         _id: mongoose.Types.ObjectId;
     } & {
         __v: number;
     } & {
         id: string;
-    }>;
+    }) | null>;
     getAllProducts: (page: number, limit: number) => Promise<any>;
     getProductById: (productId: string) => Promise<mongoose.Document<unknown, {}, IProduct, {}, mongoose.DefaultSchemaOptions> & IProduct & {
         _id: mongoose.Types.ObjectId;

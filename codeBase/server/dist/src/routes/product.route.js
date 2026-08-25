@@ -17,6 +17,7 @@ router.post('/addProduct', Auth_middleware_1.isAuthenticated, (0, Authorization_
 router.patch('/seller/product/:productId', Auth_middleware_1.isAuthenticated, (0, Authorization_1.Authorize)(auth_types_1.userRole.Seller), (0, validate_1.validate)(product_validate_1.updateProductSchema), product_controller_1.default.applyDiscount);
 router.get("/:productId", product_controller_1.default.getProductById);
 router.get("/seller/products", Auth_middleware_1.isAuthenticated, (0, Authorization_1.Authorize)(auth_types_1.userRole.Seller), product_controller_1.default.getSellerProducts);
+router.put("/seller/:productId", Auth_middleware_1.isAuthenticated, (0, Authorization_1.Authorize)(auth_types_1.userRole.Seller), upload_middleware_1.upload.array('image', 3), (0, validate_1.validate)(product_validate_1.updateProductSchema), product_controller_1.default.updateProduct);
 router.delete("/seller/product/:productId", Auth_middleware_1.isAuthenticated, (0, Authorization_1.Authorize)(auth_types_1.userRole.Seller), product_controller_1.default.deleteProduct);
 exports.default = router;
 //# sourceMappingURL=product.route.js.map

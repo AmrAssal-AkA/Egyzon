@@ -7,7 +7,6 @@ const seller_services_1 = require("../../services/seller.services");
 const Responses_1 = require("../../utils/Responses");
 const cloudainry_config_1 = __importDefault(require("../../config/cloudainry.config"));
 const AppError_1 = require("../../utils/AppError");
-const socket_1 = __importDefault(require("../../socket"));
 const createRequestToJoin = async (req, res) => {
     let uploadedCommercialRegister;
     let uploadedTaxCard;
@@ -49,20 +48,6 @@ const createRequestToJoin = async (req, res) => {
             }
         };
         await seller_services_1.SellerServices.ApplyAsPartner(sellerData, userId);
-        const socket = socket_1.default.getSockets(String(userId));
-        socket.forEach((socket) => {
-            req.io.to(socket).emit("notification", {
-                id: `seller-${userId}-${new Date().getTime()}`,
-                user: String(userId),
-                type: "success",
-                message: "Your request to join as a seller has been submitted successfully.",
-                data: {
-                    sellerId: userId,
-                },
-                isRead: false,
-                createdAt: new Date(),
-            });
-        });
         return (0, Responses_1.sendSuccessResponse)(res, 200, "Request sent successfully");
     }
     catch (error) {

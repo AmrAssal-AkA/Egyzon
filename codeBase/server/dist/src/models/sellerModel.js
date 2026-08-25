@@ -98,6 +98,12 @@ const SellerSchema = new mongoose_1.Schema({
         type: String,
         default: "",
     },
+    products: [
+        {
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: "Product",
+        }
+    ],
     createdAt: {
         type: Date,
     }

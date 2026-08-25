@@ -11,15 +11,17 @@ import {
   CheckCircle,
   AlertCircle,
   Loader2,
+  BadgePercentIcon,
 } from "lucide-react";
 import {
   fetchCategories,
   addCategory,
   addProduct,
   editProduct,
+  applyDiscount,
   addProductToCategory,
 } from "@/services/product";
-import { Product, ProductFormData } from "@/types/product.type";
+import { Product } from "@/types/product.type";
 import { toast } from "sonner";
 
 
@@ -30,14 +32,16 @@ interface CategoryOption {
 
 interface AddProductModelProps {
   onClose: () => void;
-  onSave: (data?: ProductFormData) => void;
+  onSave: (data?: any) => void;
   editingProduct?: Product | null;
+  isDiscountOnly?: boolean;
 }
 
 export default function AddProductModel({
   onClose,
   onSave,
   editingProduct = null,
+  isDiscountOnly = false,
 }: AddProductModelProps) {
   const [categoryMode, setCategoryMode] = useState<"existing" | "new">(
     "existing",
@@ -56,7 +60,13 @@ export default function AddProductModel({
         editingProduct.productDescription ||
         ""
       : "",
-    category: editingProduct ? editingProduct.category || "" : "",
+    category: editingProduct
+      ? typeof editingProduct.category === "object" && editingProduct.category !== null
+        ? (editingProduct.category as any).categoryName || (editingProduct.category as any).name || ""
+        : typeof editingProduct.category === "string"
+          ? editingProduct.category
+          : ""
+      : "",
     price: editingProduct ? editingProduct.price.toString() : "",
     discount: editingProduct
       ? (
@@ -95,7 +105,12 @@ export default function AddProductModel({
           editingProduct.description ||
           editingProduct.productDescription ||
           "",
-        category: editingProduct.category || "",
+        category:
+          typeof editingProduct.category === "object" && editingProduct.category !== null
+            ? (editingProduct.category as any).categoryName || (editingProduct.category as any).name || ""
+            : typeof editingProduct.category === "string"
+              ? editingProduct.category
+              : "",
         price: (editingProduct.price ?? "").toString(),
         discount: (
           editingProduct.discount ??
@@ -153,14 +168,18 @@ export default function AddProductModel({
           setCategoriesList(options);
 
           if (options.length > 0) {
+            const targetCategory = editingProduct?.category || formData.category;
             const initialMatch = options.find(
               (c) =>
                 c.name.toLowerCase() ===
-                (formData.category || "").toLowerCase(),
+                (targetCategory || "").toLowerCase(),
             );
             if (initialMatch) {
               setSelectedCategoryId(initialMatch.id);
-            } else if (options[0]) {
+              if (!formData.category) {
+                setFormData((prev) => ({ ...prev, category: initialMatch.name }));
+              }
+            } else if (!formData.category && options[0]) {
               setFormData((prev) => ({ ...prev, category: options[0].name }));
               setSelectedCategoryId(options[0].id);
             }
@@ -176,7 +195,7 @@ export default function AddProductModel({
       }
     }
     loadCategories();
-  }, [formData.category]);
+  }, []);
 
   // Handle Product Images Change
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -280,6 +299,43 @@ export default function AddProductModel({
     e.preventDefault();
     setFormError(null);
 
+    if (isDiscountOnly) {
+      const prodId = editingProduct?._id || editingProduct?.id;
+      if (!prodId) {
+        setFormError("Product ID is required to apply discount.");
+        return;
+      }
+
+      const discountValue = Number(formData.discount || 0);
+      if (isNaN(discountValue) || discountValue < 0 || discountValue > 100) {
+        setFormError("Please enter a valid discount percentage between 0 and 100.");
+        return;
+      }
+
+      try {
+        setIsSubmitting(true);
+      await applyDiscount(prodId, discountValue);
+
+
+        onSave({
+          ...editingProduct,
+          discount: discountValue,
+        });
+        onClose();
+      } catch (err: any) {
+        console.error("Apply discount failed:", err);
+        const errorMessage =
+          err?.response?.data?.message ||
+          err?.message ||
+          err?.error ||
+          (typeof err === "string" ? err : "Failed to apply discount");
+        setFormError(errorMessage);
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
     if (!formData.name.trim()) {
       setFormError("Product name is required.");
       return;
@@ -319,16 +375,22 @@ export default function AddProductModel({
           return;
         }
 
-        const editPayload = {
-          productName: formData.name.trim(),
-          productDescription: formData.description.trim(),
-          price: Number(formData.price),
-          discount: Number(formData.discount || 0),
-          category: (formData.category || "").trim(),
-          stock: Number(formData.stock),
-        };
+        const editFormData = new FormData();
+        editFormData.append("productId", String(prodId));
+        editFormData.append("productName", formData.name.trim());
+        editFormData.append("productDescription", formData.description.trim());
+        editFormData.append("price", String(Number(formData.price)));
+        editFormData.append("discount", String(Number(formData.discount || 0)));
+        editFormData.append("category", (formData.category || "").trim());
+        editFormData.append("stock", String(Number(formData.stock)));
 
-        const res = await editProduct(prodId, editPayload);
+        if (productImages.length > 0) {
+          productImages.forEach((file) => {
+            editFormData.append("image", file, file.name);
+          });
+        }
+
+        const res = await editProduct(prodId, editFormData);
         toast.success(res?.message || "Product updated successfully");
 
         let activeCatId = selectedCategoryId;
@@ -450,14 +512,24 @@ export default function AddProductModel({
         <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 flex items-center justify-center">
-              <Package className="w-5 h-5" />
+              {isDiscountOnly ? (
+                <BadgePercentIcon className="w-5 h-5" />
+              ) : (
+                <Package className="w-5 h-5" />
+              )}
             </div>
             <div>
               <h3 className="font-bold text-slate-900 dark:text-white text-base">
-                {editingProduct ? "Edit Product" : "Add New Product"}
+                {isDiscountOnly
+                  ? "Apply Discount"
+                  : editingProduct
+                    ? "Edit Product"
+                    : "Add New Product"}
               </h3>
               <p className="text-xs text-slate-500">
-                Fill in details for your product catalog
+                {isDiscountOnly
+                  ? "Update promotional discount percentage for this product"
+                  : "Fill in details for your product catalog"}
               </p>
             </div>
           </div>
@@ -489,12 +561,13 @@ export default function AddProductModel({
             <input
               type="text"
               required
+              disabled={isDiscountOnly}
               placeholder="e.g. Wireless Headphones"
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
-              className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -506,12 +579,13 @@ export default function AddProductModel({
             <textarea
               required
               rows={3}
+              disabled={isDiscountOnly}
               placeholder="Describe your product specs, features..."
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
-              className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
+              className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none disabled:opacity-60 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -533,8 +607,11 @@ export default function AddProductModel({
             <div className="grid grid-cols-2 gap-2 bg-white dark:bg-slate-900 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
               <button
                 type="button"
+                disabled={isDiscountOnly}
                 onClick={() => setCategoryMode("existing")}
-                className={`py-1.5 px-3 rounded-md text-xs font-medium transition-all cursor-pointer ${
+                className={`py-1.5 px-3 rounded-md text-xs font-medium transition-all ${
+                  isDiscountOnly ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+                } ${
                   categoryMode === "existing"
                     ? "bg-blue-600 text-white shadow-xs"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
@@ -544,8 +621,11 @@ export default function AddProductModel({
               </button>
               <button
                 type="button"
+                disabled={isDiscountOnly}
                 onClick={() => setCategoryMode("new")}
-                className={`py-1.5 px-3 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                className={`py-1.5 px-3 rounded-md text-xs font-medium transition-all flex items-center justify-center gap-1 ${
+                  isDiscountOnly ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+                } ${
                   categoryMode === "new"
                     ? "bg-blue-600 text-white shadow-xs"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
@@ -562,6 +642,7 @@ export default function AddProductModel({
                 <select
                   value={formData.category}
                   required
+                  disabled={isDiscountOnly}
                   onChange={(e) => {
                     const selectedName = e.target.value;
                     const selectedOption = categoriesList.find(
@@ -570,7 +651,7 @@ export default function AddProductModel({
                     setFormData({ ...formData, category: selectedName });
                     setSelectedCategoryId(selectedOption?.id || "");
                   }}
-                  className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {isLoadingCategories ? (
                     <option value="" disabled>
@@ -609,12 +690,13 @@ export default function AddProductModel({
                   </label>
                   <input
                     type="text"
+                    disabled={isDiscountOnly}
                     placeholder="e.g. Smart Wearables"
                     value={newCategory.name}
                     onChange={(e) =>
                       setNewCategory({ ...newCategory, name: e.target.value })
                     }
-                    className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-slate-100"
+                    className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-slate-100 disabled:opacity-60 disabled:cursor-not-allowed"
                   />
                 </div>
                 <div>
@@ -623,6 +705,7 @@ export default function AddProductModel({
                   </label>
                   <input
                     type="text"
+                    disabled={isDiscountOnly}
                     placeholder="Brief summary of category items..."
                     value={newCategory.description}
                     onChange={(e) =>
@@ -631,7 +714,7 @@ export default function AddProductModel({
                         description: e.target.value,
                       })
                     }
-                    className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-slate-100"
+                    className="w-full px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-slate-100 disabled:opacity-60 disabled:cursor-not-allowed"
                   />
                 </div>
                 <div>
@@ -642,8 +725,9 @@ export default function AddProductModel({
                     <input
                       type="file"
                       accept="image/*"
+                      disabled={isDiscountOnly}
                       onChange={handleCategoryImageChange}
-                      className="text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                      className="text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                     />
                     {categoryImagePreview && (
                       <Image
@@ -659,7 +743,7 @@ export default function AddProductModel({
                 <button
                   type="button"
                   onClick={handleCreateCategorySubmit}
-                  disabled={isCreatingCategory}
+                  disabled={isCreatingCategory || isDiscountOnly}
                   className="mt-1 w-full py-1.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
                 >
                   {isCreatingCategory ? (
@@ -686,30 +770,41 @@ export default function AddProductModel({
               <input
                 type="number"
                 required
+                disabled={isDiscountOnly}
                 min="0"
                 placeholder="250"
                 value={formData.price}
                 onChange={(e) =>
                   setFormData({ ...formData, price: e.target.value })
                 }
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Discount (%)
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+                <span>Discount (%)</span>
+                {isDiscountOnly && (
+                  <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold">
+                    (Editable)
+                  </span>
+                )}
               </label>
               <input
                 type="number"
                 min="0"
                 max="100"
+                autoFocus={isDiscountOnly}
                 placeholder="0"
                 value={formData.discount}
                 onChange={(e) =>
                   setFormData({ ...formData, discount: e.target.value })
                 }
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className={`w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/60 border rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none ${
+                  isDiscountOnly
+                    ? "border-blue-500 ring-2 ring-blue-500/20 font-semibold"
+                    : "border-slate-200 dark:border-slate-700"
+                }`}
               />
             </div>
 
@@ -720,13 +815,14 @@ export default function AddProductModel({
               <input
                 type="number"
                 required
+                disabled={isDiscountOnly}
                 min="0"
                 placeholder="10"
                 value={formData.stock}
                 onChange={(e) =>
                   setFormData({ ...formData, stock: e.target.value })
                 }
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -759,17 +855,26 @@ export default function AddProductModel({
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
               Product Images
             </label>
-            <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-4 flex flex-col items-center justify-center gap-2 bg-slate-50/50 dark:bg-slate-800/30 hover:bg-slate-50 transition-all cursor-pointer relative">
+            <div
+              className={`border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-4 flex flex-col items-center justify-center gap-2 bg-slate-50/50 dark:bg-slate-800/30 transition-all relative ${
+                isDiscountOnly
+                  ? "opacity-60 cursor-not-allowed"
+                  : "hover:bg-slate-50 cursor-pointer"
+              }`}
+            >
               <input
                 type="file"
                 multiple
+                disabled={isDiscountOnly}
                 accept="image/*"
                 onChange={handleImageChange}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                className="absolute inset-0 w-full h-full opacity-0 disabled:cursor-not-allowed cursor-pointer"
               />
               <Upload className="w-5 h-5 text-slate-400" />
               <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">
-                Click or drag & drop product images
+                {isDiscountOnly
+                  ? "Image uploads disabled in discount mode"
+                  : "Click or drag & drop product images"}
               </p>
               <p className="text-[10px] text-slate-400">
                 PNG, JPG, WEBP up to 5MB
@@ -791,13 +896,15 @@ export default function AddProductModel({
                       alt={`Upload ${i}`}
                       className="w-full h-full object-cover"
                     />
-                    <button
-                      type="button"
-                      onClick={() => removeProductImage(i)}
-                      className="absolute inset-0 bg-slate-900/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
+                    {!isDiscountOnly && (
+                      <button
+                        type="button"
+                        onClick={() => removeProductImage(i)}
+                        className="absolute inset-0 bg-slate-900/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -819,7 +926,13 @@ export default function AddProductModel({
               className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs shadow-md shadow-blue-500/20 transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
             >
               {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-              <span>{editingProduct ? "Save Changes" : "Add Product"}</span>
+              <span>
+                {isDiscountOnly
+                  ? "Apply Discount"
+                  : editingProduct
+                    ? "Save Changes"
+                    : "Add Product"}
+              </span>
             </button>
           </div>
         </form>

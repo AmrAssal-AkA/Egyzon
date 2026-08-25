@@ -8,9 +8,10 @@ interface AnalyticStatusCardProps {
     totalInventoryVal?: number;
     InStockRate?: number;
     ReOrderRequired?: number;
+    isLoading?: boolean;
 }
 
-export default function AnalyticStatusCard({totalInventoryVal, InStockRate, ReOrderRequired }: AnalyticStatusCardProps) {
+export default function AnalyticStatusCard({totalInventoryVal, InStockRate, ReOrderRequired, isLoading }: AnalyticStatusCardProps) {
     const statusData = useMemo(() => {
         const items = [];
 
@@ -69,9 +70,13 @@ export default function AnalyticStatusCard({totalInventoryVal, InStockRate, ReOr
                         <span className="text-[12px] font-semibold text-gray-400 tracking-wider uppercase">
                             {item.label}
                         </span>
-                        <span className="text-2xl font-bold text-gray-900 tracking-tight dark:text-gray-50">
-                            {item.value}
-                        </span>
+                        {isLoading ? (
+                            <div className="h-8 w-32 rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse mt-0.5" />
+                        ) : (
+                            <span className="text-2xl font-bold text-gray-900 tracking-tight dark:text-gray-50">
+                                {item.value}
+                            </span>
+                        )}
                     </div>
                 </div>
             ))}

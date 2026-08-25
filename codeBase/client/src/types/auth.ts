@@ -21,7 +21,8 @@ export interface User {
     storeName?: string;
     isCompleted?: boolean;
     orders?: Array<{
-        id: string;
+        id?: string;
+        _id?: string;
         product: string;
         date: string;
         status: string;

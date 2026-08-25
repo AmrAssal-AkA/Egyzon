@@ -28,6 +28,9 @@ export declare const swaggerSpec: {
         readonly name: "Wishlist";
         readonly description: "Wishlist management";
     }, {
+        readonly name: "Notifications";
+        readonly description: "User notification retrieval and read-state management";
+    }, {
         readonly name: "Seller";
         readonly description: "Seller onboarding and store setup";
     }, {
@@ -372,6 +375,42 @@ export declare const swaggerSpec: {
                         readonly minimum: 0;
                         readonly maximum: 100;
                         readonly example: 15;
+                    };
+                };
+            };
+            readonly ProductModifyRequest: {
+                readonly type: "object";
+                readonly properties: {
+                    readonly productName: {
+                        readonly type: "string";
+                        readonly example: "Wireless Headphones";
+                    };
+                    readonly productDescription: {
+                        readonly type: "string";
+                        readonly example: "Noise-cancelling over-ear headphones.";
+                    };
+                    readonly price: {
+                        readonly type: "number";
+                        readonly example: 199.99;
+                    };
+                    readonly discount: {
+                        readonly type: "number";
+                        readonly example: 15;
+                    };
+                    readonly category: {
+                        readonly type: "string";
+                        readonly example: "electronics";
+                    };
+                    readonly stock: {
+                        readonly type: "number";
+                        readonly example: 50;
+                    };
+                    readonly image: {
+                        readonly type: "array";
+                        readonly items: {
+                            readonly type: "string";
+                            readonly format: "binary";
+                        };
                     };
                 };
             };
@@ -875,6 +914,41 @@ export declare const swaggerSpec: {
                 readonly items: {
                     readonly $ref: "#/components/schemas/SellerApplicationSummary";
                 };
+            };
+            readonly NotificationItem: {
+                readonly type: "object";
+                readonly properties: {
+                    readonly _id: {
+                        readonly type: "string";
+                    };
+                    readonly user: {
+                        readonly type: "string";
+                    };
+                    readonly type: {
+                        readonly type: "string";
+                        readonly enum: readonly ["info", "warning", "error", "success"];
+                    };
+                    readonly message: {
+                        readonly type: "string";
+                    };
+                    readonly isRead: {
+                        readonly type: "boolean";
+                    };
+                    readonly createdAt: {
+                        readonly type: "string";
+                        readonly format: "date-time";
+                    };
+                };
+            };
+            readonly NotificationListResponse: {
+                readonly type: "array";
+                readonly items: {
+                    readonly $ref: "#/components/schemas/NotificationItem";
+                };
+            };
+            readonly NotificationBulkActionResponse: {
+                readonly type: "object";
+                readonly additionalProperties: true;
             };
             readonly AdminSellerSummary: {
                 readonly type: "object";
@@ -1851,6 +1925,106 @@ export declare const swaggerSpec: {
                 };
             };
         };
+        readonly "/api/product/seller/{productId}": {
+            readonly put: {
+                readonly tags: readonly ["Products"];
+                readonly summary: "Update seller product details";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }, {
+                    readonly bearerAuth: readonly [];
+                }];
+                readonly parameters: readonly [{
+                    readonly name: "productId";
+                    readonly in: "path";
+                    readonly required: true;
+                    readonly schema: {
+                        readonly type: "string";
+                    };
+                }];
+                readonly requestBody: {
+                    readonly required: true;
+                    readonly content: {
+                        readonly "multipart/form-data": {
+                            readonly schema: {
+                                readonly $ref: "#/components/schemas/ProductModifyRequest";
+                            };
+                        };
+                    };
+                };
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Product updated successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly allOf: readonly [{
+                                        readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                    }, {
+                                        readonly type: "object";
+                                        readonly properties: {
+                                            readonly data: {
+                                                readonly $ref: "#/components/schemas/ProductItem";
+                                            };
+                                        };
+                                    }];
+                                };
+                            };
+                        };
+                    };
+                    readonly 400: {
+                        readonly description: "Bad Request";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 403: {
+                        readonly description: "Forbidden";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 404: {
+                        readonly description: "Product not found";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 500: {
+                        readonly description: "Internal Server Error";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
         readonly "/api/cart": {
             readonly get: {
                 readonly tags: readonly ["Cart"];
@@ -2189,6 +2363,202 @@ export declare const swaggerSpec: {
                             readonly "application/json": {
                                 readonly schema: {
                                     readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        readonly "/api/notifications": {
+            readonly get: {
+                readonly tags: readonly ["Notifications"];
+                readonly summary: "Get the current user's notifications";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }, {
+                    readonly bearerAuth: readonly [];
+                }];
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Notifications retrieved successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly allOf: readonly [{
+                                        readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                    }, {
+                                        readonly type: "object";
+                                        readonly properties: {
+                                            readonly data: {
+                                                readonly $ref: "#/components/schemas/NotificationListResponse";
+                                            };
+                                        };
+                                    }];
+                                };
+                            };
+                        };
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        readonly "/api/notifications/{id}/markAsRead": {
+            readonly patch: {
+                readonly tags: readonly ["Notifications"];
+                readonly summary: "Mark a notification as read";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }, {
+                    readonly bearerAuth: readonly [];
+                }];
+                readonly parameters: readonly [{
+                    readonly name: "id";
+                    readonly in: "path";
+                    readonly required: true;
+                    readonly schema: {
+                        readonly type: "string";
+                    };
+                }];
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Notification marked as read successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly allOf: readonly [{
+                                        readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                    }, {
+                                        readonly type: "object";
+                                        readonly properties: {
+                                            readonly data: {
+                                                readonly $ref: "#/components/schemas/NotificationItem";
+                                            };
+                                        };
+                                    }];
+                                };
+                            };
+                        };
+                    };
+                    readonly 400: {
+                        readonly description: "Notification ID is required";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 404: {
+                        readonly description: "Notification not found";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        readonly "/api/notifications/markAllAsRead": {
+            readonly patch: {
+                readonly tags: readonly ["Notifications"];
+                readonly summary: "Mark all notifications as read for the current user";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }, {
+                    readonly bearerAuth: readonly [];
+                }];
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "All notifications marked as read successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly allOf: readonly [{
+                                        readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                    }, {
+                                        readonly type: "object";
+                                        readonly properties: {
+                                            readonly data: {
+                                                readonly $ref: "#/components/schemas/NotificationBulkActionResponse";
+                                            };
+                                        };
+                                    }];
+                                };
+                            };
+                        };
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        readonly "/api/notifications/clear": {
+            readonly delete: {
+                readonly tags: readonly ["Notifications"];
+                readonly summary: "Clear all notifications for the current user";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }, {
+                    readonly bearerAuth: readonly [];
+                }];
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "All notifications cleared successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly allOf: readonly [{
+                                        readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                    }, {
+                                        readonly type: "object";
+                                        readonly properties: {
+                                            readonly data: {
+                                                readonly $ref: "#/components/schemas/NotificationBulkActionResponse";
+                                            };
+                                        };
+                                    }];
                                 };
                             };
                         };

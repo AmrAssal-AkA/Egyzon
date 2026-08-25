@@ -9,7 +9,9 @@ import NotificationModal from '@/components/seller/common/NotificationModal'
 
 export default function SellerHeader() {
   const { user } = useAuth();
-  const { unreadCount } = useNotificationStore();
+  const unreadCount = useNotificationStore((state) =>
+    state.notifications.filter((n) => !n.isRead).length
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const sellerName = user ? `${user.FirstName} ${user.LastName}` : "Seller";
@@ -37,7 +39,7 @@ export default function SellerHeader() {
             <BellIcon className="w-5 h-5 sm:w-6 sm:h-6" />
             {unreadCount > 0 && (
               <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center px-1 rounded-full bg-blue-600 text-[10px] font-bold text-white shadow-xs animate-in zoom-in">
-                {unreadCount > 99 ? '99+' : unreadCount}
+                {unreadCount > 99 ? "99+" : unreadCount}
               </span>
             )}
           </button>

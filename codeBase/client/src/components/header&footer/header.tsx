@@ -4,12 +4,13 @@ import Link from "next/link";
 import { IoIosSearch } from "react-icons/io";
 import { FiUser, FiMenu, FiX, FiSearch } from "react-icons/fi";
 
-import Model from "./Model";
-import NavLinks from "./nav";
+import Model from "./_components/Model";
+import NavLinks from "./_components/nav";
 import { ModeToggle } from "../ui/ModeToggle";
 import WishlistIcon from "@/components/wishlist/WishlistIcon";
-import CartModel from "./CartModel";
+import CartModel from "./_components/CartModel";
 import { useAuth } from "@/hooks/useAuth";
+import SearchBarComponent from "./_components/searchBar";
 
 export default function Header() {
   const [isMenueOpen, setIsMenueOpen] = useState(false);
@@ -46,27 +47,7 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Desktop Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-md lg:max-w-lg items-center">
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              className="w-full relative flex items-center"
-            >
-              <input
-                type="text"
-                placeholder="Search products, brands, categories..."
-                className="w-full pl-4 pr-12 py-2 rounded-full border border-input bg-muted/30 text-foreground placeholder:text-muted-foreground/70 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/40 focus:border-blue-600 transition-all"
-              />
-              <button
-                type="submit"
-                aria-label="Search"
-                className="absolute right-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center shadow-xs"
-              >
-                <IoIosSearch className="w-4 h-4" />
-              </button>
-            </form>
-          </div>
-
+            <SearchBarComponent />
           {/* Right Action Icons & Controls */}
           <div className="flex items-center gap-1.5 sm:gap-2.5">
             {/* Mobile Search Toggle */}

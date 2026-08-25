@@ -1,6 +1,6 @@
 export interface Product {
   _id?: string;
-  id?: string | number;
+  id?: string;
   productName?: string;
   name?: string;
   productDescription?: string;
@@ -50,7 +50,15 @@ export interface Product {
   sellerName?: string;
   storeName?: string;
   createdAt?: string;
-  category?: string;
+  category?:
+    | string
+    | {
+        _id?: string;
+        id?: string;
+        categoryName?: string;
+        name?: string;
+        [key: string]: any;
+      };
   brand?: string;
 }
 

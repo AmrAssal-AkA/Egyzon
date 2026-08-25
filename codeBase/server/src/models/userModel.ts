@@ -38,7 +38,6 @@ const UserSchema = new Schema<IUser>(
     },
     phoneNumber: {
       type: String,
-      unique: true,
       sparse: true,
     },
     isBlocked: {
@@ -50,11 +49,6 @@ const UserSchema = new Schema<IUser>(
       default: false,
     },
     googleId: {
-      type: String,
-      unique: true,
-      sparse: true,
-    },
-    facebookId: {
       type: String,
       unique: true,
       sparse: true,

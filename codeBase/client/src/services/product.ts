@@ -1,7 +1,6 @@
 import axios from "axios";
 
 import { apiClient } from "@/lib/apiClient";
-import { Category } from "@/types/category.type";
 import { productListResponse, Product, Products } from "@/types/product.type";
 import {
   fetchCategories,
@@ -211,7 +210,7 @@ export const editProduct = async (
       ? `/api/product/editProduct?productId=${productId}`
       : `/api/product/editProduct`;
 
-    const response = await apiClient.patch(url, payload, {
+    const response = await apiClient.put(url, payload, {
       withCredentials: true,
     });
     return response.data;
@@ -221,5 +220,27 @@ export const editProduct = async (
       throw error.response.data;
     }
     throw new Error("Failed to edit product");
+  }
+};
+
+export const applyDiscount = async (
+  productId: string | number,
+  discount: number
+) => {
+  try {
+    const response = await apiClient.patch(
+      `/api/product/ApplyDiscount?productId=${productId}`,
+      { discount: Number(discount) },
+      {
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error applying discount:", error);
+    if (axios.isAxiosError(error) && error.response) {
+      throw error.response.data;
+    }
+    throw new Error("Failed to apply discount");
   }
 };

@@ -6,6 +6,9 @@ import {
   TotalProductsResponse,
   TotalOrdersResponse,
   TotalRevenueResponse,
+  TopSellingProductsResponse,
+  SellerOrdersResponse,
+  TotalInventoryValueResponse,
 } from "@/types/seller";
 import { ApiResponse } from "@/types/auth";
 
@@ -154,7 +157,7 @@ export const sellerService = {
     } | FormData
   ): Promise<ApiResponse<unknown>> => {
     try {
-      const response = await apiClient.patch(
+      const response = await apiClient.put(
         `/api/product/editProduct?productId=${productId}`,
         data,
         {
@@ -183,6 +186,43 @@ export const sellerService = {
         axiosError?.response?.data?.error ||
         axiosError?.message ||
         "Failed to edit product";
+      return { success: false, message };
+    }
+  },
+  applyDiscount: async (
+    productId: string | number,
+    discount: number
+  ): Promise<ApiResponse<unknown>> => {
+    try {
+      const response = await apiClient.patch(
+        `/api/product/ApplyDiscount?productId=${productId}`,
+        { discount: Number(discount) },
+        {
+          withCredentials: true,
+        }
+      );
+
+      return {
+        success: response.data?.success ?? true,
+        message: response.data?.message || "Discount applied successfully",
+        data: response.data?.data,
+      };
+    } catch (error: unknown) {
+      console.error("Seller apply discount error:", error);
+      const axiosError = error as {
+        response?: {
+          data?: {
+            message?: string;
+            error?: string;
+          };
+        };
+        message?: string;
+      };
+      const message =
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
+        axiosError?.message ||
+        "Failed to apply discount";
       return { success: false, message };
     }
   },
@@ -303,14 +343,147 @@ export const sellerService = {
       return { success: false, message, data: { totalRevenue: 0 } };
     }
   },
+  getTopProducts: async (): Promise<TopSellingProductsResponse> => {
+    try {
+      const response = await apiClient.get<TopSellingProductsResponse>("/api/seller/getTopProduct", {
+        withCredentials: true,
+      });
+
+      const data = response.data;
+      if (!data?.success) {
+        return {
+          success: false,
+          message: data?.message || "Failed to fetch top products",
+          data: [],
+        };
+      }
+
+      return {
+        success: true,
+        message: data.message || "Top products retrieved successfully",
+        data: Array.isArray(data.data) ? data.data : [],
+      };
+    } catch (error: unknown) {
+      console.error("Get top products error:", error);
+      const axiosError = error as {
+        response?: {
+          data?: {
+            message?: string;
+            error?: string;
+          };
+        };
+        message?: string;
+      };
+      const message =
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
+        axiosError?.message ||
+        "Failed to get top products";
+      return { success: false, message, data: [] };
+    }
+  },
+  getAllOrders: async (): Promise<SellerOrdersResponse> => {
+    try {
+      const response = await apiClient.get<SellerOrdersResponse>("/api/seller/getAllOrders", {
+        withCredentials: true,
+      });
+
+      const data = response.data;
+      if (!data?.success) {
+        return {
+          success: false,
+          message: data?.message || "Failed to fetch seller orders",
+          data: [],
+        };
+      }
+
+      const list = Array.isArray(data.data)
+        ? data.data
+        : Array.isArray((data as any).orders)
+          ? (data as any).orders
+          : Array.isArray((data as any).allOrders)
+            ? (data as any).allOrders
+            : [];
+
+      return {
+        success: true,
+        message: data.message || "Seller orders retrieved successfully",
+        data: list,
+      };
+    } catch (error: unknown) {
+      console.error("Get all seller orders error:", error);
+      const axiosError = error as {
+        response?: {
+          data?: {
+            message?: string;
+            error?: string;
+          };
+        };
+        message?: string;
+      };
+      const message =
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
+        axiosError?.message ||
+        "Failed to fetch seller orders";
+      return { success: false, message, data: [] };
+    }
+  },
+  getTotalInventoryValue: async (): Promise<TotalInventoryValueResponse> => {
+    try {
+      const response = await apiClient.get<TotalInventoryValueResponse>(
+        "/api/seller/getTotalInventoryValue",
+        {
+          withCredentials: true,
+        }
+      );
+
+      const data = response.data;
+      if (!data?.success) {
+        return {
+          success: false,
+          message: data?.message || "Failed to fetch total inventory value",
+          data: { totalInventoryValue: 0 },
+        };
+      }
+
+      return {
+        success: true,
+        message: data.message || "Total inventory value retrieved successfully",
+        data: data.data || { totalInventoryValue: 0 },
+      };
+    } catch (error: unknown) {
+      console.error("Get total inventory value error:", error);
+      const axiosError = error as {
+        response?: {
+          data?: {
+            message?: string;
+            error?: string;
+          };
+        };
+        message?: string;
+      };
+      const message =
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
+        axiosError?.message ||
+        "Failed to get total inventory value";
+      return { success: false, message, data: { totalInventoryValue: 0 } };
+    }
+  },
 };
 
 export const fetchSellerProducts = sellerService.getSellerProducts;
 export const deleteSellerProduct = sellerService.deleteProduct;
 export const editSellerProduct = sellerService.editProduct;
+export const applySellerProductDiscount = sellerService.applyDiscount;
 export const fetchTotalProducts = sellerService.getTotalProducts;
 export const fetchTotalOrders = sellerService.getTotalOrders;
 export const fetchTotalRevenue = sellerService.getTotalRevenue;
+export const fetchTopProducts = sellerService.getTopProducts;
+export const fetchSellerOrders = sellerService.getAllOrders;
+export const fetchTotalInventoryValue = sellerService.getTotalInventoryValue;
+
 
 
 

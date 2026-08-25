@@ -22,10 +22,18 @@ export const swaggerSpec = {
     { name: "Cart", description: "Cart management" },
     { name: "Orders", description: "Order placement" },
     { name: "Wishlist", description: "Wishlist management" },
+    {
+      name: "Notifications",
+      description: "User notification retrieval and read-state management",
+    },
     { name: "Seller", description: "Seller onboarding and store setup" },
     { name: "Categories", description: "Category management" },
     { name: "Customer", description: "Customer account settings" },
     { name: "Admin", description: "Admin login and seller application review" },
+    {
+      name: "Payment",
+      description: "Payment processing and Paymob integration webhooks",
+    },
   ],
   components: {
     securitySchemes: {
@@ -210,6 +218,53 @@ export const swaggerSpec = {
           },
         },
       },
+      CustomerOrderHistoryOrder: {
+        type: "object",
+        properties: {
+          _id: { type: "string" },
+          orderNumber: { type: "string", example: "ORD-20260825-1234" },
+          orderDate: { type: "string", format: "date-time" },
+          totalAmount: { type: "number", example: 450 },
+          status: {
+            type: "string",
+            enum: [
+              "pending",
+              "processing",
+              "shipped",
+              "delivered",
+              "cancelled",
+            ],
+            example: "delivered",
+          },
+        },
+      },
+      CustomerOrderHistoryData: {
+        type: "object",
+        properties: {
+          _id: { type: "string" },
+          FirstName: { type: "string", example: "Ahmed" },
+          LastName: { type: "string", example: "Ali" },
+          email: {
+            type: "string",
+            format: "email",
+            example: "customer@example.com",
+          },
+          role: { type: "string", example: "customer" },
+          phoneNumber: { type: "string", example: "+201001112223" },
+          address: {
+            type: "array",
+            items: { type: "string" },
+          },
+          orders: {
+            type: "array",
+            items: { $ref: "#/components/schemas/CustomerOrderHistoryOrder" },
+          },
+          wishlist: {
+            type: "array",
+            items: { type: "string" },
+          },
+        },
+      },
       ProductItem: {
         type: "object",
         properties: {
@@ -219,8 +274,17 @@ export const swaggerSpec = {
           price: { type: "number" },
           discount: { type: "number" },
           stock: { type: "number" },
+          AvgRating: { type: "number" },
+          sku: { type: "string" },
+          status: { type: "string", enum: ["active", "inactive"] },
           category: { type: "string" },
-          imageUrl: { type: "string" },
+          imageUrl: {
+            type: "array",
+            items: { type: "string" },
+          },
+          sellerId: { type: "string" },
+          createdAt: { type: "string", format: "date-time" },
+          updatedAt: { type: "string", format: "date-time" },
         },
       },
       ProductCreateRequest: {
@@ -253,6 +317,24 @@ export const swaggerSpec = {
         required: ["discount"],
         properties: {
           discount: { type: "number", minimum: 0, maximum: 100, example: 15 },
+        },
+      },
+      ProductModifyRequest: {
+        type: "object",
+        properties: {
+          productName: { type: "string", example: "Wireless Headphones" },
+          productDescription: {
+            type: "string",
+            example: "Noise-cancelling over-ear headphones.",
+          },
+          price: { type: "number", example: 199.99 },
+          discount: { type: "number", example: 15 },
+          category: { type: "string", example: "electronics" },
+          stock: { type: "number", example: 50 },
+          image: {
+            type: "array",
+            items: { type: "string", format: "binary" },
+          },
         },
       },
       ProductListResponse: {
@@ -306,9 +388,31 @@ export const swaggerSpec = {
           updatedAt: { type: "string", format: "date-time" },
         },
       },
+      BillingData: {
+        type: "object",
+        required: ["firstName", "lastName", "email", "phoneNumber"],
+        properties: {
+          firstName: { type: "string", example: "John" },
+          lastName: { type: "string", example: "Doe" },
+          email: {
+            type: "string",
+            format: "email",
+            example: "john@example.com",
+          },
+          phoneNumber: { type: "string", example: "+201001112223" },
+          apartment: { type: "string", example: "4B" },
+          floor: { type: "string", example: "4" },
+          street: { type: "string", example: "12 Nile St" },
+          building: { type: "string", example: "10" },
+          city: { type: "string", example: "Cairo" },
+          state: { type: "string", example: "Cairo Governorate" },
+          country: { type: "string", example: "Egypt" },
+          postalCode: { type: "string", example: "11511" },
+        },
+      },
       OrderRequest: {
         type: "object",
-        required: ["shippingAddress", "paymentMethod", "Address"],
+        required: ["shippingAddress", "paymentMethod", "address"],
         properties: {
           shippingAddress: {
             type: "string",
@@ -323,7 +427,9 @@ export const swaggerSpec = {
             type: "string",
             example: "Leave the package at the front desk.",
           },
+          address: { $ref: "#/components/schemas/OrderAddress" },
           Address: { $ref: "#/components/schemas/OrderAddress" },
+          billingData: { $ref: "#/components/schemas/BillingData" },
           phoneNumber: {
             type: "string",
             example: "+201001112223",
@@ -365,6 +471,7 @@ export const swaggerSpec = {
             type: "string",
             enum: ["pending", "paid", "failed", "refunded"],
           },
+          payment: { type: "string" },
           paymentMethod: {
             type: "object",
             properties: {
@@ -375,6 +482,7 @@ export const swaggerSpec = {
               details: { type: "string" },
             },
           },
+          address: { $ref: "#/components/schemas/OrderAddress" },
           notes: { type: "string" },
           orderItems: {
             type: "array",
@@ -382,6 +490,17 @@ export const swaggerSpec = {
           },
           createdAt: { type: "string", format: "date-time" },
           updatedAt: { type: "string", format: "date-time" },
+        },
+      },
+      PlaceOrderResponseData: {
+        type: "object",
+        properties: {
+          order: { $ref: "#/components/schemas/OrderResponse" },
+          paymentUrl: {
+            type: "string",
+            example:
+              "https://accept.paymob.com/acceptance/iframes/12345?payment_token=...",
+          },
         },
       },
       WishlistRequest: {
@@ -493,13 +612,19 @@ export const swaggerSpec = {
         type: "object",
         properties: {
           totalRevenue: { type: "number", example: 12500 },
-          revenueAfterPlatformFee: { type: "number", example: 11250 },
         },
       },
       SellerTopSellingProductItem: {
         type: "object",
         properties: {
-          productId: { type: "string" },
+          productId: { type: "string", example: "66a1f2f3d4c5b6a7c8d9e0f1" },
+          name: { type: "string", example: "Wireless Headphones" },
+          image: {
+            type: "string",
+            nullable: true,
+            example: "https://res.cloudinary.com/demo/image/upload/sample.jpg",
+          },
+          sales: { type: "number", example: 25 },
           revenue: { type: "number", example: 2500 },
         },
       },
@@ -520,19 +645,64 @@ export const swaggerSpec = {
           totalInventoryValue: { type: "number", example: 18500 },
         },
       },
+      SellerChangeOrderStatusRequest: {
+        type: "object",
+        required: ["orderId", "newStatus"],
+        properties: {
+          orderId: { type: "string", example: "66a1f2f3d4c5b6a7c8d9e0f1" },
+          newStatus: {
+            type: "string",
+            enum: ["pending", "processing", "shipped"],
+            example: "processing",
+          },
+        },
+      },
+      PaymentItem: {
+        type: "object",
+        properties: {
+          _id: { type: "string" },
+          transactionId: { type: "string", example: "12345678" },
+          paymobOrderId: { type: "number", example: 98765432 },
+          amount: { type: "number", example: 500 },
+          currency: { type: "string", example: "EGP" },
+          paymentMethod: { type: "string", example: "card" },
+          paymentStatus: {
+            type: "string",
+            enum: ["pending", "paid", "failed", "refunded"],
+            example: "paid",
+          },
+          paymentDate: { type: "string", format: "date-time" },
+          gateway: { type: "string", example: "paymob" },
+          gatewayResponse: { type: "string" },
+          refundAmount: { type: "number", example: 0 },
+          cardLast4: { type: "string", example: "1234" },
+          cardBrand: { type: "string", example: "MasterCard" },
+          createdAt: { type: "string", format: "date-time" },
+          updatedAt: { type: "string", format: "date-time" },
+        },
+      },
+      PaymobWebhookResponseData: {
+        type: "object",
+        properties: {
+          payment: { $ref: "#/components/schemas/PaymentItem" },
+          order: { $ref: "#/components/schemas/OrderResponse" },
+        },
+      },
       PlatformFeeResponse: {
         type: "object",
         properties: {
           PlatformFeePercentage: { type: "number", example: 10 },
+          taxRate: { type: "number", example: 14 },
           updatedBy: { type: "string" },
           updateAt: { type: "string", format: "date-time" },
         },
       },
       SetPlatformFeeRequest: {
         type: "object",
-        required: ["feePercentage"],
+        required: ["feePercentage", "taxRate"],
         properties: {
           feePercentage: { type: "number", example: 10 },
+          taxRate: { type: "number", example: 14 },
         },
       },
       AdminAdditionalDocumentsRequest: {
@@ -578,6 +748,28 @@ export const swaggerSpec = {
       SellerApplicationListResponse: {
         type: "array",
         items: { $ref: "#/components/schemas/SellerApplicationSummary" },
+      },
+      NotificationItem: {
+        type: "object",
+        properties: {
+          _id: { type: "string" },
+          user: { type: "string" },
+          type: {
+            type: "string",
+            enum: ["info", "warning", "error", "success"],
+          },
+          message: { type: "string" },
+          isRead: { type: "boolean" },
+          createdAt: { type: "string", format: "date-time" },
+        },
+      },
+      NotificationListResponse: {
+        type: "array",
+        items: { $ref: "#/components/schemas/NotificationItem" },
+      },
+      NotificationBulkActionResponse: {
+        type: "object",
+        additionalProperties: true,
       },
       AdminSellerSummary: {
         type: "object",
@@ -1397,6 +1589,89 @@ export const swaggerSpec = {
         },
       },
     },
+    "/api/product/seller/{productId}": {
+      put: {
+        tags: ["Products"],
+        summary: "Update seller product details",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        parameters: [
+          {
+            name: "productId",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "multipart/form-data": {
+              schema: { $ref: "#/components/schemas/ProductModifyRequest" },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Product updated successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: { $ref: "#/components/schemas/ProductItem" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad Request",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          404: {
+            description: "Product not found",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
     "/api/cart": {
       get: {
         tags: ["Cart"],
@@ -1662,6 +1937,176 @@ export const swaggerSpec = {
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/notifications": {
+      get: {
+        tags: ["Notifications"],
+        summary: "Get the current user's notifications",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Notifications retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/NotificationListResponse",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/notifications/{id}/markAsRead": {
+      patch: {
+        tags: ["Notifications"],
+        summary: "Mark a notification as read",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Notification marked as read successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: { $ref: "#/components/schemas/NotificationItem" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          400: {
+            description: "Notification ID is required",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          404: {
+            description: "Notification not found",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/notifications/markAllAsRead": {
+      patch: {
+        tags: ["Notifications"],
+        summary: "Mark all notifications as read for the current user",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "All notifications marked as read successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/NotificationBulkActionResponse",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/notifications/clear": {
+      delete: {
+        tags: ["Notifications"],
+        summary: "Clear all notifications for the current user",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "All notifications cleared successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/NotificationBulkActionResponse",
+                        },
+                      },
+                    },
+                  ],
+                },
               },
             },
           },
@@ -1997,7 +2442,8 @@ export const swaggerSpec = {
     "/api/seller/getAllOrders": {
       get: {
         tags: ["Seller"],
-        summary: "Get all orders containing the authenticated seller's products",
+        summary:
+          "Get all orders containing the authenticated seller's products",
         security: [{ cookieAuth: [] }, { bearerAuth: [] }],
         responses: {
           200: {
@@ -2075,6 +2521,85 @@ export const swaggerSpec = {
           },
           403: {
             description: "Forbidden",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/seller/change-order-status": {
+      patch: {
+        tags: ["Seller"],
+        summary: "Update the status of an order containing seller's products",
+        description:
+          "Allows a seller to update an order status to pending, processing, or shipped.",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/SellerChangeOrderStatusRequest",
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Order status updated successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: { $ref: "#/components/schemas/OrderResponse" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          400: {
+            description: "Bad Request",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          404: {
+            description: "Order or seller not found",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ApiErrorResponse" },
@@ -2438,6 +2963,59 @@ export const swaggerSpec = {
         },
       },
     },
+    "/api/customer/order-history": {
+      get: {
+        tags: ["Customer"],
+        summary: "Get customer order history",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Customer order history retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/CustomerOrderHistoryData",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          404: {
+            description: "Customer not found",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
     "/api/order/placeOrder": {
       post: {
         tags: ["Orders"],
@@ -2462,7 +3040,9 @@ export const swaggerSpec = {
                     {
                       type: "object",
                       properties: {
-                        data: { $ref: "#/components/schemas/OrderResponse" },
+                        data: {
+                          $ref: "#/components/schemas/PlaceOrderResponseData",
+                        },
                       },
                     },
                   ],
@@ -2496,6 +3076,88 @@ export const swaggerSpec = {
           },
           404: {
             description: "Product not found while placing order",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/payment/paymob/webhook": {
+      post: {
+        tags: ["Payment"],
+        summary: "Paymob transaction webhook callback",
+        description:
+          "Processes transaction callbacks from Paymob. Verifies the HMAC SHA512 signature in the query parameter and updates payment and order status.",
+        parameters: [
+          {
+            name: "hmac",
+            in: "query",
+            required: true,
+            schema: { type: "string" },
+            description:
+              "HMAC SHA512 signature from Paymob for request verification",
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["obj"],
+                properties: {
+                  obj: {
+                    type: "object",
+                    description: "Paymob transaction object",
+                    additionalProperties: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Payment processed successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/PaymobWebhookResponseData",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          400: {
+            description: "Invalid HMAC signature",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          404: {
+            description: "Payment not found for the given Paymob order ID",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ApiErrorResponse" },

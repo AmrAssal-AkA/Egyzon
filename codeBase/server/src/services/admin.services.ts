@@ -250,16 +250,32 @@ export const AdminService = {
   },
   setPlatformFee: async (
     feePercentage: number,
+    taxRate: number,
     adminId: string,
   ): Promise<IPlatformConfig> => {
     try {
       const admin = await Admin.findById(adminId);
       if (!admin) throw new AppError(404, "Admin not found");
-      if (feePercentage < 0 || feePercentage > 100) throw new AppError(400, "Invalid fee percentage. Must be between 0 and 100");
+      if (
+        feePercentage < 0 ||
+        feePercentage > 100 ||
+        taxRate < 0 ||
+        taxRate > 100
+      )
+        throw new AppError(
+          400,
+          "Invalid fee or tax rate  . Must be between 0 and 100",
+        );
+
       const updatedPlatformConfig =
         await PlatformConfigSetting.findOneAndUpdate(
           {},
-          { PlatformFeePercentage: feePercentage, updatedBy: admin._id, updateAt: new Date() },
+          {
+            PlatformFeePercentage: feePercentage,
+            taxRate: taxRate,
+            updatedBy: admin._id,
+            updateAt: new Date(),
+          },
           { new: true, upsert: true },
         );
       if (!updatedPlatformConfig)
@@ -274,8 +290,9 @@ export const AdminService = {
   },
   getPlatformFee: async (): Promise<IPlatformConfig> => {
     try {
-      const platformFee = await PlatformConfigSetting.findOne().populate("PlatformFeePercentage");
-      if (!platformFee) throw new AppError(404, "Platform configuration not found");
+      const platformFee = await PlatformConfigSetting.findOne();
+      if (!platformFee)
+        throw new AppError(404, "Platform configuration not found");
       return platformFee;
     } catch (error) {
       if (error instanceof AppError) {
@@ -283,5 +300,5 @@ export const AdminService = {
       }
       throw new AppError(500, "Internal Server Error");
     }
-  }
+  },
 };

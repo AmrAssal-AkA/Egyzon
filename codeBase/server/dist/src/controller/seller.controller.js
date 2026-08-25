@@ -82,6 +82,17 @@ exports.SellerController = {
         catch (error) {
             return (0, Responses_1.sendErrorResponse)(res, 500, "internal server error");
         }
+    },
+    changeOrderStatus: async (req, res) => {
+        try {
+            const sellerId = req.user?.userId;
+            const seller = req.user?.role;
+            if (!sellerId || seller !== "seller")
+                return (0, Responses_1.sendErrorResponse)(res, 403, "Forbidden", "You are not authorized to access this resource");
+        }
+        catch (error) {
+            return (0, Responses_1.sendErrorResponse)(res, 500, "Internal Server Error");
+        }
     }
 };
 //# sourceMappingURL=seller.controller.js.map

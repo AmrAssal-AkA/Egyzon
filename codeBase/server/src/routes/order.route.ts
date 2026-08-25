@@ -1,5 +1,5 @@
 import express from 'express';
-import {placeOrder} from '../controller/order.controller';
+import {placeOrder, getUserOrders} from '../controller/order.controller';
 import { validate } from '../middleware/validate';
 import {isAuthenticated} from '../middleware/Auth.middleware';
 import { Authorize } from '../middleware/Authorization';
@@ -12,6 +12,7 @@ const router = express.Router();
 
 
 router.post("/placeOrder", isAuthenticated, Authorize(userRole.Customer), validate(orderBaseSchema), placeOrder);
+router.get("/getUserOrders", isAuthenticated, Authorize(userRole.Customer), getUserOrders);
 
 
 

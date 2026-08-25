@@ -2,6 +2,7 @@ import Product from "../models/productModel";
 import { IProduct } from "../types/product.types";
 import { AppError } from "../utils/AppError";
 import Category from "../models/categoryModel";
+import Seller from "../models/sellerModel";
 import mongoose from "mongoose";
 import { initializeRedisClient } from "../config/client";
 
@@ -37,7 +38,7 @@ export const ProductServices = {
       const newProduct = await Product.create({
         ...productData,
         category: category._id,
-          sellerId: sellerId,
+        sellerId: sellerId,
       });
 
       return newProduct;
@@ -69,16 +70,33 @@ export const ProductServices = {
     productId: string,
     productData: any,
   ) => {
+     const seller = await Seller.findById(sellerId).populate("products");
+     console.log(seller?.products);
+    if (!seller) throw new AppError(404, "Seller not found");
     const isObjectId = mongoose.Types.ObjectId.isValid(productId);
     const query = isObjectId
       ? { _id: productId, sellerId }
       : { sku: productId, sellerId };
+      console.log("Query for finding product:", query);
     const product = await Product.findOne(query);
-    if (!product) {
-      throw new AppError(404, "Product not found");
+    if (!product) throw new AppError(404, "Product not found");
+    if (product.sellerId.toString() !== sellerId) {
+      throw new AppError(403, "Unauthorized to update this product");
     }
-    Object.assign(product, productData);
-    return await product.save();
+    console.log("Product found for update:", product);
+
+      if (!product) throw new AppError(404, "Product not found");
+     const EditProduct = await Product.findByIdAndUpdate(productId, {
+      productName: productData.productName,
+      description: productData.description,
+      price: productData.price !== undefined ? Number(productData.price) : undefined,
+      discount: productData.discount !== undefined ? Number(productData.discount) : undefined,
+      stock: productData.stock !== undefined ? Number(productData.stock) : undefined,
+      category: productData.category,
+      imageUrl: productData.imageUrl,
+    }, { new: true });
+    console.log("Updated product details:", EditProduct);
+    return EditProduct;
   },
   // Service function to get all products with pagination
   getAllProducts: async (page: number, limit: number) => {
@@ -169,7 +187,8 @@ export const ProductServices = {
         ? { $or: [{ _id: productId }, { sku: productId }] }
         : { sku: productId };
 
-      const product = await Product.findOne(query).populate("sellerId", "storeName FirstName LastName");
+      const product = await Product.findOne(query).populate("sellerId", "storeName FirstName LastName").populate("category", "categoryName");
+      console.log("Product found:", product);
       if (!product) {
         throw new AppError(404, "Product not found");
       }
@@ -185,7 +204,7 @@ export const ProductServices = {
   },
   getSellerProducts: async (sellerId: string) => {
     try {
-      const products = await Product.find({ sellerId });
+      const products = await Product.find({ sellerId }).populate("category", "categoryName");
       return products;
     } catch (error) {
       console.log(error);

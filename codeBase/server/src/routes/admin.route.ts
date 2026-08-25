@@ -8,6 +8,7 @@ import  {adminLoginSchema}  from '../validators/user.validate';
 import { isAuthenticated } from '../middleware/Auth.middleware';
 import { Authorize } from '../middleware/Authorization';
 import { userRole } from '../types/auth.types';
+import {setPlatformFeeSchema} from '../validators/admin.validate';
 
 const router = express.Router();
 

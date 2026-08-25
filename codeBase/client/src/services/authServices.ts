@@ -28,7 +28,6 @@ export const authServices = {
     register: async (payload: RegisterPayload): Promise<ApiResponse<User>> => {
         try { 
             const { data } = await ApiCall.post<ApiResponse<User>>("/auth/register", payload);
-            console.log("Register Data: ", data)
             return data;
         } catch (error: unknown) {
             console.error("Registration error:", error);

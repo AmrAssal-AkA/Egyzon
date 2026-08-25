@@ -16,7 +16,6 @@ const RegisterUser = async (userData: any, res: Response, req: Request) => {
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(409).json({ message: "User already exists" });
 
-    console.log("Registering user:", { FirstName, LastName, email, password });
     const hashedPassword = await hashPassword(password);
     const newUser = new User({
       FirstName,
@@ -25,7 +24,6 @@ const RegisterUser = async (userData: any, res: Response, req: Request) => {
       password: hashedPassword,
     });
     await newUser.save();
-
     const token = await signAccessToken({
       userId: newUser.id,
       role: newUser.role,
@@ -39,7 +37,6 @@ const RegisterUser = async (userData: any, res: Response, req: Request) => {
       userId: newUser.id,
     });
     await refreshTokenDoc.save();
-
     const emailToken = generateToken();
     const {
       token: emailTokenValue,
@@ -53,19 +50,18 @@ const RegisterUser = async (userData: any, res: Response, req: Request) => {
     const verificationUrl = `${process.env.FRONTEND_URL}/verifyEmail?token=${emailTokenValue}`;
     await verifyEmailTemplate(email, emailTokenValue, verificationUrl);
 
-    res.cookie("Access_token", token, {
+    res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 60 * 60 * 1000,
+      maxAge: 60 * 15 ,
     });
-    res.cookie("refresh_token", refreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 60 * 60 * 24 * 7,
     });
-    console.log("User registered successfully:", newUser);
     sendSuccessResponse(res, 201, "User created successfully", {
       token,
       refreshToken: refreshToken,

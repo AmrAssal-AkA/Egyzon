@@ -1,22 +1,12 @@
 import React from 'react'
 
-
 import AnalyticCard from '@/components/seller/dashboardComp/AnalyticCard'
 import TotalRevenueCard from '@/components/seller/dashboardComp/TotalRevenueCard'
 import TotalOrdersCard from '@/components/seller/dashboardComp/TotalOrdersCard'
 import TotalProductsCard from '@/components/seller/dashboardComp/TotalProductsCard'
 import AnalyticsGraph from '@/components/seller/dashboardComp/AnalyticsGraph'
-import TopProduct, { initialProducts } from '@/components/seller/dashboardComp/topProduct'
+import TopProduct from '@/components/seller/dashboardComp/topProduct'
 import TopOrders from '@/components/seller/dashboardComp/topOrders'
-
-const topOrders = [
-  {id: 1, orderId: "#5554", customerName: "Amr", totalAmount: 5000, orderDate: "20-06-2026", status: "Delivered"},
-  {id: 2, orderId: "#5555", customerName: "Ahmed", totalAmount: 3000, orderDate: "21-06-2026", status: "Pending"},
-  {id: 3, orderId: "#5556", customerName: "Ali", totalAmount: 7000, orderDate: "22-06-2026", status: "Delivered"},
-  {id: 4, orderId: "#5557", customerName: "Sara", totalAmount: 2000, orderDate: "23-06-2026", status: "Cancelled"},
-  
-]
-
 
 function SellerDashboard() {
   return (
@@ -30,8 +20,8 @@ function SellerDashboard() {
 
       <AnalyticsGraph />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <TopProduct topProducts={initialProducts} />
-        <TopOrders topOrders={topOrders} />
+        <TopProduct />
+        <TopOrders />
       </div>
     </main>
   )

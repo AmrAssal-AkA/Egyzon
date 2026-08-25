@@ -32,7 +32,7 @@ export const metadata = {
 
 export default async function Home() {
   // Fetch products and categories from the server
-  const productsResponse = await fetchProducts(1, 3);
+  const productsResponse = await fetchProducts(1, 4);
   const products = productsResponse.data.products;
   const categories = await fetchCategories();
   const categoriesList = Array.isArray(categories) ? categories : [];
@@ -55,13 +55,13 @@ export default async function Home() {
             <p className="text-muted-foreground">No products found.</p>
           </div>
         ) : (
-          <div className="flex justify-center items-center md:min-x-max">
+          <div className="w-full">
             <ProductGrid products={products} />
           </div>
         )}
       </div>
       {/* Categories Section */}
-      <div className="w-full max-w-10xl px-4 md:px-20 mt-10">
+      <div className="w-full max-w-10xl px-4 md:px-20 mt-10 ">
         <h2 className="text-3xl font-bold  mt-10 mb-5">Our Top Categories</h2>
         <p className="text-muted-foreground mb-10">
           Explore our diverse range of categories and find the perfect products
@@ -84,7 +84,7 @@ export default async function Home() {
             <p className="text-muted-foreground">No products found.</p>
           </div>
         ) : (
-          <div className="flex justify-center">
+          <div className="w-full">
             <ProductGrid products={products} />
           </div>
         )}

@@ -1,8 +1,8 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import {v4 as uuidv4} from 'uuid';
 
-import { IOrder, OrderStatus, PaymentStatus, IOrderItem } from '../types/order.type';
-
+import { IOrder, OrderStatus, IOrderItem } from '../types/order.type';
+import { PaymentStatus } from '../types/payment.type';
 
 
 const orderItemSchema = new Schema<IOrderItem>({
@@ -14,7 +14,7 @@ const orderItemSchema = new Schema<IOrderItem>({
 
 const orderSchema = new Schema<IOrder>({
     orderNumber: { type: String, required: true, unique: true, default: () => `ORD-${uuidv4()}` },
-    customer: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
+    customer: { type: Schema.Types.ObjectId, ref: 'customer', required: true },
     orderDate: { type: Date, default: Date.now },
     orderStatus: { type: String, enum: Object.values(OrderStatus), default: OrderStatus.pending },
     subTotal: { type: Number, required: true },
@@ -28,7 +28,7 @@ const orderSchema = new Schema<IOrder>({
         method: { type: String, enum: ['cashOnDelivery', 'creditCard'], required: true },
         details: { type: String }
     },
-    Address: {
+    address: {
         address1: { type: String, required: true },
         address2: { type: String },
         city: { type: String, required: true },

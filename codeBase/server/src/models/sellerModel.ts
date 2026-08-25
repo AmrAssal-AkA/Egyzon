@@ -63,6 +63,12 @@ const SellerSchema = new Schema<ISeller>(
       type: String,
       default: "",
     },
+    products: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      }
+    ],
     createdAt: {
       type: Date,
     }

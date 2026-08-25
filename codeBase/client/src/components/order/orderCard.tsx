@@ -14,8 +14,6 @@ export interface OrderCardProps {
   onRemove: (orderNumber: string) => void;
 }
 
-
-
 export function OrderCard({ order, onRemove }: OrderCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 

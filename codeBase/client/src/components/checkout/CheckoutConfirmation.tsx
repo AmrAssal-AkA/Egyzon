@@ -96,7 +96,7 @@ export default function CheckoutConfirmation({
   };
 
   return (
-    <main className="w-full min-h-screen bg-background py-12 px-4 md:px-8 lg:px-16 mt-20 flex flex-col items-center">
+    <div className="w-full flex flex-col items-center">
       <div className="w-full max-w-7xl flex flex-col gap-6 md:gap-8">
         {/* Banner */}
         <ConfirmationBanner
@@ -132,6 +132,6 @@ export default function CheckoutConfirmation({
           onFinalizeConfirmation={onFinalizeConfirmation}
         />
       </div>
-    </main>
+    </div>
   );
 }

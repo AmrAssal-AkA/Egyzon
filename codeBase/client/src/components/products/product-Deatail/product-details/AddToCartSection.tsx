@@ -54,7 +54,6 @@ export default function AddToCartSection({
         title: productTitle,
         price: productPrice,
         image: productThumbnail,
-        thumbnail: productThumbnail,
       });
     }
     onAddToWishlist();

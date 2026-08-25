@@ -12,7 +12,7 @@ export interface IProduct {
     sku: string;
     imageUrl: string[];
     sellerId: Types.ObjectId;
-    categoryId: Types.ObjectId;
+    category: Types.ObjectId;
 }
 
 export interface ICategory {

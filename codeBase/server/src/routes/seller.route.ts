@@ -19,6 +19,7 @@ router.get("/total-orders", isAuthenticated, Authorize(userRole.Seller), SellerC
 router.get("/total-revenue", isAuthenticated, Authorize(userRole.Seller), SellerController.getTotalRevenue);
 router.get("/total-selling-product", isAuthenticated, Authorize(userRole.Seller), SellerController.getTopSellingProducts);
 router.get("/getAllOrders", isAuthenticated, Authorize(userRole.Seller), SellerController.getAllOrders);
-router.get("/totalInventoryValue", isAuthenticated, Authorize(userRole.Seller), SellerController.totalInventoryValue)
+router.get("/totalInventoryValue", isAuthenticated, Authorize(userRole.Seller), SellerController.totalInventoryValue);
+router.patch("/change-order-status", isAuthenticated, Authorize(userRole.Seller), SellerController.changeOrderStatus);
 
 export default router;

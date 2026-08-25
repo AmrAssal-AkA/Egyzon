@@ -3,7 +3,6 @@ import {ICustomer} from "../types/User.types";
 import User from "./userModel";
 
 const CustomerSchema = new Schema<ICustomer>({
-
     orders: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: "Order",

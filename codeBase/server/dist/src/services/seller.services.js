@@ -27,7 +27,7 @@ exports.SellerServices = {
                 taxCardNumber: sellerData.taxCardNumber,
                 sellerDocuments: sellerData.sellerDocuments,
                 applicantStatus: "pending",
-            }
+            },
         }, { returnDocument: "after" });
         console.log("SaveSellerData:", SaveSellerData);
         try {
@@ -79,7 +79,9 @@ exports.SellerServices = {
             const seller = await sellerModel_1.default.findById(sellerId);
             if (!seller)
                 throw new AppError_1.AppError(404, "Seller not found");
-            const totalProductCounts = await productModel_1.default.countDocuments({ sellerId: seller.id });
+            const totalProductCounts = await productModel_1.default.countDocuments({
+                sellerId: seller.id,
+            });
             return { totalProductCounts };
         }
         catch (error) {
@@ -96,7 +98,9 @@ exports.SellerServices = {
                 throw new AppError_1.AppError(404, "Seller not found");
             const getProducts = await productModel_1.default.find({ sellerId: seller.id });
             const productIds = getProducts.map((product) => product._id);
-            const totalOrders = await orderModel_1.default.countDocuments({ "orderItems.product": { $in: productIds } });
+            const totalOrders = await orderModel_1.default.countDocuments({
+                "orderItems.product": { $in: productIds },
+            });
             return { totalOrders };
         }
         catch (error) {
@@ -113,7 +117,9 @@ exports.SellerServices = {
         try {
             const getProducts = await productModel_1.default.find({ sellerId: seller.id });
             const productIds = getProducts.map((product) => product._id.toString());
-            const orders = await orderModel_1.default.find({ "orderItems.product": { $in: productIds } });
+            const orders = await orderModel_1.default.find({
+                "orderItems.product": { $in: productIds },
+            });
             const subRevenue = orders.reduce((total, order) => {
                 const orderTotal = order.orderItems.reduce((orderSum, item) => {
                     if (productIds.includes(item.product.toString())) {
@@ -134,29 +140,43 @@ exports.SellerServices = {
             throw new AppError_1.AppError(500, "Internal Server Error");
         }
     },
-    getTopProductsByRevenue: async (sellerId, limit = 5) => {
+    getTopProductsByRevenue: async (sellerId) => {
         try {
             const seller = await sellerModel_1.default.findById(sellerId);
             if (!seller)
                 throw new AppError_1.AppError(404, "Seller not found");
             const getProducts = await productModel_1.default.find({ sellerId: seller.id });
             const productIds = getProducts.map((product) => product._id.toString());
-            const orders = await orderModel_1.default.find({ "orderItems.product": { $in: productIds } });
-            const revenueMap = {};
+            const orders = await orderModel_1.default.find({
+                "orderItems.product": { $in: productIds },
+            });
+            const productRevenueMap = {};
+            const productSalesMap = {};
             orders.forEach((order) => {
                 order.orderItems.forEach((item) => {
                     if (productIds.includes(item.product.toString())) {
-                        revenueMap[item.product.toString()] = (revenueMap[item.product.toString()] || 0) + item.unitPrice * item.quantity;
+                        const productId = item.product.toString();
+                        const revenue = item.unitPrice * item.quantity;
+                        productRevenueMap[productId] =
+                            (productRevenueMap[productId] || 0) + revenue;
+                        productSalesMap[productId] =
+                            (productSalesMap[productId] || 0) + item.quantity;
                     }
                 });
             });
-            const topProducts = Object.entries(revenueMap)
+            const topProducts = Object.entries(productRevenueMap)
                 .sort(([, revenueA], [, revenueB]) => revenueB - revenueA)
-                .slice(0, limit)
-                .map(([productId, revenue]) => ({
-                productId,
-                revenue,
-            }));
+                .slice(0, 5)
+                .map(([productId, revenue]) => {
+                const product = getProducts.find((p) => p._id.toString() === productId);
+                return {
+                    productId,
+                    name: product?.productName ?? "Unknown product",
+                    image: product?.imageUrl?.[0] ?? null,
+                    sales: productSalesMap[productId] ?? 0,
+                    revenue,
+                };
+            });
             return topProducts;
         }
         catch (error) {
@@ -172,7 +192,9 @@ exports.SellerServices = {
                 throw new AppError_1.AppError(404, "Seller not found");
             const getProducts = await productModel_1.default.find({ sellerId: seller.id }).lean();
             const productIds = getProducts.map((product) => product._id.toString());
-            const orders = await orderModel_1.default.find({ "orderItems.product": { $in: productIds } });
+            const orders = await orderModel_1.default.find({
+                "orderItems.product": { $in: productIds },
+            });
             return orders;
         }
         catch (error) {
@@ -188,7 +210,7 @@ exports.SellerServices = {
                 throw new AppError_1.AppError(403, "Forbidden, You are not authorized to access this resource");
             const products = await productModel_1.default.find({ sellerId: seller.id });
             const totalInventoryValue = products.reduce((total, product) => {
-                return total + (product.price * (product.stock || 0));
+                return total + product.price * (product.stock || 0);
             }, 0);
             return { totalInventoryValue };
         }
@@ -197,6 +219,19 @@ exports.SellerServices = {
                 throw new AppError_1.AppError(error.statusCode, error.message);
             throw new AppError_1.AppError(500, "internal Server Error");
         }
-    }
+    },
+    // seller should change order status from pending to process to shipped only
+    changeOrderStatus: async (sellerId, orderId, newStatus) => {
+        try {
+            const seller = await sellerModel_1.default.findById(sellerId);
+            if (!seller)
+                throw new AppError_1.AppError(404, "Seller not found");
+        }
+        catch (error) {
+            if (error instanceof AppError_1.AppError)
+                throw new AppError_1.AppError(error.statusCode, error.message);
+            throw new AppError_1.AppError(500, "Internal Server Error");
+        }
+    },
 };
 //# sourceMappingURL=seller.services.js.map

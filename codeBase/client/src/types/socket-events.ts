@@ -18,7 +18,7 @@ export interface ClientToServerEvents {
 
 export interface NotificationPayload {
   id: string;
-  user: string;
+  user?: string;
   type: string;
   title: string;
   message: string;

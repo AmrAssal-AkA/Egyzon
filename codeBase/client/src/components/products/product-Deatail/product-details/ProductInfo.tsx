@@ -25,6 +25,7 @@ interface ProductInfoProps {
   rating: number;
   reviewCount: number;
   price: number;
+  discount?: number;
   inStock: boolean;
   stock: number;
   seller: Seller;
@@ -37,12 +38,19 @@ export default function ProductInfo({
   rating,
   reviewCount,
   price,
+  discount = 0,
   inStock,
   stock,
   seller,
   thumbnail,
 }: ProductInfoProps) {
   const [quantity, setQuantity] = useState(1);
+
+  const numPrice = typeof price === "number" ? price : Number(price) || 0;
+  const numDiscount = typeof discount === "number" ? discount : Number(discount) || 0;
+  const hasDiscount = numDiscount > 0 && numDiscount < 100;
+  const discountedPrice = hasDiscount ? numPrice * (1 - numDiscount / 100) : numPrice;
+  const finalPrice = hasDiscount ? discountedPrice : numPrice;
 
   const handleAddToCart = () => {
     toast.success(`Added ${quantity} x "${title}" to your cart!`);
@@ -97,11 +105,25 @@ export default function ProductInfo({
 
       {/* Price */}
       <div className="border-t border-border pt-4">
-        <div className="flex items-baseline gap-2">
-          <span className="text-3xl font-bold text-foreground tracking-tight">
-            {price.toFixed(2)} EGP
-          </span>
-        </div>0
+        <div className="flex items-baseline gap-3 flex-wrap">
+          {hasDiscount ? (
+            <>
+              <span className="text-xl text-muted-foreground line-through">
+                {numPrice.toFixed(2)} EGP
+              </span>
+              <span className="text-3xl font-bold text-foreground tracking-tight">
+                {discountedPrice.toFixed(2)} EGP
+              </span>
+              <span className="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-md bg-rose-500/10 text-rose-600 dark:text-rose-400">
+                {Math.round(numDiscount)}% OFF
+              </span>
+            </>
+          ) : (
+            <span className="text-3xl font-bold text-foreground tracking-tight">
+              {numPrice.toFixed(2)} EGP
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Selector & Actions */}
@@ -115,7 +137,7 @@ export default function ProductInfo({
           onAddToCart={handleAddToCart}
           productId={id}
           productTitle={title}
-          productPrice={price}
+          productPrice={finalPrice}
           productThumbnail={thumbnail}
           onAddToWishlist={handleAddToWishlist}
           isAvailable={inStock}

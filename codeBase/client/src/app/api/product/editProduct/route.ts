@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import axios from "axios";
-
 import { serverClient } from "@/lib/serverClient";
 
 async function handleEdit(req: NextRequest) {
@@ -22,90 +21,74 @@ async function handleEdit(req: NextRequest) {
     let productId = searchParams.get("productId") || searchParams.get("id");
 
     const contentType = req.headers.get("content-type") || "";
-    let payload: {
-      discount: number;
-      productName: string;
-      productDescription: string;
-      price: number;
-      category: string;
-      stock: number;
-    } = {
-      discount: 0,
-      productName: "",
-      productDescription: "",
-      price: 0,
-      category: "",
-      stock: 0,
-    };
+    const outgoing = new FormData();
 
-    if (contentType.includes("application/json")) {
-      const body = await req.json();
-      if (!productId) {
-        productId = body.productId || body.id || body._id;
-      }
-      payload = {
-        discount: body.discount !== undefined ? Number(body.discount) : 0,
-        productName: body.productName || body.name || "",
-        productDescription: body.productDescription || body.description || "",
-        price: body.price !== undefined ? Number(body.price) : 0,
-        category: body.category || "",
-        stock: body.stock !== undefined ? Number(body.stock) : 0,
-      };
-    } else if (
-      contentType.includes("multipart/form-data") ||
-      contentType.includes("application/x-www-form-urlencoded")
-    ) {
+    if (contentType.includes("multipart/form-data")) {
       const incoming = await req.formData();
-      if (!productId) {
-        productId = (incoming.get("productId") ||
-          incoming.get("id") ||
-          incoming.get("_id")) as string;
+
+      for (const [key, value] of incoming.entries()) {
+        if (key === "productId" || key === "id" || key === "_id") {
+          if (!productId && typeof value === "string") {
+            productId = value;
+          }
+        }
+        if (value instanceof File) {
+          outgoing.append(key, value, value.name);
+        } else {
+          outgoing.append(key, value);
+        }
       }
-      payload = {
-        discount: incoming.has("discount") ? Number(incoming.get("discount")) : 0,
-        productName: (incoming.get("productName") || incoming.get("name") || "") as string,
-        productDescription: (incoming.get("productDescription") || incoming.get("description") || "") as string,
-        price: incoming.has("price") ? Number(incoming.get("price")) : 0,
-        category: (incoming.get("category") || "") as string,
-        stock: incoming.has("stock") ? Number(incoming.get("stock")) : 0,
-      };
+
+      // Aliases handling
+      if (!outgoing.has("productName") && incoming.has("name")) {
+        outgoing.append("productName", incoming.get("name") as string);
+      }
+      if (!outgoing.has("productDescription") && incoming.has("description")) {
+        outgoing.append("productDescription", incoming.get("description") as string);
+      }
     } else {
+      // JSON payload
       try {
         const body = await req.json();
         if (!productId) {
           productId = body.productId || body.id || body._id;
         }
-        payload = {
-          discount: body.discount !== undefined ? Number(body.discount) : 0,
-          productName: body.productName || body.name || "",
-          productDescription: body.productDescription || body.description || "",
-          price: body.price !== undefined ? Number(body.price) : 0,
-          category: body.category || "",
-          stock: body.stock !== undefined ? Number(body.stock) : 0,
-        };
+
+        const name = body.productName || body.name;
+        const description = body.productDescription || body.description;
+
+        if (name !== undefined) outgoing.append("productName", String(name));
+        if (description !== undefined) outgoing.append("productDescription", String(description));
+        if (body.price !== undefined) outgoing.append("price", String(body.price));
+        if (body.discount !== undefined) outgoing.append("discount", String(body.discount));
+        if (body.category !== undefined) outgoing.append("category", String(body.category));
+        if (body.stock !== undefined) outgoing.append("stock", String(body.stock));
+
+        if (Array.isArray(body.image)) {
+          body.image.forEach((img: string) => outgoing.append("image", img));
+        } else if (typeof body.image === "string") {
+          outgoing.append("image", body.image);
+        }
       } catch {
-        // Empty or non-JSON body
+        // Body was empty or not JSON
       }
     }
 
     if (!productId) {
       return NextResponse.json(
-        { success: false, message: "Product ID is required." },
+        { success: false, message: "Product ID is required for editing." },
         { status: 400 }
       );
     }
 
-    const backendRes = await serverClient.patch(
-      `/api/product/seller/product/${productId}`,
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      }
-    );
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    const backendRes = await serverClient.put(`/api/product/seller/${productId}`, outgoing, {
+      headers,
+      withCredentials: true,
+    });
 
     const data = backendRes.data;
 
@@ -133,11 +116,11 @@ async function handleEdit(req: NextRequest) {
   }
 }
 
-export async function PATCH(req: NextRequest) {
+export async function PUT(req: NextRequest) {
   return handleEdit(req);
 }
 
-export async function PUT(req: NextRequest) {
+export async function PATCH(req: NextRequest) {
   return handleEdit(req);
 }
 

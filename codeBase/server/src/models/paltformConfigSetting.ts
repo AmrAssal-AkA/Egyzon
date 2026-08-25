@@ -3,6 +3,7 @@ import {IPlatformConfig }from "../types/platformConfig.types";
 
 const PlatformConfigSettingSchema = new Schema<IPlatformConfig>({
     PlatformFeePercentage: { type: Number, required: true },
+    taxRate: { type: Number, required: true },
     updatedBy: { type: Schema.Types.ObjectId, ref: "Admin", required: true },
     updateAt: { type: Date, default: Date.now },
 })

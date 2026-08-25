@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Package,
+  BadgePercentIcon
 } from "lucide-react";
 import { Product } from "@/types/product.type";
 import {
@@ -28,6 +29,7 @@ interface ProductViewerProps {
   categoryFilter?: string;
   onEditProduct?: (product: Product) => void;
   onDeleteProduct?: (id: string | number) => void | Promise<void>;
+  onApplyDiscount?: (product: Product) => void;
 }
 
 export default function ProductViewer({
@@ -37,6 +39,7 @@ export default function ProductViewer({
   categoryFilter = "all",
   onEditProduct,
   onDeleteProduct,
+  onApplyDiscount,
 }: ProductViewerProps) {
   const [products, setProducts] = useState<Product[]>(productsList);
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
@@ -69,10 +72,17 @@ export default function ProductViewer({
       )
         return false;
 
+      const productCat =
+        typeof p.category === "object" && p.category !== null
+          ? (p.category as any).categoryName || (p.category as any).name || ""
+          : typeof p.category === "string"
+            ? p.category
+            : "";
+
       // Category filter
       if (
         categoryFilter !== "all" &&
-        (p.category || "").toLowerCase() !== categoryFilter.toLowerCase()
+        productCat.toLowerCase() !== categoryFilter.toLowerCase()
       ) {
         return false;
       }
@@ -82,7 +92,7 @@ export default function ProductViewer({
         const query = searchQuery.toLowerCase();
         const productName = (p.name || p.productName || "").toLowerCase();
         const productSku = (p.sku || "").toLowerCase();
-        const productCategory = (p.category || "").toLowerCase();
+        const productCategory = productCat.toLowerCase();
         const matchesName = productName.includes(query);
         const matchesSku = productSku.includes(query);
         const matchesCat = productCategory.includes(query);
@@ -139,6 +149,10 @@ export default function ProductViewer({
       handleDeleteItem(id);
     });
     setSelectedIds([]);
+  };
+
+  const handleProductDiscount = (product: Product) => {
+    onApplyDiscount?.(product);
   };
 
   // Status badge styling helper
@@ -264,7 +278,12 @@ export default function ProductViewer({
                   const displaySku =
                     product.sku ||
                     (prodId ? `SKU-${String(prodId).slice(-6)}` : "SKU-N/A");
-                  const displayCategory = product.category || "General";
+                  const displayCategory =
+                    typeof product.category === "object" && product.category !== null
+                      ? (product.category as any).categoryName || (product.category as any).name || "General"
+                      : typeof product.category === "string" && product.category.trim() !== ""
+                        ? product.category
+                        : "General";
                   const imageSrc = Array.isArray(product.imageUrl)
                     ? product.imageUrl[0]
                     : typeof product.imageUrl === "string"
@@ -367,7 +386,14 @@ export default function ProductViewer({
                       {/* Action Buttons */}
                       <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
-                          <button
+                          <button 
+                            onClick={() => handleProductDiscount(product)}
+                            title="Apply discount"
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-all cursor-pointer"
+                          >
+                            <BadgePercentIcon className="w-5 h-5" />
+                          </button>
+                          <button 
                             onClick={() => onEditProduct?.(product)}
                             title="Edit product"
                             className="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-all cursor-pointer"

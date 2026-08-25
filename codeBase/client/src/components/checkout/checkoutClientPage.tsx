@@ -1,9 +1,9 @@
 "use client";
-import Link from "next/link";
+
 import React, { useState, useMemo, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-
 
 import {
   ArrowLeft,
@@ -17,19 +17,16 @@ import {
   FileText,
   Loader2,
 } from "lucide-react";
-import { useCartStore } from "@/stores/buyer/useCart";
 import { toast } from "sonner";
-import {
-  ShippingInfo,
-  ValidationErrors,
-} from "@/types/cart.type";
+
+import { useCartStore } from "@/stores/buyer/useCart";
+import { ShippingInfo, ValidationErrors } from "@/types/cart.type";
 import { PaymentMethodType } from "@/types/order.types";
 import { placeOrder } from "@/services/checkoutService";
 import { useAuth } from "@/hooks/useAuth";
 
-
 export default function CheckoutClientPage() {
-  const { cartItems, clearCart, syncCartWithServer, setLastOrder, clearLocalCart } = useCartStore();
+  const { cartItems, clearCart, setLastOrder, clearLocalCart } = useCartStore();
   const router = useRouter();
   const { user } = useAuth();
 
@@ -51,10 +48,12 @@ export default function CheckoutClientPage() {
     if (!user) return;
 
     const profileAddress = Array.isArray(user.address)
-      ? user.address.filter((part): part is string => Boolean(part && part.trim())).join(", ")
-      : typeof user.address === "string"
       ? user.address
-      : "";
+          .filter((part): part is string => Boolean(part && part.trim()))
+          .join(", ")
+      : typeof user.address === "string"
+        ? user.address
+        : "";
 
     setShippingInfo((prev) => ({
       ...prev,
@@ -66,7 +65,8 @@ export default function CheckoutClientPage() {
   }, [user]);
 
   const [errors, setErrors] = useState<ValidationErrors>({});
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>("cashOnDelivery");
+  const [paymentMethod, setPaymentMethod] =
+    useState<PaymentMethodType>("cashOnDelivery");
   const [orderNotes, setOrderNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -232,34 +232,54 @@ export default function CheckoutClientPage() {
     }
 
     const cleanNotes = orderNotes.trim()
-      ? orderNotes.trim().replace(/[^a-zA-Z0-9\s-]/g, "").slice(0, 200)
+      ? orderNotes
+          .trim()
+          .replace(/[^a-zA-Z0-9\s-]/g, "")
+          .slice(0, 200)
       : undefined;
     const cleanPhone = shippingInfo.phone.trim().replace(/[\s-]/g, "");
 
     setIsSubmitting(true);
     try {
+      const addressPayload = {
+        address1: shippingInfo.address1
+          .trim()
+          .replace(/[^a-zA-Z0-9\s-]/g, ""),
+        address2: address2Clean
+          ? address2Clean.replace(/[^a-zA-Z0-9\s-]/g, "")
+          : undefined,
+        city: shippingInfo.city.trim().replace(/[^a-zA-Z0-9\s-]/g, ""),
+        state: shippingInfo.state.trim().replace(/[^a-zA-Z0-9\s-]/g, ""),
+        postalCode: shippingInfo.postalCode
+          .trim()
+          .replace(/[^a-zA-Z0-9\s-]/g, ""),
+        country: (shippingInfo.country || "Egypt")
+          .trim()
+          .replace(/[^a-zA-Z0-9\s-]/g, ""),
+      };
+
+      const billingDataPayload = {
+        firstName: shippingInfo.firstName.trim(),
+        lastName: shippingInfo.lastName.trim(),
+        email: user?.email || "customer@egyzon.com",
+        phoneNumber: cleanPhone,
+        apartment: address2Clean ? address2Clean.replace(/[^a-zA-Z0-9\s-]/g, "") : "N/A",
+        floor: "N/A",
+        street: shippingInfo.address1.trim().replace(/[^a-zA-Z0-9\s-]/g, ""),
+        building: "N/A",
+        city: shippingInfo.city.trim().replace(/[^a-zA-Z0-9\s-]/g, ""),
+        state: shippingInfo.state.trim().replace(/[^a-zA-Z0-9\s-]/g, ""),
+        country: (shippingInfo.country || "Egypt").trim().replace(/[^a-zA-Z0-9\s-]/g, ""),
+        postalCode: shippingInfo.postalCode.trim().replace(/[^a-zA-Z0-9\s-]/g, ""),
+      };
+
       const res = await placeOrder({
+        Address: addressPayload,
+        billingData: billingDataPayload,
+        phoneNumber: cleanPhone,
         shippingAddress: fullShippingAddress,
         paymentMethod,
         notes: cleanNotes || undefined,
-        Address: {
-          address1: shippingInfo.address1.trim().replace(/[^a-zA-Z0-9\s-]/g, ""),
-          address2: address2Clean
-            ? address2Clean.replace(/[^a-zA-Z0-9\s-]/g, "")
-            : undefined,
-          city: shippingInfo.city.trim().replace(/[^a-zA-Z0-9\s-]/g, ""),
-          state: shippingInfo.state.trim().replace(/[^a-zA-Z0-9\s-]/g, ""),
-          postalCode: shippingInfo.postalCode
-            .trim()
-            .replace(/[^a-zA-Z0-9\s-]/g, ""),
-          country: (shippingInfo.country || "Egypt")
-            .trim()
-            .replace(/[^a-zA-Z0-9\s-]/g, ""),
-        },
-        phoneNumber:
-          cleanPhone && /^\+?[1-9]\d{1,14}$/.test(cleanPhone)
-            ? cleanPhone
-            : undefined,
       });
 
       const orderData = res.data;
@@ -274,12 +294,13 @@ export default function CheckoutClientPage() {
 
       setLastOrder({
         orderNumber:
-          orderData.orderNumber ||
+          orderData?.orderNumber ||
+          orderData?._id ||
           `EGY-${new Date().getFullYear()}-${Math.floor(
-            100000 + Math.random() * 900000
+            100000 + Math.random() * 900000,
           )}`,
-        orderDate: orderData.orderDate
-          ? new Date(orderData.orderDate).toLocaleDateString("en-US", {
+        orderDate: (orderData?.orderDate || orderData?.createdAt)
+          ? new Date(orderData.orderDate || orderData.createdAt!).toLocaleDateString("en-US", {
               day: "numeric",
               month: "long",
               year: "numeric",
@@ -290,12 +311,12 @@ export default function CheckoutClientPage() {
               year: "numeric",
             }),
         orderItems: [...cartItems],
-        subtotal: orderData.subTotal ?? subtotal,
-        shipping: orderData.shippingFee ?? shipping,
-        tax: orderData.taxAmount ?? taxes,
-        discount: orderData.discount ?? discount,
-        total: orderData.totalAmount ?? grandTotal,
-        orderStatus: orderData.orderStatus || "Confirmed",
+        subtotal: orderData?.subTotal ?? subtotal,
+        shipping: orderData?.shippingFee ?? shipping,
+        tax: orderData?.taxAmount ?? taxes,
+        discount: orderData?.discount ?? discount,
+        total: orderData?.totalAmount ?? grandTotal,
+        orderStatus: orderData?.orderStatus || "Confirmed",
         delivery: {
           method: "Standard Shipping",
           estimatedDelivery: "3-5 business days",
@@ -305,15 +326,14 @@ export default function CheckoutClientPage() {
           type: paymentLabels[paymentMethod] || "Cash on Delivery",
           provider: paymentProviders[paymentMethod] || "Cash Payment",
           last4: paymentMethod === "creditCard" ? "••••" : "COD",
-          status:
-            orderData.paymentStatus === "completed" ? "Paid" : "Pending",
+          status: orderData?.paymentStatus === "completed" ? "Paid" : "Pending",
         },
         summary: {
-          subtotal: orderData.subTotal ?? subtotal,
-          shipping: orderData.shippingFee ?? shipping,
-          tax: orderData.taxAmount ?? taxes,
-          discount: orderData.discount ?? discount,
-          total: orderData.totalAmount ?? grandTotal,
+          subtotal: orderData?.subTotal ?? subtotal,
+          shipping: orderData?.shippingFee ?? shipping,
+          tax: orderData?.taxAmount ?? taxes,
+          discount: orderData?.discount ?? discount,
+          total: orderData?.totalAmount ?? grandTotal,
           currency: "EGP",
         },
         address: {
@@ -326,12 +346,15 @@ export default function CheckoutClientPage() {
           city: shippingInfo.city,
           governorate: shippingInfo.state,
           postalCode: shippingInfo.postalCode,
+          country: shippingInfo.country || "Egypt",
         },
       });
 
       clearLocalCart();
       toast.success("Order placed successfully!");
-      router.push("/checkout/confirmation");
+        router.push("/checkout/confirmation");
+      
+
     } catch (error: any) {
       toast.error(error.message || "Failed to place order. Please try again.");
     } finally {
@@ -418,7 +441,9 @@ export default function CheckoutClientPage() {
                     className="text-sm font-medium text-foreground"
                   >
                     First Name
-                    {!isProfilePrefilled && <span className="text-destructive"> *</span>}
+                    {!isProfilePrefilled && (
+                      <span className="text-destructive"> *</span>
+                    )}
                   </label>
                   <input
                     type="text"
@@ -455,7 +480,9 @@ export default function CheckoutClientPage() {
                     className="text-sm font-medium text-foreground"
                   >
                     Last Name
-                    {!isProfilePrefilled && <span className="text-destructive"> *</span>}
+                    {!isProfilePrefilled && (
+                      <span className="text-destructive"> *</span>
+                    )}
                   </label>
                   <input
                     type="text"
@@ -492,7 +519,9 @@ export default function CheckoutClientPage() {
                     className="text-sm font-medium text-foreground"
                   >
                     Address Line 1
-                    {!isProfilePrefilled && <span className="text-destructive"> *</span>}
+                    {!isProfilePrefilled && (
+                      <span className="text-destructive"> *</span>
+                    )}
                   </label>
                   <input
                     type="text"
@@ -501,7 +530,9 @@ export default function CheckoutClientPage() {
                     value={shippingInfo.address1}
                     onChange={handleShippingChange}
                     onBlur={handleShippingBlur}
-                    placeholder={isProfilePrefilled ? "" : "123 Main St, Apartment 4B"}
+                    placeholder={
+                      isProfilePrefilled ? "" : "123 Main St, Apartment 4B"
+                    }
                     className={`w-full rounded-xl border bg-background px-4 py-3 text-foreground outline-none transition placeholder:text-muted-foreground focus:ring-2 focus:ring-ring/20 ${
                       errors.address1
                         ? "border-destructive focus:border-destructive animate-shake"
@@ -656,7 +687,9 @@ export default function CheckoutClientPage() {
                     className="text-sm font-medium text-foreground"
                   >
                     Phone Number
-                    {!isProfilePrefilled && <span className="text-destructive"> *</span>}
+                    {!isProfilePrefilled && (
+                      <span className="text-destructive"> *</span>
+                    )}
                   </label>
                   <input
                     type="tel"

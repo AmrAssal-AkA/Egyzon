@@ -6,6 +6,9 @@ import {
   TotalProductsResponse,
   TotalOrdersResponse,
   TotalRevenueResponse,
+  TopSellingProductsResponse,
+  SellerOrdersResponse,
+  TotalInventoryValueResponse,
 } from "@/types/seller";
 
 export const useTotalProducts = () => {
@@ -66,5 +69,59 @@ export const useTotalRevenue = () => {
     mutate,
   };
 };
+
+export const useTopProducts = () => {
+  const { data, error, isLoading, mutate } = useSWR<TopSellingProductsResponse>(
+    "/api/seller/getTopProduct",
+    () => sellerService.getTopProducts(),
+    {
+      revalidateOnFocus: true,
+    }
+  );
+
+  return {
+    topProducts: Array.isArray(data?.data) ? data.data : [],
+    isLoading,
+    error,
+    mutate,
+  };
+};
+
+export const useSellerOrders = () => {
+  const { data, error, isLoading, mutate } = useSWR<SellerOrdersResponse>(
+    "/api/seller/getAllOrders",
+    () => sellerService.getAllOrders(),
+    {
+      revalidateOnFocus: true,
+    }
+  );
+  console.log("data?.data:", data?.data);
+  return {
+    orders: Array.isArray(data?.data) ? data.data : [],
+    isLoading,
+    error,
+    mutate,
+  };
+};
+
+export const useTotalInventoryValue = () => {
+  const { data, error, isLoading, mutate } = useSWR<TotalInventoryValueResponse>(
+    "/api/seller/getTotalInventoryValue",
+    () => sellerService.getTotalInventoryValue(),
+    {
+      revalidateOnFocus: true,
+    }
+  );
+
+  return {
+    totalInventoryValue: data?.data?.totalInventoryValue ?? 0,
+    isLoading,
+    error,
+    mutate,
+  };
+};
+
+
+
 
 

@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrderService = void 0;
+const customerModel_1 = __importDefault(require("../models/customerModel"));
 const order_type_1 = require("../types/order.type");
 const AppError_1 = require("../utils/AppError");
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -16,11 +17,15 @@ class OrderService {
         this.product = product;
     }
     async placeOrder(input) {
+        const customerId = input.customerId;
         const client = await (0, client_1.initializeRedisClient)();
-        const userCartKey = (0, keys_1.cartkeyUserById)(input.customerId);
+        const userCartKey = (0, keys_1.cartkeyUserById)(customerId);
         const cartRaw = await client.get(userCartKey);
+        const customer = await customerModel_1.default.findById(customerId);
         if (!cartRaw)
             throw new AppError_1.AppError(400, "Cart is empty");
+        if (!customer)
+            throw new AppError_1.AppError(404, "Customer not found");
         let cartItems = [];
         let cartKeyToDelete = null;
         try {
@@ -103,6 +108,7 @@ class OrderService {
                 Address: input.Address,
             });
             await order.save({ session });
+            await customerModel_1.default.findByIdAndUpdate(customerId, { $push: { orders: order._id } }, { session });
             await session.commitTransaction();
             try {
                 const keysToDelete = [userCartKey];

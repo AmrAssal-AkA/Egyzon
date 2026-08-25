@@ -9,6 +9,7 @@ import DashboardLayout from './pages/(dashboard)/layout';
 import DashBoardPage from './pages/(dashboard)/dashboard';
 import Users from './pages/(dashboard)/users';
 import SellerManagement from './pages/(dashboard)/sellerManagement';
+import StoreSetting from './pages/(dashboard)/Setting';
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Route path="/dashboard" element={<DashBoardPage />} />
           <Route path="/users" element={<Users />} />
           <Route path="/sellerManagement" element={<SellerManagement />} />
+          <Route path="/storeSetting" element={<StoreSetting />} />
         </Route>
       </Route>
     </Routes>

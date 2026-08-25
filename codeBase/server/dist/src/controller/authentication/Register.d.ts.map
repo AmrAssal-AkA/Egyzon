@@ -1,1 +1,1 @@
-{"version":3,"file":"Register.d.ts","sourceRoot":"","sources":["../../../../src/controller/authentication/Register.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAY5C,QAAA,MAAM,YAAY,aAAoB,GAAG,OAAO,QAAQ,OAAO,OAAO,4DAgErE,CAAC;eAEa,YAAY"}
+{"version":3,"file":"Register.d.ts","sourceRoot":"","sources":["../../../../src/controller/authentication/Register.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAY5C,QAAA,MAAM,YAAY,aAAoB,GAAG,OAAO,QAAQ,OAAO,OAAO,4DA+DrE,CAAC;eAEa,YAAY"}

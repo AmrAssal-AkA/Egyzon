@@ -1,4 +1,5 @@
 import axios from "axios";
+
 import { apiClient } from "@/lib/apiClient";
 import { PlaceOrderRequest, PlaceOrderApiResponse } from "@/types/order.types";
 
@@ -15,6 +16,9 @@ export const placeOrder = async (
         },
       }
     );
+    if (res.status === 201 && formData.paymentMethod === "creditCard") {
+      window.location.href = res.data.data?.paymentUrl || "";
+    }
     return res.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {

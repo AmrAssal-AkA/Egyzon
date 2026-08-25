@@ -7,6 +7,7 @@ import ProductViewer from "./_components/productViewer";
 import AddProductModel from "./_components/AddProductModel";
 import AnalyticStatusCart from "./_components/AnalyticStatusCard";
 import { sellerService } from "@/services/sellerService";
+import { useTotalInventoryValue } from "@/hooks/useSeller";
 import { SellerProduct } from "@/types/seller";
 import { Product } from "@/types/product.type";
 import { toast } from "sonner";
@@ -20,7 +21,15 @@ export default function ProductsContainer() {
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDiscountOnly, setIsDiscountOnly] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  // Total Inventory Value from Backend API
+  const {
+    totalInventoryValue,
+    isLoading: isInventoryValueLoading,
+    mutate: mutateInventoryValue,
+  } = useTotalInventoryValue();
 
   const loadProducts = useCallback(async () => {
     try {
@@ -104,11 +113,19 @@ export default function ProductsContainer() {
 
   const handleOpenAddModal = () => {
     setEditingProduct(null);
+    setIsDiscountOnly(false);
     setIsModalOpen(true);
   };
 
   const handleOpenEditModal = (product: Product) => {
     setEditingProduct(product);
+    setIsDiscountOnly(false);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenDiscountModal = (product: Product) => {
+    setEditingProduct(product);
+    setIsDiscountOnly(true);
     setIsModalOpen(true);
   };
 
@@ -128,24 +145,33 @@ export default function ProductsContainer() {
 
       if (editingProduct) {
         const targetId = editingProduct.id ?? editingProduct._id;
+        const displayName = savedData.name || savedData.productName || editingProduct.name || editingProduct.productName;
+        const displayDesc = savedData.description || savedData.productDescription || editingProduct.description || editingProduct.productDescription;
+        const displayImg = savedData.imageUrl || savedData.image || editingProduct.imageUrl || editingProduct.image;
         setProducts((prev) =>
           prev.map((p) =>
             (p.id ?? p._id) === targetId
               ? {
                   ...p,
-                  name: savedData.name,
-                  productName: savedData.name,
-                  category: savedData.category,
-                  price: savedData.price,
-                  stock: savedData.stock,
+                  name: displayName,
+                  productName: displayName,
+                  description: displayDesc,
+                  productDescription: displayDesc,
+                  category: savedData.category || p.category,
+                  price: savedData.price ?? p.price,
+                  discount: savedData.discount ?? p.discount,
+                  stock: savedData.stock ?? p.stock,
                   status: computedStatus,
+                  imageUrl: displayImg,
+                  image: displayImg,
                 }
               : p,
           ),
         );
       } else {
         const newProd: Product = {
-          id: Date.now(),
+          id: String(Date.now()),
+          _id: String(Date.now()),
           name: savedData.name,
           productName: savedData.name,
           category: savedData.category,
@@ -161,14 +187,11 @@ export default function ProductsContainer() {
         setProducts((prev) => [newProd, ...prev]);
       }
     }
-    // Refresh products list from server
+    // Refresh products list and inventory value from server
     loadProducts();
+    mutateInventoryValue();
     setIsModalOpen(false);
   };
-
-  const totalVal = useMemo(() => {
-    return products.reduce((acc, p) => acc + p.price * p.stock, 0);
-  }, [products]);
 
   const inStockRate = useMemo(() => {
     if (products.length === 0) return 0;
@@ -187,6 +210,7 @@ export default function ProductsContainer() {
         toast.success(response.message || "Product deleted successfully");
         setProducts((prev) => prev.filter((p) => (p.id ?? p._id) !== id));
         loadProducts();
+        mutateInventoryValue();
       } else {
         toast.error(response?.message || "Failed to delete product");
       }
@@ -224,11 +248,15 @@ export default function ProductsContainer() {
           categoryFilter={categoryFilter}
           onEditProduct={handleOpenEditModal}
           onDeleteProduct={handleDeleteProduct}
+          onApplyDiscount={handleOpenDiscountModal}
         />
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <AnalyticStatusCart totalInventoryVal={totalVal || 35000} />
+        <AnalyticStatusCart
+          totalInventoryVal={totalInventoryValue}
+          isLoading={isInventoryValueLoading}
+        />
         <AnalyticStatusCart InStockRate={inStockRate || 50.6} />
         <AnalyticStatusCart ReOrderRequired={reorderCount} />
       </div>
@@ -239,6 +267,7 @@ export default function ProductsContainer() {
           onClose={() => setIsModalOpen(false)}
           onSave={handleSaveProduct}
           editingProduct={editingProduct}
+          isDiscountOnly={isDiscountOnly}
         />
       )}
     </div>

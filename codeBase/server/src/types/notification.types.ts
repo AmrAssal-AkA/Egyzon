@@ -1,8 +1,14 @@
 
+type NotificationType = "info" | "warning" | "error" | "success";
 
-
-export type NotificationType = "info" | "success" | "warning" | "error";
-
+export type createNotificationInput = {
+    user: string;
+    title?: string;
+    type: NotificationType;
+    message: string;
+    isRead?: boolean;
+    createdAt?: Date;
+}
 export interface Notification {
     user: string;
     type: NotificationType;
@@ -10,10 +16,3 @@ export interface Notification {
     isRead: boolean;
     createdAt: Date;
 }
-
-export interface AuthUser {
-    userId: string;
-    role: "seller" | "admin";
-    sellerId?: string
-}
-

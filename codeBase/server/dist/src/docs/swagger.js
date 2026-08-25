@@ -24,6 +24,10 @@ exports.swaggerSpec = {
         { name: "Cart", description: "Cart management" },
         { name: "Orders", description: "Order placement" },
         { name: "Wishlist", description: "Wishlist management" },
+        {
+            name: "Notifications",
+            description: "User notification retrieval and read-state management",
+        },
         { name: "Seller", description: "Seller onboarding and store setup" },
         { name: "Categories", description: "Category management" },
         { name: "Customer", description: "Customer account settings" },
@@ -255,6 +259,24 @@ exports.swaggerSpec = {
                 required: ["discount"],
                 properties: {
                     discount: { type: "number", minimum: 0, maximum: 100, example: 15 },
+                },
+            },
+            ProductModifyRequest: {
+                type: "object",
+                properties: {
+                    productName: { type: "string", example: "Wireless Headphones" },
+                    productDescription: {
+                        type: "string",
+                        example: "Noise-cancelling over-ear headphones.",
+                    },
+                    price: { type: "number", example: 199.99 },
+                    discount: { type: "number", example: 15 },
+                    category: { type: "string", example: "electronics" },
+                    stock: { type: "number", example: 50 },
+                    image: {
+                        type: "array",
+                        items: { type: "string", format: "binary" },
+                    },
                 },
             },
             ProductListResponse: {
@@ -579,6 +601,28 @@ exports.swaggerSpec = {
             SellerApplicationListResponse: {
                 type: "array",
                 items: { $ref: "#/components/schemas/SellerApplicationSummary" },
+            },
+            NotificationItem: {
+                type: "object",
+                properties: {
+                    _id: { type: "string" },
+                    user: { type: "string" },
+                    type: {
+                        type: "string",
+                        enum: ["info", "warning", "error", "success"],
+                    },
+                    message: { type: "string" },
+                    isRead: { type: "boolean" },
+                    createdAt: { type: "string", format: "date-time" },
+                },
+            },
+            NotificationListResponse: {
+                type: "array",
+                items: { $ref: "#/components/schemas/NotificationItem" },
+            },
+            NotificationBulkActionResponse: {
+                type: "object",
+                additionalProperties: true,
             },
             AdminSellerSummary: {
                 type: "object",
@@ -1398,6 +1442,89 @@ exports.swaggerSpec = {
                 },
             },
         },
+        "/api/product/seller/{productId}": {
+            put: {
+                tags: ["Products"],
+                summary: "Update seller product details",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: "productId",
+                        in: "path",
+                        required: true,
+                        schema: { type: "string" },
+                    },
+                ],
+                requestBody: {
+                    required: true,
+                    content: {
+                        "multipart/form-data": {
+                            schema: { $ref: "#/components/schemas/ProductModifyRequest" },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: "Product updated successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: { $ref: "#/components/schemas/ProductItem" },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    400: {
+                        description: "Bad Request",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Forbidden",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    404: {
+                        description: "Product not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    500: {
+                        description: "Internal Server Error",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
         "/api/cart": {
             get: {
                 tags: ["Cart"],
@@ -1663,6 +1790,176 @@ exports.swaggerSpec = {
                         content: {
                             "application/json": {
                                 schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/notifications": {
+            get: {
+                tags: ["Notifications"],
+                summary: "Get the current user's notifications",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: "Notifications retrieved successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: {
+                                                    $ref: "#/components/schemas/NotificationListResponse",
+                                                },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/notifications/{id}/markAsRead": {
+            patch: {
+                tags: ["Notifications"],
+                summary: "Mark a notification as read",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: "id",
+                        in: "path",
+                        required: true,
+                        schema: { type: "string" },
+                    },
+                ],
+                responses: {
+                    200: {
+                        description: "Notification marked as read successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: { $ref: "#/components/schemas/NotificationItem" },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    400: {
+                        description: "Notification ID is required",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    404: {
+                        description: "Notification not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/notifications/markAllAsRead": {
+            patch: {
+                tags: ["Notifications"],
+                summary: "Mark all notifications as read for the current user",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: "All notifications marked as read successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: {
+                                                    $ref: "#/components/schemas/NotificationBulkActionResponse",
+                                                },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/notifications/clear": {
+            delete: {
+                tags: ["Notifications"],
+                summary: "Clear all notifications for the current user",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: "All notifications cleared successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: {
+                                                    $ref: "#/components/schemas/NotificationBulkActionResponse",
+                                                },
+                                            },
+                                        },
+                                    ],
+                                },
                             },
                         },
                     },

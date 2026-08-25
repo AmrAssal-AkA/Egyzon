@@ -9,12 +9,28 @@ export interface OrderAddressPayload {
   country: string;
 }
 
+export interface BillingDataPayload {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  apartment?: string;
+  floor?: string;
+  street?: string;
+  building?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  postalCode?: string;
+}
+
 export interface PlaceOrderRequest {
-  shippingAddress: string;
-  paymentMethod: PaymentMethodType;
-  notes?: string;
   Address: OrderAddressPayload;
-  phoneNumber?: string;
+  billingData: BillingDataPayload;
+  phoneNumber: string;
+  shippingAddress?: string;
+  paymentMethod?: PaymentMethodType;
+  notes?: string;
 }
 
 export interface IOrderItemResponse {
@@ -28,20 +44,25 @@ export interface IOrderResponse {
   _id?: string;
   orderNumber?: string;
   customer?: string;
-  orderDate: string;
-  orderStatus: string;
-  subTotal: number;
-  discount: number;
-  shippingFee: number;
-  taxAmount: number;
-  totalAmount: number;
-  paymentStatus: string;
-  paymentMethod: {
+  orderDate?: string;
+  orderStatus?: string;
+  subTotal?: number;
+  discount?: number;
+  shippingFee?: number;
+  taxAmount?: number;
+  totalAmount?: number;
+  paymentStatus?: string;
+  paymentMethod?: {
     method: PaymentMethodType;
     details?: string;
   };
+  paymentUrl?: string;
   notes?: string;
-  orderItems: IOrderItemResponse[];
+  orderItems?: IOrderItemResponse[];
+  address?: OrderAddressPayload;
+  billingData?: BillingDataPayload;
+  phoneNumber?: string;
+  details?: string;
   createdAt?: string;
   updatedAt?: string;
 }

@@ -7,6 +7,7 @@ exports.ProductServices = void 0;
 const productModel_1 = __importDefault(require("../models/productModel"));
 const AppError_1 = require("../utils/AppError");
 const categoryModel_1 = __importDefault(require("../models/categoryModel"));
+const sellerModel_1 = __importDefault(require("../models/sellerModel"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const client_1 = require("../config/client");
 const Soft_TTL_Safely = 60 * 10; // 10 minutes
@@ -63,16 +64,37 @@ exports.ProductServices = {
     },
     // Service function to update a product by a seller
     UpdateProduct: async (sellerId, productId, productData) => {
+        const seller = await sellerModel_1.default.findById(sellerId);
+        if (!seller)
+            throw new AppError_1.AppError(404, "Seller not found");
         const isObjectId = mongoose_1.default.Types.ObjectId.isValid(productId);
         const query = isObjectId
             ? { _id: productId, sellerId }
             : { sku: productId, sellerId };
         const product = await productModel_1.default.findOne(query);
-        if (!product) {
+        if (!product)
             throw new AppError_1.AppError(404, "Product not found");
+        if (product.sellerId.toString() !== sellerId) {
+            throw new AppError_1.AppError(403, "Unauthorized to update this product");
         }
-        Object.assign(product, productData);
-        return await product.save();
+        const category = await categoryModel_1.default.findOne({
+            categoryName: productData.category,
+        });
+        if (!category) {
+            throw new AppError_1.AppError(404, "Category not found");
+        }
+        if (!product)
+            throw new AppError_1.AppError(404, "Product not found");
+        const EditProduct = await productModel_1.default.findByIdAndUpdate(productId, {
+            productName: productData.productName,
+            description: productData.description,
+            price: productData.price !== undefined ? Number(productData.price) : undefined,
+            discount: productData.discount !== undefined ? Number(productData.discount) : undefined,
+            stock: productData.stock !== undefined ? Number(productData.stock) : undefined,
+            category: productData.category,
+            imageUrl: productData.imageUrl,
+        }, { new: true });
+        return EditProduct;
     },
     // Service function to get all products with pagination
     getAllProducts: async (page, limit) => {

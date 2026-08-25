@@ -71,5 +71,17 @@ export const SellerController = {
     }catch(error){
        return sendErrorResponse(res, 500, "internal server error")
     }
+  },
+  changeOrderStatus: async (req: Request, res: Response) => {
+    try {
+      const sellerId = req.user?.userId;
+      const seller = req.user?.role;
+      if(!sellerId || seller !== "seller") return sendErrorResponse(res, 403, "Forbidden", "You are not authorized to access this resource");
+      const { orderId, newStatus } = req.body;
+      const updatedOrder = await SellerServices.changeOrderStatus(sellerId, orderId, newStatus);
+      return sendSuccessResponse(res, 200, "Order status updated successfully", updatedOrder);
+    }catch(error){
+      return sendErrorResponse(res, 500, "Internal Server Error")
+    }
   }
 }

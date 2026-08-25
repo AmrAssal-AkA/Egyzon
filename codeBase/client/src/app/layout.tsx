@@ -9,6 +9,7 @@ import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/provider/theme-provider";
 import { AuthProvider } from "@/contexts/AuthContext";
+import NotificationListener from '@/components/seller/common/NotificationListener'
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -30,7 +31,8 @@ export default function RootLayout({children} : Readonly<{children: React.ReactN
           >
             <AuthProvider>
               {children}
-              <Toaster position="top-right" />
+              <Toaster position="bottom-right" />
+              <NotificationListener />
             </AuthProvider>
           </ThemeProvider>
       </body>

@@ -4,7 +4,7 @@ import {IWishlist} from '../types/wishlist.types';
 const wishlistSchema = new Schema<IWishlist>({
     userId: {
         type: Schema.Types.ObjectId,
-        ref: 'Customer',
+        ref: 'customer',
         required: true,
         unique: true
     },

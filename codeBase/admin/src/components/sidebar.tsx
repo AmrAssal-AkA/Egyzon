@@ -23,7 +23,7 @@ export default function SideBarMenu() {
       icon: Package,
     },
     { id: 4, label: "Financial", path: "/financial", icon: PoundSterling },
-    { id: 5, label: "Settings", path: "/settings", icon: Settings },
+    { id: 5, label: "Settings", path: "/storeSetting", icon: Settings },
   ];
   const {admin, logout } = useAuth();
 

@@ -34,7 +34,7 @@ function RegisterForm() {
         setError(message);
         return;
       }
-      console.log("Registration successful, redirecting to dashboard...", res);
+      console.log("Registration response:", res);
       toast.success("Registration successful!");
       router.push("/");
     } catch (error: unknown) {

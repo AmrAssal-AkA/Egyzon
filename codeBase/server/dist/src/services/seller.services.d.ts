@@ -1,3 +1,4 @@
+import type { OrderStatus } from "../types/order.type";
 export declare const SellerServices: {
     ApplyAsPartner: (sellerData: any, userId: string) => Promise<import("mongodb").WithId<import("bson").Document> | null>;
     checkExistingSeller: (userId: string) => Promise<null>;
@@ -15,8 +16,11 @@ export declare const SellerServices: {
     getTotalRevenue: (sellerId: string) => Promise<{
         totalRevenue: number;
     }>;
-    getTopProductsByRevenue: (sellerId: string, limit?: number) => Promise<{
+    getTopProductsByRevenue: (sellerId: string) => Promise<{
         productId: string;
+        name: string;
+        image: string | null;
+        sales: number;
         revenue: number;
     }[]>;
     getAllOrders: (sellerId: string) => Promise<(import("mongoose").Document<unknown, {}, import("../types/order.type").IOrder, {}, import("mongoose").DefaultSchemaOptions> & import("../types/order.type").IOrder & Required<{
@@ -29,5 +33,6 @@ export declare const SellerServices: {
     totalInventoryValue: (sellerId: string) => Promise<{
         totalInventoryValue: number;
     }>;
+    changeOrderStatus: (sellerId: string, orderId: string, newStatus: OrderStatus) => Promise<void>;
 };
 //# sourceMappingURL=seller.services.d.ts.map

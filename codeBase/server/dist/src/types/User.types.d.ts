@@ -51,6 +51,7 @@ export interface ISeller extends IUser {
     wallet: Types.ObjectId;
     contary: string;
     applicantStatus: 'pending' | 'under-review' | 'additional_docs_requested' | 'approved' | 'rejected';
+    products: Types.ObjectId[];
     notes: string;
     createdAt: Date;
 }

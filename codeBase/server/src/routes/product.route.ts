@@ -14,6 +14,7 @@ router.post('/addProduct', isAuthenticated, Authorize(userRole.Seller), upload.a
 router.patch('/seller/product/:productId', isAuthenticated, Authorize(userRole.Seller), validate(updateProductSchema), productController.applyDiscount);
 router.get("/:productId", productController.getProductById)
 router.get("/seller/products", isAuthenticated, Authorize(userRole.Seller), productController.getSellerProducts);
+router.put("/seller/:productId", isAuthenticated, Authorize(userRole.Seller), upload.array('image', 3), validate(updateProductSchema), productController.updateProduct);
 router.delete("/seller/product/:productId", isAuthenticated, Authorize(userRole.Seller), productController.deleteProduct);
 
 export default router;
