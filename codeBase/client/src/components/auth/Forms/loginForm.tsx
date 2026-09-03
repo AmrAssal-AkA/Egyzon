@@ -7,7 +7,6 @@ import { toast } from "sonner";
 
 import { useAuth } from "@/hooks/useAuth";
 
-
 function LoginForm() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [formData, setFormData] = useState({
@@ -41,7 +40,9 @@ function LoginForm() {
       const message =
         (error as { response?: { data?: { message?: string } } })?.response
           ?.data?.message ||
-        (error instanceof Error ? error.message : "Login failed");
+        (error instanceof Error
+          ? error.message
+          : "An error occurred during login");
       toast.error(message);
       setError(message);
     } finally {
@@ -51,7 +52,7 @@ function LoginForm() {
   return (
     <div className="space-y-6">
       <div className="space-y-3">
-        <button 
+        <button
           type="button"
           onClick={continueWithGoogle}
           className="flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background cursor-pointer"
@@ -71,7 +72,10 @@ function LoginForm() {
 
       <form className="space-y-5" onSubmit={handleSubmit}>
         <div className="space-y-2">
-          <label htmlFor="email" className="text-sm font-medium text-foreground">
+          <label
+            htmlFor="email"
+            className="text-sm font-medium text-foreground"
+          >
             Email
           </label>
           <input
@@ -80,7 +84,9 @@ function LoginForm() {
             placeholder="you@example.com"
             className="w-full rounded-xl border border-input bg-background px-4 py-3 text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20"
             value={formData.Email}
-            onChange={(e) => setFormData({ ...formData, Email: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, Email: e.target.value })
+            }
           />
         </div>
         <div className="space-y-2">
@@ -97,7 +103,9 @@ function LoginForm() {
               placeholder="Enter your password"
               className="w-full rounded-xl border border-input bg-background px-4 py-3 text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20"
               value={formData.Password}
-              onChange={(e) => setFormData({ ...formData, Password: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, Password: e.target.value })
+              }
             />
             <button
               type="button"

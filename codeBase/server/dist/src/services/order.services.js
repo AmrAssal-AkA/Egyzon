@@ -10,11 +10,14 @@ const AppError_1 = require("../utils/AppError");
 const mongoose_1 = __importDefault(require("mongoose"));
 const client_1 = require("../config/client");
 const keys_1 = require("../utils/keys");
-const TAX_RATE = 0.14; // 14% tax rate
+const payment_type_1 = require("../types/payment.type");
+const payment_controller_1 = require("../controller/payment.controller");
+// const TAX_RATE = 0.14; // 14% tax rate
 class OrderService {
-    constructor(order, product) {
+    constructor(order, product, paymentService = payment_controller_1.paymentServices) {
         this.order = order;
         this.product = product;
+        this.paymentService = paymentService;
     }
     async placeOrder(input) {
         const customerId = input.customerId;
@@ -30,12 +33,10 @@ class OrderService {
         let cartKeyToDelete = null;
         try {
             const parsed = JSON.parse(cartRaw);
-            if (Array.isArray(parsed)) {
+            if (Array.isArray(parsed))
                 cartItems = parsed;
-            }
-            else if (parsed && Array.isArray(parsed.items)) {
+            else if (parsed && Array.isArray(parsed.items))
                 cartItems = parsed.items;
-            }
         }
         catch {
             const cartKey = (0, keys_1.cartkeyById)(cartRaw);
@@ -44,12 +45,10 @@ class OrderService {
             if (cartData) {
                 try {
                     const parsed = JSON.parse(cartData);
-                    if (Array.isArray(parsed)) {
+                    if (Array.isArray(parsed))
                         cartItems = parsed;
-                    }
-                    else if (parsed && Array.isArray(parsed.items)) {
+                    else if (parsed && Array.isArray(parsed.items))
                         cartItems = parsed.items;
-                    }
                 }
                 catch (e) {
                     console.error("Failed to parse cartData:", e);
@@ -58,8 +57,14 @@ class OrderService {
         }
         if (!cartItems || cartItems.length === 0)
             throw new AppError_1.AppError(400, "Cart is empty");
+        {
+            /*1. DB Transaction  */
+        }
         const session = await mongoose_1.default.startSession();
         session.startTransaction();
+        let order;
+        let paymobProuducts = [];
+        let totalAmount = 0;
         try {
             const orderItems = [];
             let subtotal = 0;
@@ -72,54 +77,54 @@ class OrderService {
                     throw new AppError_1.AppError(404, `Product with ID ${i.productId} not found`);
                 if (product.stock < i.quantity)
                     throw new AppError_1.AppError(400, `out of stock for product ${product.productName}`);
-                const originalPrice = product.price;
-                const unitPrice = originalPrice - (originalPrice * product.discount) / 100;
+                const unitPrice = product.price;
                 const itemSubtotal = unitPrice * i.quantity;
-                const itemDiscount = (originalPrice - unitPrice) * i.quantity;
+                const itemDiscount = product.discount
+                    ? (unitPrice * product.discount * i.quantity) / 100
+                    : 0;
+                const itemTotal = itemSubtotal - itemDiscount;
                 subtotal += itemSubtotal;
                 totalDiscount += itemDiscount;
                 orderItems.push({
                     product: product._id,
+                    seller: product.sellerId,
                     quantity: i.quantity,
                     unitPrice,
-                    subtotal: itemSubtotal,
+                    discount: itemDiscount,
+                    total: itemTotal,
+                });
+                paymobProuducts.push({
+                    name: product.productName,
+                    price: itemTotal,
+                    quantity: i.quantity,
+                    description: product.productDescription || "",
                 });
                 product.stock -= i.quantity;
                 await product.save({ session });
             }
-            const shippingFee = subtotal > 1500 ? 0 : subtotal * 100;
-            const taxAmount = subtotal * TAX_RATE;
-            const totalAmount = subtotal + shippingFee + taxAmount;
-            const order = new this.order({
+            const shippingFee = subtotal > 0 ? 10 : 0; // Flat shipping fee
+            const taxAmount = 0;
+            totalAmount = subtotal - totalDiscount + shippingFee + taxAmount;
+            order = new this.order({
                 customer: input.customerId,
                 orderItems,
                 subTotal: subtotal,
                 discount: totalDiscount,
-                shippingFee: shippingFee,
+                shippingFee,
                 taxAmount,
                 totalAmount,
-                paymentStatus: order_type_1.PaymentStatus.pending,
+                paymentStatus: payment_type_1.PaymentStatus.pending,
                 paymentMethod: {
                     method: input.paymentMethod,
                     details: input.shippingAddress,
                 },
                 orderStatus: order_type_1.OrderStatus.pending,
                 notes: input.notes || "",
-                Address: input.Address,
+                address: input.address,
             });
             await order.save({ session });
             await customerModel_1.default.findByIdAndUpdate(customerId, { $push: { orders: order._id } }, { session });
             await session.commitTransaction();
-            try {
-                const keysToDelete = [userCartKey];
-                if (cartKeyToDelete)
-                    keysToDelete.push(cartKeyToDelete);
-                await Promise.all(keysToDelete.map((k) => client.del(k)));
-            }
-            catch (cacherror) {
-                console.error("Error clearing cart cache:", cacherror);
-            }
-            return order;
         }
         catch (error) {
             await session.abortTransaction();
@@ -131,6 +136,52 @@ class OrderService {
         finally {
             session.endSession();
         }
+        // ---------- PHASE 2: post-commit side effects (no session involved) ----------
+        try {
+            const keysToDelete = [userCartKey];
+            if (cartKeyToDelete)
+                keysToDelete.push(cartKeyToDelete);
+            await Promise.all(keysToDelete.map((k) => client.del(k)));
+        }
+        catch (cacherror) {
+            console.error("Error clearing cart cache:", cacherror);
+        }
+        if (input.paymentMethod === "cashOnDelivery") {
+            const payment = await this.paymentService.createCodPayment({
+                amount: totalAmount,
+            });
+            order.payment = payment._id;
+            await order.save();
+            return { order };
+        }
+        if (input.paymentMethod === "creditCard") {
+            if (!input.billingData)
+                throw new AppError_1.AppError(400, "Billing data is required for credit card payment");
+            const paymobBillingData = {
+                firstName: input.billingData.firstName,
+                lastName: input.billingData.lastName,
+                email: input.billingData.email,
+                phoneNumber: input.billingData.phoneNumber,
+                apartment: "NA",
+                floor: "NA",
+                street: input.address.address1,
+                building: input.address.address2 || "NA",
+                city: input.address.city,
+                state: input.address.state,
+                country: input.address.country,
+                postalCode: input.address.postalCode,
+            };
+            const { paymentDoc, paymentUrl } = await this.paymentService.initializePayment({
+                orderMongoId: order._id.toString(),
+                amount: totalAmount,
+                billingData: paymobBillingData,
+                products: paymobProuducts,
+            });
+            order.payment = paymentDoc._id;
+            await order.save();
+            return { order, paymentUrl };
+        }
+        throw new AppError_1.AppError(400, "Invalid payment method");
     }
 }
 exports.OrderService = OrderService;

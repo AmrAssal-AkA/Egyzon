@@ -3,6 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SellerController = void 0;
 const seller_services_1 = require("../services//seller.services");
 const Responses_1 = require("../utils/Responses");
+const AppError_1 = require("../utils/AppError");
+const analytics_services_1 = require("../services/analytics.services");
+const socket_1 = require("../config/socket");
+const analyticalData_types_1 = require("../types/analyticalData.types");
 exports.SellerController = {
     getTotalProducts: async (req, res) => {
         try {
@@ -89,8 +93,62 @@ exports.SellerController = {
             const seller = req.user?.role;
             if (!sellerId || seller !== "seller")
                 return (0, Responses_1.sendErrorResponse)(res, 403, "Forbidden", "You are not authorized to access this resource");
+            const { orderId, newStatus } = req.body;
+            const updatedOrder = await seller_services_1.SellerServices.changeOrderStatus(sellerId, orderId, newStatus);
+            return (0, Responses_1.sendSuccessResponse)(res, 200, "Order status updated successfully", updatedOrder);
         }
         catch (error) {
+            return (0, Responses_1.sendErrorResponse)(res, 500, "Internal Server Error");
+        }
+    },
+    getAvgOrderValue: async (req, res) => {
+        try {
+            const sellerId = req.user?.userId;
+            const seller = req.user?.role;
+            if (!sellerId || seller !== "seller")
+                return (0, Responses_1.sendErrorResponse)(res, 403, "Forbidden", "You are not authorized to access this resource");
+            const avgOrderValue = await seller_services_1.SellerServices.getAvgOrderValue(sellerId);
+            return (0, Responses_1.sendSuccessResponse)(res, 200, "Average order value fetched successfully", avgOrderValue);
+        }
+        catch (error) {
+            if (error instanceof AppError_1.AppError)
+                return (0, Responses_1.sendErrorResponse)(res, error.statusCode, error.status, error.message);
+            return (0, Responses_1.sendErrorResponse)(res, 500, "Internal Server Error");
+        }
+    },
+    salesPerformanceIndicator: async (req, res) => {
+        try {
+            const sellerId = req.user?.userId;
+            const seller = req.user?.role;
+            if (!sellerId || seller !== "seller")
+                return (0, Responses_1.sendErrorResponse)(res, 403, "Forbidden", "You are not authorized to access this resource");
+            const { timeframe } = req.query;
+            const validTimeframes = Object.values(analyticalData_types_1.AnalyticalDateTimeframe);
+            const safeTimeframe = validTimeframes.includes(timeframe) ? timeframe : analyticalData_types_1.AnalyticalDateTimeframe.SEVEN_DAYS;
+            const data = await analytics_services_1.Analytical.getSellerAnalytics(sellerId, safeTimeframe);
+            if ((0, socket_1.isUserConnected)(sellerId)) {
+                (0, socket_1.getIo)().to(`user-${sellerId}`).emit("sales-indicator:subscribe", data);
+            }
+            (0, Responses_1.sendSuccessResponse)(res, 200, "Sales performance indicator fetched successfully", data);
+        }
+        catch (error) {
+            if (error instanceof AppError_1.AppError)
+                return (0, Responses_1.sendErrorResponse)(res, error.statusCode, error.status, error.message);
+            return (0, Responses_1.sendErrorResponse)(res, 500, "Internal Server Error");
+        }
+    },
+    getSalesByCategory: async (req, res) => {
+        try {
+            const sellerId = req.user?.userId;
+            const seller = req.user?.role;
+            if (!sellerId || seller !== "seller")
+                return (0, Responses_1.sendErrorResponse)(res, 403, "Forbidden", "You are not authorized to access this resource");
+            const salesByCategory = await seller_services_1.SellerServices.getSalesByCategory(sellerId);
+            (0, Responses_1.sendSuccessResponse)(res, 200, "Sales by category fetched successfully", salesByCategory);
+        }
+        catch (error) {
+            if (error instanceof AppError_1.AppError)
+                return (0, Responses_1.sendErrorResponse)(res, error.statusCode, error.status, error.message);
             return (0, Responses_1.sendErrorResponse)(res, 500, "Internal Server Error");
         }
     }

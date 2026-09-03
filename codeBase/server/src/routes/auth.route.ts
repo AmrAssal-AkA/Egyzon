@@ -25,6 +25,7 @@ import { isAuthenticated } from "../middleware/Auth.middleware";
 import type { jwtPayload } from "../types/auth.types";
 import { passportAuthMW } from "../middleware/passportAuthMW";
 import { RequestForgetPassword, ForgetPassword } from "../controller/authentication/forgetPassword";
+import {authLimiter} from '../middleware/rateLimiter'
 
 const router = express.Router();
 
@@ -45,13 +46,14 @@ router.get("/me", isAuthenticated, async (req: Request, res: Response) => {
 router.post(
   "/register",
   validate(RegisterSchema),
+  authLimiter,
   (req: Request, res: Response) => {
     const userData = req.body;
     RegisterUser(userData, res, req);
   },
 );
 // Login route
-router.post("/login", validate(LoginSchema), LoginUser);
+router.post("/login",authLimiter, validate(LoginSchema), LoginUser);
 // Refresh token route
 router.patch(
   "/onBoarding",

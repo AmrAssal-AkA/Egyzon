@@ -1,4 +1,5 @@
 import { Document, Types } from 'mongoose';
+import { PaymentStatus } from './payment.type';
 export declare enum OrderStatus {
     pending = "pending",
     processing = "processing",
@@ -6,17 +7,13 @@ export declare enum OrderStatus {
     delivered = "delivered",
     cancelled = "cancelled"
 }
-export declare enum PaymentStatus {
-    pending = "pending",
-    completed = "completed",
-    failed = "failed",
-    refunded = "refunded"
-}
 export interface IOrderItem {
     product: Types.ObjectId;
+    seller: Types.ObjectId;
     quantity: number;
     unitPrice: number;
-    subtotal: number;
+    discount: number;
+    total: number;
 }
 export interface PaymentMethod {
     method: "cashOnDelivery" | "creditCard";
@@ -36,7 +33,7 @@ export interface IOrder extends Document {
     paymentMethod: PaymentMethod;
     payment?: Types.ObjectId;
     notes: string;
-    Address: {
+    address: {
         address1: string;
         address2?: string;
         city: string;
@@ -45,17 +42,5 @@ export interface IOrder extends Document {
         country: string;
     };
     orderItems: IOrderItem[];
-    placeOrder(): Promise<IOrder>;
-    cancelOrder(): Promise<IOrder>;
-    updateOrderStatus(status: OrderStatus): Promise<IOrder>;
-    calculateSubTotal(): number;
-    calculateFullTolal(): number;
-    addOrderItem(item: Omit<IOrderItem, "subTotal">): Promise<IOrder>;
-    removeOrderItem(productId: Types.ObjectId): Promise<IOrder>;
-    getTotalItems(): number;
-    setIsPaid(): Promise<IOrder>;
-    isShipped(): boolean;
-    requestCancellation(): Promise<IOrder>;
-    requestRefund(): Promise<IOrder>;
 }
 //# sourceMappingURL=order.type.d.ts.map

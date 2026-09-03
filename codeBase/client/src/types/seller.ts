@@ -86,6 +86,45 @@ export interface TotalInventoryValueResponse {
   data?: TotalInventoryValueData;
 }
 
+export interface WalletBalanceData {
+  balance: number;
+}
+
+export interface WalletBalanceResponse {
+  success: boolean;
+  message: string;
+  data?: WalletBalanceData;
+}
+
+export interface SalesPerformanceSeriesPoint {
+  label: string;
+  date?: string;
+  revenue: number;
+  orders: number;
+  conversionRate?: number;
+}
+
+export interface SalesPerformancePeak {
+  label: string;
+  date?: string;
+  revenue: number;
+}
+
+export interface SalesPerformanceData {
+  timeframe: string;
+  totalRevenue: number;
+  totalOrders: number;
+  AverageOrderValue?: number;
+  revenueChangePercent?: number;
+  series: SalesPerformanceSeriesPoint[];
+  peak?: SalesPerformancePeak;
+}
+
+export interface SalesPerformanceResponse {
+  success: boolean;
+  message: string;
+  data?: SalesPerformanceData;
+}
 
 export interface TopSellingProductItem {
   _id?: string;
@@ -121,6 +160,26 @@ export interface TopSellingProductsResponse {
   data: TopSellingProductItem[];
 }
 
+export interface AvgOrderValueData {
+  avgOrderValue: number;
+  changePercent?: number;
+  message?: string;
+}
+
+export interface AvgOrderValueResponse {
+  success: boolean;
+  message: string;
+  data?: AvgOrderValueData;
+}
+
+export type SalesByCategoryData = Record<string, number>;
+
+export interface SalesByCategoryResponse {
+  success: boolean;
+  message: string;
+  data?: SalesByCategoryData;
+}
+
 export interface SellerOrderItem {
   product:
     | string
@@ -130,11 +189,14 @@ export interface SellerOrderItem {
         name?: string;
         price?: number;
         imageUrl?: string | string[];
+        image?: string;
         category?: string;
       };
   quantity: number;
   unitPrice: number;
   subtotal: number;
+  imageUrl?: string | string[];
+  image?: string;
 }
 
 export interface SellerOrderCustomer {
@@ -164,7 +226,7 @@ export interface SellerOrder {
     method: string;
     details?: string;
   };
-  Address?: {
+  address?: {
     address1: string;
     address2?: string;
     city: string;
@@ -183,3 +245,14 @@ export interface SellerOrdersResponse {
   message: string;
   data: SellerOrder[];
 }
+
+export type {
+  StoreType,
+  AddressSuggestion,
+  StorefrontFormData,
+  StoreValidationErrors,
+  CreateStoreResponse,
+  BackendStoreManagement,
+  BackendStoreDetails,
+  StoreDetailsResponse,
+} from "@/types/store";

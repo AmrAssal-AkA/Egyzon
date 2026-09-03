@@ -1,9 +1,57 @@
 import React from "react";
-
-import { CreditCard, Check } from "lucide-react";
+import { CreditCard, Check, Clock, X } from "lucide-react";
 import { PaymentMethodsProps } from "@/types/cart.type";
 
 export function PaymentMethods({ payment }: PaymentMethodsProps) {
+  const isCreditCard =
+    payment.type?.toLowerCase().includes("credit") ||
+    payment.type?.toLowerCase().includes("card") ||
+    Boolean(payment.last4 && payment.last4 !== "COD");
+
+  const formattedCardInfo = () => {
+    if (!isCreditCard) {
+      return payment.provider || "Cash on Delivery";
+    }
+
+    const cleanLast4 = payment.last4?.replace(/\D/g, "");
+    if (cleanLast4 && cleanLast4.length === 4) {
+      return `${payment.provider || "Card"} (•••• ${cleanLast4})`;
+    }
+    if (payment.last4 && payment.last4.includes("•")) {
+      return `${payment.provider || "Card"} (${payment.last4})`;
+    }
+    return payment.provider || "Credit Card";
+  };
+
+  const renderStatusBadge = () => {
+    const statusLower = payment.status?.toLowerCase() || "pending";
+
+    if (statusLower === "paid" || statusLower === "completed") {
+      return (
+        <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+          <Check className="w-3 h-3" />
+          Paid
+        </span>
+      );
+    }
+
+    if (statusLower === "failed" || statusLower === "cancelled") {
+      return (
+        <span className="inline-flex items-center gap-1 text-xs font-semibold text-destructive bg-destructive/10 px-2.5 py-1 rounded-full border border-destructive/20">
+          <X className="w-3 h-3" />
+          Failed
+        </span>
+      );
+    }
+
+    return (
+      <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">
+        <Clock className="w-3 h-3" />
+        {payment.status || "Pending"}
+      </span>
+    );
+  };
+
   return (
     <section className="flex flex-col gap-4 bg-card text-card-foreground border border-border rounded-2xl p-6 shadow-2xs">
       <div className="flex items-center gap-2.5 border-b border-border pb-3">
@@ -31,14 +79,11 @@ export function PaymentMethods({ payment }: PaymentMethodsProps) {
             <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
               Provider / Card
             </span>
-            <span className="font-medium text-foreground mt-0.5">
-              {payment.provider} (•••• {payment.last4})
+            <span className="font-medium text-foreground mt-0.5 font-mono">
+              {formattedCardInfo()}
             </span>
           </div>
-          <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
-            <Check className="w-3 h-3" />
-            {payment.status}
-          </span>
+          {renderStatusBadge()}
         </div>
       </div>
     </section>

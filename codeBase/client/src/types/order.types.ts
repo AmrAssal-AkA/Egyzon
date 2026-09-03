@@ -70,5 +70,8 @@ export interface IOrderResponse {
 export interface PlaceOrderApiResponse {
   success: boolean;
   message: string;
-  data: IOrderResponse;
+  data: ({
+    order?: IOrderResponse;
+    paymentUrl?: string;
+  } & IOrderResponse) | null;
 }

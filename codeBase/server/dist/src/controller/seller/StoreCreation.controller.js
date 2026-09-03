@@ -7,6 +7,8 @@ const seller_services_1 = require("../../services/seller.services");
 const Responses_1 = require("../../utils/Responses");
 const cloudainry_config_1 = __importDefault(require("../../config/cloudainry.config"));
 const AppError_1 = require("../../utils/AppError");
+const virusScan_1 = require("../../utils/virusScan");
+const logger_1 = __importDefault(require("../../utils/logger"));
 const createRequestToJoin = async (req, res) => {
     let uploadedCommercialRegister;
     let uploadedTaxCard;
@@ -30,7 +32,23 @@ const createRequestToJoin = async (req, res) => {
             return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "Invalid image format. Only JPE, PNG and JPG are allowed");
         if (!allowedTypes.includes(taxMime))
             return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "Invalid image format. Only JPEG and PNG are allowed");
+        // Check if the user is already a seller
         await seller_services_1.SellerServices.checkExistingSeller(userId);
+        // Scan the uploaded images for viruses
+        for (const file of files.commercialRegisterImage ?? []) {
+            const { isInfected, viruses } = await (0, virusScan_1.scanFile)(file.buffer);
+            if (isInfected) {
+                logger_1.default.warn(`Commercial Register Image is infected with viruses: ${viruses.join(", ")}`);
+                return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", `Commercial Register Image is infected with viruses: ${viruses.join(", ")}`);
+            }
+        }
+        for (const file of files.taxCardImage ?? []) {
+            const { isInfected, viruses } = await (0, virusScan_1.scanFile)(file.buffer);
+            if (isInfected) {
+                logger_1.default.warn(`Tax Card Image is infected with viruses: ${viruses.join(", ")}`);
+                return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", `Tax Card Image is infected with viruses: ${viruses.join(", ")}`);
+            }
+        }
         const [crUpload, taxUpload] = await Promise.all([
             (0, cloudainry_config_1.default)(files.commercialRegisterImage[0].buffer, "Egyzon/Seller/CommercialRegister"),
             (0, cloudainry_config_1.default)(files.taxCardImage[0].buffer, "Egyzon/Seller/TaxCard"),
@@ -45,7 +63,7 @@ const createRequestToJoin = async (req, res) => {
             sellerDocuments: {
                 commercialRegisterUrl: crUpload.secure_url,
                 taxCardUrl: taxUpload.secure_url,
-            }
+            },
         };
         await seller_services_1.SellerServices.ApplyAsPartner(sellerData, userId);
         return (0, Responses_1.sendSuccessResponse)(res, 200, "Request sent successfully");
@@ -81,6 +99,7 @@ const setupStore = async (req, res) => {
             storeOnlineAddress.trim() === "") {
             return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "All fields are required");
         }
+        console.log("Request body:", req.body);
         if (storeType !== "physical" &&
             storeType !== "online" &&
             storeType !== "both") {
@@ -104,6 +123,22 @@ const setupStore = async (req, res) => {
             files.storeLogo[0].mimetype !== "image/png") {
             return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "Invalid image format");
         }
+        // Scan the uploaded images for viruses
+        for (const file of files.storeLogo ?? []) {
+            const { isInfected, viruses } = await (0, virusScan_1.scanFile)(file.buffer);
+            if (isInfected) {
+                logger_1.default.warn(`Store Logo is infected with viruses: ${viruses.join(", ")}`);
+                return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", `Store Logo is infected with viruses: ${viruses.join(", ")}`);
+            }
+        }
+        for (const file of files.storeBanner ?? []) {
+            const { isInfected, viruses } = await (0, virusScan_1.scanFile)(file.buffer);
+            if (isInfected) {
+                logger_1.default.warn(`Store Banner is infected with viruses: ${viruses.join(", ")}`);
+                return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", `Store Banner is infected with viruses: ${viruses.join(", ")}`);
+            }
+        }
+        // Upload images to Cloudinary
         const [storeLogoUpload, storeBannerUpload] = await Promise.all([
             (0, cloudainry_config_1.default)(files.storeLogo[0].buffer, "Egyzon/Seller/StoreLogo"),
             files.storeBanner
@@ -116,8 +151,10 @@ const setupStore = async (req, res) => {
             storeType,
             storephysicalAddress,
             storeOnlineAddress,
-            storeLogo: storeLogoUpload.secure,
-            storeBanner: storeBannerUpload.secure_url,
+            storeManagement: {
+                storeLogo: storeLogoUpload.secure,
+                storeBanner: storeBannerUpload.secure_url,
+            },
         };
         await seller_services_1.SellerServices.setupStore(storeData, userId);
         return (0, Responses_1.sendSuccessResponse)(res, 200, "Store setup successful");

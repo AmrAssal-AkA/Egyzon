@@ -8,7 +8,8 @@ import {
   PoundSterling,
   Settings,
   LogOut,
-  UserCircleIcon
+  UserCircleIcon,
+  TruckIcon
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 
@@ -22,8 +23,9 @@ export default function SideBarMenu() {
       path: "/sellerManagement",
       icon: Package,
     },
-    { id: 4, label: "Financial", path: "/financial", icon: PoundSterling },
-    { id: 5, label: "Settings", path: "/storeSetting", icon: Settings },
+    { id: 4, label: "Orders", path: "/orders", icon: TruckIcon },
+    { id: 5, label: "Financial", path: "/financial", icon: PoundSterling },
+    { id: 6, label: "Settings", path: "/storeSetting", icon: Settings },
   ];
   const {admin, logout } = useAuth();
 

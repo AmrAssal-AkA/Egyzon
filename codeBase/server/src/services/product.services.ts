@@ -40,7 +40,9 @@ export const ProductServices = {
         category: category._id,
         sellerId: sellerId,
       });
-
+      await Seller.findByIdAndUpdate(sellerId, 
+        {$push: { products: newProduct._id }}, 
+      { new: true });
       return newProduct;
     } catch (error) {
       console.log(error);
@@ -83,7 +85,6 @@ export const ProductServices = {
     if (product.sellerId.toString() !== sellerId) {
       throw new AppError(403, "Unauthorized to update this product");
     }
-    console.log("Product found for update:", product);
 
       if (!product) throw new AppError(404, "Product not found");
      const EditProduct = await Product.findByIdAndUpdate(productId, {
@@ -95,7 +96,7 @@ export const ProductServices = {
       category: productData.category,
       imageUrl: productData.imageUrl,
     }, { new: true });
-    console.log("Updated product details:", EditProduct);
+
     return EditProduct;
   },
   // Service function to get all products with pagination
@@ -188,7 +189,6 @@ export const ProductServices = {
         : { sku: productId };
 
       const product = await Product.findOne(query).populate("sellerId", "storeName FirstName LastName").populate("category", "categoryName");
-      console.log("Product found:", product);
       if (!product) {
         throw new AppError(404, "Product not found");
       }

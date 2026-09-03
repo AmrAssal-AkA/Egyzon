@@ -47,17 +47,17 @@ const RegisterUser = async (userData, res, req) => {
         await newUser.save();
         const verificationUrl = `${process.env.FRONTEND_URL}/verifyEmail?token=${emailTokenValue}`;
         await (0, verifyEmailTemplate_1.default)(email, emailTokenValue, verificationUrl);
-        res.cookie("Access_token", token, {
+        res.cookie("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
-            maxAge: 60 * 60 * 1000,
+            maxAge: 60 * 15,
         });
-        res.cookie("refresh_token", refreshToken, {
+        res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
-            maxAge: 24 * 60 * 60 * 1000,
+            maxAge: 60 * 60 * 24 * 7,
         });
         (0, Responses_1.sendSuccessResponse)(res, 201, "User created successfully", {
             token,

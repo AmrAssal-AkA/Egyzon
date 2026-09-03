@@ -36,15 +36,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const uuid_1 = require("uuid");
 const order_type_1 = require("../types/order.type");
+const payment_type_1 = require("../types/payment.type");
 const orderItemSchema = new mongoose_1.Schema({
     product: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Product', required: true },
+    seller: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Seller', required: true },
     quantity: { type: Number, required: true },
     unitPrice: { type: Number, required: true },
-    subtotal: { type: Number, required: true },
+    discount: { type: Number, default: 0 },
+    total: { type: Number, required: true },
 });
 const orderSchema = new mongoose_1.Schema({
     orderNumber: { type: String, required: true, unique: true, default: () => `ORD-${(0, uuid_1.v4)()}` },
-    customer: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Customer', required: true },
+    customer: { type: mongoose_1.Schema.Types.ObjectId, ref: 'customer', required: true },
     orderDate: { type: Date, default: Date.now },
     orderStatus: { type: String, enum: Object.values(order_type_1.OrderStatus), default: order_type_1.OrderStatus.pending },
     subTotal: { type: Number, required: true },
@@ -52,13 +55,13 @@ const orderSchema = new mongoose_1.Schema({
     shippingFee: { type: Number, default: 0 },
     taxAmount: { type: Number, default: 0 },
     totalAmount: { type: Number, required: true },
-    paymentStatus: { type: String, enum: Object.values(order_type_1.PaymentStatus), default: order_type_1.PaymentStatus.pending },
+    paymentStatus: { type: String, enum: Object.values(payment_type_1.PaymentStatus), default: payment_type_1.PaymentStatus.pending },
     payment: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Payment' },
     paymentMethod: {
         method: { type: String, enum: ['cashOnDelivery', 'creditCard'], required: true },
         details: { type: String }
     },
-    Address: {
+    address: {
         address1: { type: String, required: true },
         address2: { type: String },
         city: { type: String, required: true },
@@ -71,5 +74,6 @@ const orderSchema = new mongoose_1.Schema({
 }, {
     timestamps: true,
 });
+orderSchema.index({ "orderItems.seller": 1, paymentStatus: 1, orderDate: 1 });
 exports.default = mongoose_1.default.model('Order', orderSchema);
 //# sourceMappingURL=orderModel.js.map

@@ -1,6 +1,10 @@
+import type { AnalyticalTimeframe } from "./analytics";
+
 export type RevenueData = {
   date: string;
   revenue: number;
+  orders?: number;
+  label?: string;
 };
 
 export type SellerDistributionData = {
@@ -15,15 +19,18 @@ export type CategorySalesData = {
 };
 
 export interface RevenueChartProps {
-  data: RevenueData[];
-  title: string;
+  data?: RevenueData[];
+  title?: string;
   description?: string;
   valueFormatter?: (value: number) => string;
-  period: string;
+  period?: string;
   onPeriodChange?: (period: string) => void;
+  timeframe?: AnalyticalTimeframe;
+  onTimeframeChange?: (timeframe: AnalyticalTimeframe) => void;
   height?: number;
   className?: string;
   ariaLabel?: string;
+  isLoading?: boolean;
 }
 
 export interface SellerDistributionChartProps {

@@ -42,6 +42,9 @@ export declare const swaggerSpec: {
     }, {
         readonly name: "Admin";
         readonly description: "Admin login and seller application review";
+    }, {
+        readonly name: "Payment";
+        readonly description: "Payment processing and Paymob integration webhooks";
     }];
     readonly components: {
         readonly securitySchemes: {
@@ -300,6 +303,78 @@ export declare const swaggerSpec: {
                     };
                 };
             };
+            readonly CustomerOrderHistoryOrder: {
+                readonly type: "object";
+                readonly properties: {
+                    readonly _id: {
+                        readonly type: "string";
+                    };
+                    readonly orderNumber: {
+                        readonly type: "string";
+                        readonly example: "ORD-20260825-1234";
+                    };
+                    readonly orderDate: {
+                        readonly type: "string";
+                        readonly format: "date-time";
+                    };
+                    readonly totalAmount: {
+                        readonly type: "number";
+                        readonly example: 450;
+                    };
+                    readonly status: {
+                        readonly type: "string";
+                        readonly enum: readonly ["pending", "processing", "shipped", "delivered", "cancelled"];
+                        readonly example: "delivered";
+                    };
+                };
+            };
+            readonly CustomerOrderHistoryData: {
+                readonly type: "object";
+                readonly properties: {
+                    readonly _id: {
+                        readonly type: "string";
+                    };
+                    readonly FirstName: {
+                        readonly type: "string";
+                        readonly example: "Ahmed";
+                    };
+                    readonly LastName: {
+                        readonly type: "string";
+                        readonly example: "Ali";
+                    };
+                    readonly email: {
+                        readonly type: "string";
+                        readonly format: "email";
+                        readonly example: "customer@example.com";
+                    };
+                    readonly role: {
+                        readonly type: "string";
+                        readonly example: "customer";
+                    };
+                    readonly phoneNumber: {
+                        readonly type: "string";
+                        readonly example: "+201001112223";
+                    };
+                    readonly address: {
+                        readonly type: "array";
+                        readonly items: {
+                            readonly type: "string";
+                        };
+                    };
+                    readonly orders: {
+                        readonly type: "array";
+                        readonly items: {
+                            readonly $ref: "#/components/schemas/CustomerOrderHistoryOrder";
+                        };
+                    };
+                    readonly wishlist: {
+                        readonly type: "array";
+                        readonly items: {
+                            readonly type: "string";
+                        };
+                    };
+                };
+            };
             readonly ProductItem: {
                 readonly type: "object";
                 readonly properties: {
@@ -321,11 +396,35 @@ export declare const swaggerSpec: {
                     readonly stock: {
                         readonly type: "number";
                     };
+                    readonly AvgRating: {
+                        readonly type: "number";
+                    };
+                    readonly sku: {
+                        readonly type: "string";
+                    };
+                    readonly status: {
+                        readonly type: "string";
+                        readonly enum: readonly ["active", "inactive"];
+                    };
                     readonly category: {
                         readonly type: "string";
                     };
                     readonly imageUrl: {
+                        readonly type: "array";
+                        readonly items: {
+                            readonly type: "string";
+                        };
+                    };
+                    readonly sellerId: {
                         readonly type: "string";
+                    };
+                    readonly createdAt: {
+                        readonly type: "string";
+                        readonly format: "date-time";
+                    };
+                    readonly updatedAt: {
+                        readonly type: "string";
+                        readonly format: "date-time";
                     };
                 };
             };
@@ -440,6 +539,29 @@ export declare const swaggerSpec: {
                     readonly $ref: "#/components/schemas/ProductItem";
                 };
             };
+            readonly ProductSearchResponse: {
+                readonly type: "object";
+                readonly properties: {
+                    readonly products: {
+                        readonly type: "array";
+                        readonly items: {
+                            readonly $ref: "#/components/schemas/ProductItem";
+                        };
+                    };
+                    readonly total: {
+                        readonly type: "integer";
+                        readonly example: 42;
+                    };
+                    readonly totalPages: {
+                        readonly type: "integer";
+                        readonly example: 5;
+                    };
+                    readonly currentPage: {
+                        readonly type: "integer";
+                        readonly example: 1;
+                    };
+                };
+            };
             readonly CartItem: {
                 readonly type: "object";
                 readonly required: readonly ["productId", "quantity", "price"];
@@ -505,9 +627,64 @@ export declare const swaggerSpec: {
                     };
                 };
             };
+            readonly BillingData: {
+                readonly type: "object";
+                readonly required: readonly ["firstName", "lastName", "email", "phoneNumber"];
+                readonly properties: {
+                    readonly firstName: {
+                        readonly type: "string";
+                        readonly example: "John";
+                    };
+                    readonly lastName: {
+                        readonly type: "string";
+                        readonly example: "Doe";
+                    };
+                    readonly email: {
+                        readonly type: "string";
+                        readonly format: "email";
+                        readonly example: "john@example.com";
+                    };
+                    readonly phoneNumber: {
+                        readonly type: "string";
+                        readonly example: "+201001112223";
+                    };
+                    readonly apartment: {
+                        readonly type: "string";
+                        readonly example: "4B";
+                    };
+                    readonly floor: {
+                        readonly type: "string";
+                        readonly example: "4";
+                    };
+                    readonly street: {
+                        readonly type: "string";
+                        readonly example: "12 Nile St";
+                    };
+                    readonly building: {
+                        readonly type: "string";
+                        readonly example: "10";
+                    };
+                    readonly city: {
+                        readonly type: "string";
+                        readonly example: "Cairo";
+                    };
+                    readonly state: {
+                        readonly type: "string";
+                        readonly example: "Cairo Governorate";
+                    };
+                    readonly country: {
+                        readonly type: "string";
+                        readonly example: "Egypt";
+                    };
+                    readonly postalCode: {
+                        readonly type: "string";
+                        readonly example: "11511";
+                    };
+                };
+            };
             readonly OrderRequest: {
                 readonly type: "object";
-                readonly required: readonly ["shippingAddress", "paymentMethod", "Address"];
+                readonly required: readonly ["shippingAddress", "paymentMethod", "address"];
                 readonly properties: {
                     readonly shippingAddress: {
                         readonly type: "string";
@@ -522,8 +699,14 @@ export declare const swaggerSpec: {
                         readonly type: "string";
                         readonly example: "Leave the package at the front desk.";
                     };
+                    readonly address: {
+                        readonly $ref: "#/components/schemas/OrderAddress";
+                    };
                     readonly Address: {
                         readonly $ref: "#/components/schemas/OrderAddress";
+                    };
+                    readonly billingData: {
+                        readonly $ref: "#/components/schemas/BillingData";
                     };
                     readonly phoneNumber: {
                         readonly type: "string";
@@ -587,6 +770,9 @@ export declare const swaggerSpec: {
                         readonly type: "string";
                         readonly enum: readonly ["pending", "paid", "failed", "refunded"];
                     };
+                    readonly payment: {
+                        readonly type: "string";
+                    };
                     readonly paymentMethod: {
                         readonly type: "object";
                         readonly properties: {
@@ -598,6 +784,9 @@ export declare const swaggerSpec: {
                                 readonly type: "string";
                             };
                         };
+                    };
+                    readonly address: {
+                        readonly $ref: "#/components/schemas/OrderAddress";
                     };
                     readonly notes: {
                         readonly type: "string";
@@ -616,6 +805,24 @@ export declare const swaggerSpec: {
                         readonly type: "string";
                         readonly format: "date-time";
                     };
+                };
+            };
+            readonly PlaceOrderResponseData: {
+                readonly type: "object";
+                readonly properties: {
+                    readonly order: {
+                        readonly $ref: "#/components/schemas/OrderResponse";
+                    };
+                    readonly paymentUrl: {
+                        readonly type: "string";
+                        readonly example: "https://accept.paymob.com/acceptance/iframes/12345?payment_token=...";
+                    };
+                };
+            };
+            readonly CustomerOrderListResponse: {
+                readonly type: "array";
+                readonly items: {
+                    readonly $ref: "#/components/schemas/OrderResponse";
                 };
             };
             readonly WishlistRequest: {
@@ -791,10 +998,6 @@ export declare const swaggerSpec: {
                         readonly type: "number";
                         readonly example: 12500;
                     };
-                    readonly revenueAfterPlatformFee: {
-                        readonly type: "number";
-                        readonly example: 11250;
-                    };
                 };
             };
             readonly SellerTopSellingProductItem: {
@@ -802,6 +1005,20 @@ export declare const swaggerSpec: {
                 readonly properties: {
                     readonly productId: {
                         readonly type: "string";
+                        readonly example: "66a1f2f3d4c5b6a7c8d9e0f1";
+                    };
+                    readonly name: {
+                        readonly type: "string";
+                        readonly example: "Wireless Headphones";
+                    };
+                    readonly image: {
+                        readonly type: "string";
+                        readonly nullable: true;
+                        readonly example: "https://res.cloudinary.com/demo/image/upload/sample.jpg";
+                    };
+                    readonly sales: {
+                        readonly type: "number";
+                        readonly example: 25;
                     };
                     readonly revenue: {
                         readonly type: "number";
@@ -831,12 +1048,221 @@ export declare const swaggerSpec: {
                     };
                 };
             };
+            readonly SellerChangeOrderStatusRequest: {
+                readonly type: "object";
+                readonly required: readonly ["orderId", "newStatus"];
+                readonly properties: {
+                    readonly orderId: {
+                        readonly type: "string";
+                        readonly example: "66a1f2f3d4c5b6a7c8d9e0f1";
+                    };
+                    readonly newStatus: {
+                        readonly type: "string";
+                        readonly enum: readonly ["pending", "processing", "shipped"];
+                        readonly example: "processing";
+                    };
+                };
+            };
+            readonly SellerWalletBalanceResponse: {
+                readonly type: "object";
+                readonly properties: {
+                    readonly balance: {
+                        readonly type: "number";
+                        readonly example: 12500;
+                    };
+                };
+            };
+            readonly SellerAvgOrderValueResponse: {
+                readonly type: "object";
+                readonly properties: {
+                    readonly success: {
+                        readonly type: "boolean";
+                        readonly example: true;
+                    };
+                    readonly data: {
+                        readonly type: "object";
+                        readonly properties: {
+                            readonly avgOrderValue: {
+                                readonly type: "number";
+                                readonly example: 450.5;
+                            };
+                            readonly changePercent: {
+                                readonly type: "number";
+                                readonly example: 0;
+                            };
+                            readonly message: {
+                                readonly type: "string";
+                                readonly example: "Average Order Value calculated successfully";
+                            };
+                        };
+                    };
+                };
+            };
+            readonly SellerSalesByCategoryResponse: {
+                readonly type: "object";
+                readonly additionalProperties: {
+                    readonly type: "number";
+                };
+                readonly example: {
+                    readonly Electronics: 12500;
+                    readonly Clothing: 4500;
+                };
+            };
+            readonly AnalyticalDataPoint: {
+                readonly type: "object";
+                readonly properties: {
+                    readonly label: {
+                        readonly type: "string";
+                        readonly example: "2026-08-25";
+                    };
+                    readonly date: {
+                        readonly type: "string";
+                        readonly example: "2026-08-25";
+                    };
+                    readonly revenue: {
+                        readonly type: "number";
+                        readonly example: 2100;
+                    };
+                    readonly orders: {
+                        readonly type: "integer";
+                        readonly example: 5;
+                    };
+                };
+            };
+            readonly SellerSalesPerformanceResponse: {
+                readonly type: "object";
+                readonly properties: {
+                    readonly timeframe: {
+                        readonly type: "string";
+                        readonly enum: readonly ["7days", "30days", "12months"];
+                        readonly example: "7days";
+                    };
+                    readonly totalRevenue: {
+                        readonly type: "number";
+                        readonly example: 15420.5;
+                    };
+                    readonly totalOrders: {
+                        readonly type: "integer";
+                        readonly example: 35;
+                    };
+                    readonly AverageOrderValue: {
+                        readonly type: "number";
+                        readonly example: 440.6;
+                    };
+                    readonly revenueChangePercent: {
+                        readonly type: "number";
+                        readonly example: 12.5;
+                    };
+                    readonly series: {
+                        readonly type: "array";
+                        readonly items: {
+                            readonly $ref: "#/components/schemas/AnalyticalDataPoint";
+                        };
+                    };
+                    readonly peak: {
+                        readonly type: "object";
+                        readonly properties: {
+                            readonly label: {
+                                readonly type: "string";
+                                readonly example: "2026-08-25";
+                            };
+                            readonly date: {
+                                readonly type: "string";
+                                readonly example: "2026-08-25";
+                            };
+                            readonly revenue: {
+                                readonly type: "number";
+                                readonly example: 2100;
+                            };
+                        };
+                    };
+                };
+            };
+            readonly PaymentItem: {
+                readonly type: "object";
+                readonly properties: {
+                    readonly _id: {
+                        readonly type: "string";
+                    };
+                    readonly transactionId: {
+                        readonly type: "string";
+                        readonly example: "12345678";
+                    };
+                    readonly paymobOrderId: {
+                        readonly type: "number";
+                        readonly example: 98765432;
+                    };
+                    readonly amount: {
+                        readonly type: "number";
+                        readonly example: 500;
+                    };
+                    readonly currency: {
+                        readonly type: "string";
+                        readonly example: "EGP";
+                    };
+                    readonly paymentMethod: {
+                        readonly type: "string";
+                        readonly example: "card";
+                    };
+                    readonly paymentStatus: {
+                        readonly type: "string";
+                        readonly enum: readonly ["pending", "paid", "failed", "refunded"];
+                        readonly example: "paid";
+                    };
+                    readonly paymentDate: {
+                        readonly type: "string";
+                        readonly format: "date-time";
+                    };
+                    readonly gateway: {
+                        readonly type: "string";
+                        readonly example: "paymob";
+                    };
+                    readonly gatewayResponse: {
+                        readonly type: "string";
+                    };
+                    readonly refundAmount: {
+                        readonly type: "number";
+                        readonly example: 0;
+                    };
+                    readonly cardLast4: {
+                        readonly type: "string";
+                        readonly example: "1234";
+                    };
+                    readonly cardBrand: {
+                        readonly type: "string";
+                        readonly example: "MasterCard";
+                    };
+                    readonly createdAt: {
+                        readonly type: "string";
+                        readonly format: "date-time";
+                    };
+                    readonly updatedAt: {
+                        readonly type: "string";
+                        readonly format: "date-time";
+                    };
+                };
+            };
+            readonly PaymobWebhookResponseData: {
+                readonly type: "object";
+                readonly properties: {
+                    readonly payment: {
+                        readonly $ref: "#/components/schemas/PaymentItem";
+                    };
+                    readonly order: {
+                        readonly $ref: "#/components/schemas/OrderResponse";
+                    };
+                };
+            };
             readonly PlatformFeeResponse: {
                 readonly type: "object";
                 readonly properties: {
                     readonly PlatformFeePercentage: {
                         readonly type: "number";
                         readonly example: 10;
+                    };
+                    readonly taxRate: {
+                        readonly type: "number";
+                        readonly example: 14;
                     };
                     readonly updatedBy: {
                         readonly type: "string";
@@ -849,11 +1275,15 @@ export declare const swaggerSpec: {
             };
             readonly SetPlatformFeeRequest: {
                 readonly type: "object";
-                readonly required: readonly ["feePercentage"];
+                readonly required: readonly ["feePercentage", "taxRate"];
                 readonly properties: {
                     readonly feePercentage: {
                         readonly type: "number";
                         readonly example: 10;
+                    };
+                    readonly taxRate: {
+                        readonly type: "number";
+                        readonly example: 14;
                     };
                 };
             };
@@ -1042,6 +1472,46 @@ export declare const swaggerSpec: {
                 readonly type: "array";
                 readonly items: {
                     readonly $ref: "#/components/schemas/UserSummary";
+                };
+            };
+            readonly AdminActiveSellerCountsResponse: {
+                readonly type: "object";
+                readonly properties: {
+                    readonly totalSellersActive: {
+                        readonly type: "integer";
+                        readonly example: 12;
+                    };
+                    readonly growth: {
+                        readonly type: "number";
+                        readonly nullable: true;
+                        readonly example: 15.5;
+                        readonly description: "Percentage growth of active sellers over the last 30 days (null if no previous data)";
+                    };
+                };
+            };
+            readonly AdminPendingSellerCountsResponse: {
+                readonly type: "object";
+                readonly properties: {
+                    readonly totalSellersPending: {
+                        readonly type: "integer";
+                        readonly example: 4;
+                    };
+                };
+            };
+            readonly AdminSellerProductsCategoryResponse: {
+                readonly type: "array";
+                readonly items: {
+                    readonly type: "object";
+                    readonly properties: {
+                        readonly _id: {
+                            readonly type: "string";
+                            readonly example: "66a1f2f3d4c5b6a7c8d9e0f1";
+                        };
+                        readonly categoryName: {
+                            readonly type: "string";
+                            readonly example: "Electronics";
+                        };
+                    };
                 };
             };
         };
@@ -2004,6 +2474,104 @@ export declare const swaggerSpec: {
                     };
                     readonly 404: {
                         readonly description: "Product not found";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 500: {
+                        readonly description: "Internal Server Error";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        readonly "/api/product/search": {
+            readonly get: {
+                readonly tags: readonly ["Products"];
+                readonly summary: "Search products";
+                readonly description: "Search products with text query, category filter, sorting, and pagination.";
+                readonly parameters: readonly [{
+                    readonly name: "q";
+                    readonly in: "query";
+                    readonly required: true;
+                    readonly schema: {
+                        readonly type: "string";
+                    };
+                    readonly description: "Search keyword query";
+                    readonly example: "wireless headphones";
+                }, {
+                    readonly name: "category";
+                    readonly in: "query";
+                    readonly required: false;
+                    readonly schema: {
+                        readonly type: "string";
+                    };
+                    readonly description: "Filter by category ID or name";
+                    readonly example: "electronics";
+                }, {
+                    readonly name: "sort";
+                    readonly in: "query";
+                    readonly required: false;
+                    readonly schema: {
+                        readonly type: "string";
+                        readonly enum: readonly ["price:asc", "price:desc", "productName:asc", "productName:desc", "createdAt:asc", "createdAt:desc"];
+                    };
+                    readonly description: "Sort field and order formatted as field:order (e.g. price:asc, price:desc, productName:asc, createdAt:desc)";
+                    readonly example: "price:asc";
+                }, {
+                    readonly name: "page";
+                    readonly in: "query";
+                    readonly required: false;
+                    readonly schema: {
+                        readonly type: "integer";
+                        readonly minimum: 1;
+                        readonly default: 1;
+                    };
+                    readonly example: 1;
+                }, {
+                    readonly name: "limit";
+                    readonly in: "query";
+                    readonly required: false;
+                    readonly schema: {
+                        readonly type: "integer";
+                        readonly minimum: 1;
+                        readonly maximum: 100;
+                        readonly default: 10;
+                    };
+                    readonly example: 10;
+                }];
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Products retrieved successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly allOf: readonly [{
+                                        readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                    }, {
+                                        readonly type: "object";
+                                        readonly properties: {
+                                            readonly data: {
+                                                readonly $ref: "#/components/schemas/ProductSearchResponse";
+                                            };
+                                        };
+                                    }];
+                                };
+                            };
+                        };
+                    };
+                    readonly 400: {
+                        readonly description: "Query parameter is required and must be a string";
                         readonly content: {
                             readonly "application/json": {
                                 readonly schema: {
@@ -3055,6 +3623,382 @@ export declare const swaggerSpec: {
                 };
             };
         };
+        readonly "/api/seller/change-order-status": {
+            readonly patch: {
+                readonly tags: readonly ["Seller"];
+                readonly summary: "Update the status of an order containing seller's products";
+                readonly description: "Allows a seller to update an order status to pending, processing, or shipped.";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }, {
+                    readonly bearerAuth: readonly [];
+                }];
+                readonly requestBody: {
+                    readonly required: true;
+                    readonly content: {
+                        readonly "application/json": {
+                            readonly schema: {
+                                readonly $ref: "#/components/schemas/SellerChangeOrderStatusRequest";
+                            };
+                        };
+                    };
+                };
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Order status updated successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly allOf: readonly [{
+                                        readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                    }, {
+                                        readonly type: "object";
+                                        readonly properties: {
+                                            readonly data: {
+                                                readonly $ref: "#/components/schemas/OrderResponse";
+                                            };
+                                        };
+                                    }];
+                                };
+                            };
+                        };
+                    };
+                    readonly 400: {
+                        readonly description: "Bad Request";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 403: {
+                        readonly description: "Forbidden";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 404: {
+                        readonly description: "Order or seller not found";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 500: {
+                        readonly description: "Internal Server Error";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        readonly "/api/seller/balance": {
+            readonly get: {
+                readonly tags: readonly ["Seller"];
+                readonly summary: "Get the authenticated seller's wallet balance";
+                readonly description: "Retrieves the available wallet balance for the authenticated seller.";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }, {
+                    readonly bearerAuth: readonly [];
+                }];
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Wallet balance retrieved successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly allOf: readonly [{
+                                        readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                    }, {
+                                        readonly type: "object";
+                                        readonly properties: {
+                                            readonly data: {
+                                                readonly $ref: "#/components/schemas/SellerWalletBalanceResponse";
+                                            };
+                                        };
+                                    }];
+                                };
+                            };
+                        };
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 403: {
+                        readonly description: "Forbidden - Unauthorized access or not a seller";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 404: {
+                        readonly description: "Seller not found";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 500: {
+                        readonly description: "Internal Server Error";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        readonly "/api/seller/avg-order-value": {
+            readonly get: {
+                readonly tags: readonly ["Seller"];
+                readonly summary: "Get the authenticated seller's average order value / total revenue";
+                readonly description: "Retrieves the revenue calculation and order metrics for the authenticated seller.";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }, {
+                    readonly bearerAuth: readonly [];
+                }];
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Average order value fetched successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly allOf: readonly [{
+                                        readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                    }, {
+                                        readonly type: "object";
+                                        readonly properties: {
+                                            readonly data: {
+                                                readonly $ref: "#/components/schemas/SellerAvgOrderValueResponse";
+                                            };
+                                        };
+                                    }];
+                                };
+                            };
+                        };
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 403: {
+                        readonly description: "Forbidden - You are not authorized to access this resource";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 404: {
+                        readonly description: "Seller not found";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 500: {
+                        readonly description: "Internal Server Error";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        readonly "/api/seller/sales-performance-indicator": {
+            readonly get: {
+                readonly tags: readonly ["Seller"];
+                readonly summary: "Get the authenticated seller's sales performance indicator analytics";
+                readonly description: "Retrieves revenue, order count, series trends, and peak metrics over a timeframe (7days, 30days, 12months). Emits real-time updates through Socket.IO.";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }, {
+                    readonly bearerAuth: readonly [];
+                }];
+                readonly parameters: readonly [{
+                    readonly name: "timeframe";
+                    readonly in: "query";
+                    readonly required: false;
+                    readonly schema: {
+                        readonly type: "string";
+                        readonly enum: readonly ["7days", "30days", "12months"];
+                        readonly default: "7days";
+                    };
+                    readonly example: "7days";
+                }];
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Sales performance indicator fetched successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly allOf: readonly [{
+                                        readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                    }, {
+                                        readonly type: "object";
+                                        readonly properties: {
+                                            readonly data: {
+                                                readonly $ref: "#/components/schemas/SellerSalesPerformanceResponse";
+                                            };
+                                        };
+                                    }];
+                                };
+                            };
+                        };
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 403: {
+                        readonly description: "Forbidden - You are not authorized to access this resource";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 500: {
+                        readonly description: "Internal Server Error";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        readonly "/api/seller/get-salses-by-category": {
+            readonly get: {
+                readonly tags: readonly ["Seller"];
+                readonly summary: "Get the authenticated seller's sales grouped by category";
+                readonly description: "Retrieves total sales revenue breakdown by category for the authenticated seller.";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }, {
+                    readonly bearerAuth: readonly [];
+                }];
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Sales by category fetched successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly allOf: readonly [{
+                                        readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                    }, {
+                                        readonly type: "object";
+                                        readonly properties: {
+                                            readonly data: {
+                                                readonly $ref: "#/components/schemas/SellerSalesByCategoryResponse";
+                                            };
+                                        };
+                                    }];
+                                };
+                            };
+                        };
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 403: {
+                        readonly description: "Forbidden - You are not authorized to access this resource";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 500: {
+                        readonly description: "Internal Server Error";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
         readonly "/api/category/addCategory": {
             readonly post: {
                 readonly tags: readonly ["Categories"];
@@ -3472,6 +4416,68 @@ export declare const swaggerSpec: {
                 };
             };
         };
+        readonly "/api/customer/order-history": {
+            readonly get: {
+                readonly tags: readonly ["Customer"];
+                readonly summary: "Get customer order history";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }, {
+                    readonly bearerAuth: readonly [];
+                }];
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Customer order history retrieved successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly allOf: readonly [{
+                                        readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                    }, {
+                                        readonly type: "object";
+                                        readonly properties: {
+                                            readonly data: {
+                                                readonly $ref: "#/components/schemas/CustomerOrderHistoryData";
+                                            };
+                                        };
+                                    }];
+                                };
+                            };
+                        };
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 404: {
+                        readonly description: "Customer not found";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 500: {
+                        readonly description: "Internal Server Error";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
         readonly "/api/order/placeOrder": {
             readonly post: {
                 readonly tags: readonly ["Orders"];
@@ -3503,7 +4509,7 @@ export declare const swaggerSpec: {
                                         readonly type: "object";
                                         readonly properties: {
                                             readonly data: {
-                                                readonly $ref: "#/components/schemas/OrderResponse";
+                                                readonly $ref: "#/components/schemas/PlaceOrderResponseData";
                                             };
                                         };
                                     }];
@@ -3543,6 +4549,154 @@ export declare const swaggerSpec: {
                     };
                     readonly 404: {
                         readonly description: "Product not found while placing order";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        readonly "/api/order/getUserOrders": {
+            readonly get: {
+                readonly tags: readonly ["Orders"];
+                readonly summary: "Get current customer's orders";
+                readonly description: "Retrieves all orders placed by the authenticated customer, sorted newest first.";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }, {
+                    readonly bearerAuth: readonly [];
+                }];
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Orders retrieved successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly allOf: readonly [{
+                                        readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                    }, {
+                                        readonly type: "object";
+                                        readonly properties: {
+                                            readonly data: {
+                                                readonly $ref: "#/components/schemas/CustomerOrderListResponse";
+                                            };
+                                        };
+                                    }];
+                                };
+                            };
+                        };
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 403: {
+                        readonly description: "Forbidden - You are not authorized to view orders";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 500: {
+                        readonly description: "Internal Server Error";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        readonly "/api/payment/paymob/webhook": {
+            readonly post: {
+                readonly tags: readonly ["Payment"];
+                readonly summary: "Paymob transaction webhook callback";
+                readonly description: "Processes transaction callbacks from Paymob. Verifies the HMAC SHA512 signature in the query parameter and updates payment and order status.";
+                readonly parameters: readonly [{
+                    readonly name: "hmac";
+                    readonly in: "query";
+                    readonly required: true;
+                    readonly schema: {
+                        readonly type: "string";
+                    };
+                    readonly description: "HMAC SHA512 signature from Paymob for request verification";
+                }];
+                readonly requestBody: {
+                    readonly required: true;
+                    readonly content: {
+                        readonly "application/json": {
+                            readonly schema: {
+                                readonly type: "object";
+                                readonly required: readonly ["obj"];
+                                readonly properties: {
+                                    readonly obj: {
+                                        readonly type: "object";
+                                        readonly description: "Paymob transaction object";
+                                        readonly additionalProperties: true;
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Payment processed successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly allOf: readonly [{
+                                        readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                    }, {
+                                        readonly type: "object";
+                                        readonly properties: {
+                                            readonly data: {
+                                                readonly $ref: "#/components/schemas/PaymobWebhookResponseData";
+                                            };
+                                        };
+                                    }];
+                                };
+                            };
+                        };
+                    };
+                    readonly 400: {
+                        readonly description: "Invalid HMAC signature";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 404: {
+                        readonly description: "Payment not found for the given Paymob order ID";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 500: {
+                        readonly description: "Internal Server Error";
                         readonly content: {
                             readonly "application/json": {
                                 readonly schema: {
@@ -4202,6 +5356,195 @@ export declare const swaggerSpec: {
                     };
                     readonly 404: {
                         readonly description: "User not found or no pending application found";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        readonly "/api/admin/getAllSellerActiveCounts": {
+            readonly get: {
+                readonly tags: readonly ["Admin"];
+                readonly summary: "Get count of all active/approved sellers";
+                readonly description: "Retrieves the total count of approved and active sellers on the platform.";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }, {
+                    readonly bearerAuth: readonly [];
+                }];
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Seller counts retrieved successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly allOf: readonly [{
+                                        readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                    }, {
+                                        readonly type: "object";
+                                        readonly properties: {
+                                            readonly data: {
+                                                readonly $ref: "#/components/schemas/AdminActiveSellerCountsResponse";
+                                            };
+                                        };
+                                    }];
+                                };
+                            };
+                        };
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 403: {
+                        readonly description: "Unauthorized access";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 500: {
+                        readonly description: "Internal Server Error";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        readonly "/api/admin/getAllSellerPendingCounts": {
+            readonly get: {
+                readonly tags: readonly ["Admin"];
+                readonly summary: "Get count of all pending seller applications";
+                readonly description: "Retrieves the total count of pending seller applications awaiting review.";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }, {
+                    readonly bearerAuth: readonly [];
+                }];
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Seller counts retrieved successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly allOf: readonly [{
+                                        readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                    }, {
+                                        readonly type: "object";
+                                        readonly properties: {
+                                            readonly data: {
+                                                readonly $ref: "#/components/schemas/AdminPendingSellerCountsResponse";
+                                            };
+                                        };
+                                    }];
+                                };
+                            };
+                        };
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 403: {
+                        readonly description: "Unauthorized access";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 500: {
+                        readonly description: "Internal Server Error";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        readonly "/api/admin/getSellerProductsCategory": {
+            readonly get: {
+                readonly tags: readonly ["Admin"];
+                readonly summary: "Get product categories for seller management";
+                readonly description: "Retrieves list of product categories (ID and name) available in the system.";
+                readonly security: readonly [{
+                    readonly cookieAuth: readonly [];
+                }, {
+                    readonly bearerAuth: readonly [];
+                }];
+                readonly responses: {
+                    readonly 200: {
+                        readonly description: "Seller products category retrieved successfully";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly allOf: readonly [{
+                                        readonly $ref: "#/components/schemas/ApiSuccessResponse";
+                                    }, {
+                                        readonly type: "object";
+                                        readonly properties: {
+                                            readonly data: {
+                                                readonly $ref: "#/components/schemas/AdminSellerProductsCategoryResponse";
+                                            };
+                                        };
+                                    }];
+                                };
+                            };
+                        };
+                    };
+                    readonly 401: {
+                        readonly description: "Unauthorized";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 403: {
+                        readonly description: "Unauthorized access";
+                        readonly content: {
+                            readonly "application/json": {
+                                readonly schema: {
+                                    readonly $ref: "#/components/schemas/ApiErrorResponse";
+                                };
+                            };
+                        };
+                    };
+                    readonly 500: {
+                        readonly description: "Internal Server Error";
                         readonly content: {
                             readonly "application/json": {
                                 readonly schema: {

@@ -1,7 +1,7 @@
 import { z } from "zod";
 export declare const sellerBaseSchema: z.ZodObject<{
     body: z.ZodObject<{
-        storeName: z.ZodString;
+        storeName: z.ZodPipe<z.ZodString, z.ZodTransform<string, string>>;
         commercialRegisterNumber: z.ZodString;
         taxCardNumber: z.ZodString;
     }, z.core.$strip>;
@@ -22,7 +22,7 @@ export declare const sellerBaseSchema: z.ZodObject<{
 }, z.core.$strip>;
 export declare const sellerSetupStoreSchema: z.ZodObject<{
     body: z.ZodObject<{
-        storeDescription: z.ZodString;
+        storeDescription: z.ZodPipe<z.ZodString, z.ZodTransform<string, string>>;
         storeLogo: z.ZodCustom<File, File>;
         storeBanner: z.ZodCustom<File, File>;
         storeType: z.ZodEnum<{

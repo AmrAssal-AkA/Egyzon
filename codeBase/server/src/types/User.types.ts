@@ -1,6 +1,6 @@
 import {HydratedDocument, Types} from "mongoose";
 
-export interface IUser {
+export interface IUser extends Document{
     id: string;
     FirstName: string;
     LastName: string;
@@ -27,7 +27,7 @@ export interface IUser {
 
 export type UserDocument = HydratedDocument<IUser>;
 
-export interface ICustomer  extends IUser {
+export interface ICustomer extends IUser {
     orders: Types.ObjectId[];
     wishlist: Types.ObjectId[];
     cart: Types.ObjectId[];

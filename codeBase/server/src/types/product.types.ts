@@ -1,6 +1,6 @@
-import {Types} from "mongoose";
+import {Types, Document} from "mongoose";
 
-export interface IProduct {
+export interface IProduct extends Document {
     productId: string;
     productName: string;
     productDescription: string;
@@ -13,6 +13,8 @@ export interface IProduct {
     imageUrl: string[];
     sellerId: Types.ObjectId;
     category: Types.ObjectId;
+    lowStockNotify: boolean;
+    outOfStockNotify: boolean;
 }
 
 export interface ICategory {

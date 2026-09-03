@@ -1,75 +1,68 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Link from "next/link";
 
-
-import { ClipboardList } from "lucide-react";
-import { toast } from "sonner";
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
-import { useCartStore, LastOrder } from "@/stores/buyer/useCart";
+import { ClipboardList, LogIn } from "lucide-react";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { OrderCard } from "@/components/order/orderCard";
-
+import { useCustomerOrderHistory } from "@/hooks/useCustomer";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function OrderHolderComponent() {
-  const { lastOrder } = useCartStore();
-  const [orders, setOrders] = useState<LastOrder[]>([]);
-  const [mounted, setMounted] = useState(false);
+  const { user } = useAuth();
+  const { orders, isLoading } = useCustomerOrderHistory();
 
-  useEffect(() => {
-    // Rehydrate/load from localstorage
-    const savedOrdersStr = localStorage.getItem("egyzon-orders");
-    let savedOrders: LastOrder[] = [];
-    if (savedOrdersStr) {
-      try {
-        savedOrders = JSON.parse(savedOrdersStr);
-      } catch (e) {
-        console.error("Failed to parse orders from localStorage:", e);
-      }
-    }
+  if (!user) {
+    return (
+      <Empty className="py-24 border border-dashed border-border rounded-2xl bg-muted/20">
+        <EmptyHeader>
+          <EmptyMedia variant="icon" className="mb-4">
+            <LogIn className="w-8 h-8 text-muted-foreground/50" />
+          </EmptyMedia>
+          <EmptyTitle className="text-xl font-bold text-foreground">
+            Sign In Required
+          </EmptyTitle>
+          <EmptyDescription className="text-muted-foreground text-sm mt-2 max-w-md px-4">
+            Please log in to your account to view your order history and manage your purchases.
+          </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+          <Link
+            href="/login"
+            className="mt-6 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white font-semibold text-sm rounded-lg shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer inline-block"
+          >
+            Log In
+          </Link>
+        </EmptyContent>
+      </Empty>
+    );
+  }
 
-    // Sync lastOrder if it exists and is not already in savedOrders
-    if (lastOrder && lastOrder.orderNumber) {
-      const alreadyExists = savedOrders.some(
-        (o) => o.orderNumber === lastOrder.orderNumber
-      );
-      if (!alreadyExists) {
-        savedOrders = [lastOrder, ...savedOrders];
-        localStorage.setItem("egyzon-orders", JSON.stringify(savedOrders));
-      }
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      setOrders(savedOrders);
-      setMounted(true);
-    }, 0);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [lastOrder]);
-
-  const handleRemoveOrder = (orderNumber: string) => {
-    if (confirm(`Are you sure you want to remove order ${orderNumber} from your history?`)) {
-      const updatedOrders = orders.filter((o) => o.orderNumber !== orderNumber);
-      setOrders(updatedOrders);
-      localStorage.setItem("egyzon-orders", JSON.stringify(updatedOrders));
-      toast.success(`Removed order ${orderNumber} from history.`);
-    }
-  };
-
-  if (!mounted) {
+  if (isLoading) {
     return (
       <div className="w-full flex flex-col gap-6">
-        <div className="h-10 w-48 bg-muted animate-pulse rounded-lg" />
+        <div className="h-8 w-32 bg-muted animate-pulse rounded-lg" />
         <div className="flex flex-col gap-6">
-          {[1, 2].map((i) => (
-            <div key={i} className="h-48 w-full bg-muted animate-pulse rounded-xl" />
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="h-48 w-full bg-muted/40 animate-pulse rounded-xl border border-border"
+            />
           ))}
         </div>
       </div>
     );
   }
 
-  if (orders.length === 0) {
+  if (!orders || orders.length === 0) {
     return (
       <Empty className="py-24 border border-dashed border-border rounded-2xl bg-muted/20">
         <EmptyHeader>
@@ -86,7 +79,7 @@ export default function OrderHolderComponent() {
         <EmptyContent>
           <Link
             href="/"
-            className="mt-6 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white font-semibold text-sm rounded-lg shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer"
+            className="mt-6 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white font-semibold text-sm rounded-lg shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer inline-block"
           >
             Start Shopping
           </Link>
@@ -98,14 +91,18 @@ export default function OrderHolderComponent() {
   return (
     <div className="w-full flex flex-col gap-6">
       <div className="flex justify-between items-center">
+        <h2 className="text-xl font-bold text-foreground">My Orders</h2>
         <span className="text-sm font-normal text-muted-foreground bg-muted px-3 py-1 rounded-full">
           {orders.length} {orders.length === 1 ? "order" : "orders"}
         </span>
       </div>
 
       <div className="flex flex-col gap-6">
-        {orders.map((order) => (
-          <OrderCard key={order.orderNumber} order={order} onRemove={handleRemoveOrder} />
+        {orders.map((order, idx) => (
+          <OrderCard
+            key={order._id || order.orderNumber || `order-${idx}`}
+            order={order}
+          />
         ))}
       </div>
     </div>

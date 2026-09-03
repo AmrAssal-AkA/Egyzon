@@ -12,6 +12,8 @@ const refreshToken_1 = __importDefault(require("../models/refreshToken"));
 const AppError_1 = require("../utils/AppError");
 const password_ustils_1 = require("../utils//password.ustils");
 const jwt_util_1 = require("../utils/jwt.util");
+const logger_1 = __importDefault(require("../utils/logger"));
+const categoryModel_1 = __importDefault(require("../models/categoryModel"));
 exports.AdminService = {
     AdminLoggingin: async (email, password) => {
         try {
@@ -78,6 +80,7 @@ exports.AdminService = {
                 isBlocked: false,
             });
             await newAdmin.save();
+            logger_1.default.info(`User ${user.email} promoted to admin successfully`);
             return newAdmin;
         }
         catch (error) {
@@ -95,6 +98,7 @@ exports.AdminService = {
             const blockUser = await userModel_1.default.findByIdAndUpdate(userId, { isBlocked: true }, { new: true });
             if (!blockUser)
                 throw new AppError_1.AppError(500, "Failed to block user");
+            logger_1.default.info(`Admin: User ${user.email} blocked successfully`);
             return blockUser;
         }
         catch (error) {
@@ -115,6 +119,7 @@ exports.AdminService = {
             const activateUser = await userModel_1.default.findByIdAndUpdate(userId, { isBlocked: false }, { new: true });
             if (!activateUser)
                 throw new AppError_1.AppError(500, "Failed to activate user");
+            logger_1.default.info(`Admin: User ${user.email} activated successfully`);
             return activateUser;
         }
         catch (error) {
@@ -205,6 +210,7 @@ exports.AdminService = {
         }
     },
     requestAdditionalDocuments: async (sellerId, message) => {
+        logger_1.default.info(`Admin requesting additional documents for seller: ${sellerId}`);
         const seller = await userModel_1.default.findById(sellerId);
         try {
             const getSellerApplicationById = await sellerModel_1.default.findById(sellerId);
@@ -221,14 +227,22 @@ exports.AdminService = {
             throw new AppError_1.AppError(500, "Internal Server Error");
         }
     },
-    setPlatformFee: async (feePercentage, adminId) => {
+    setPlatformFee: async (feePercentage, taxRate, adminId) => {
         try {
             const admin = await adminModel_1.default.findById(adminId);
             if (!admin)
                 throw new AppError_1.AppError(404, "Admin not found");
-            if (feePercentage < 0 || feePercentage > 100)
-                throw new AppError_1.AppError(400, "Invalid fee percentage. Must be between 0 and 100");
-            const updatedPlatformConfig = await paltformConfigSetting_1.PlatformConfigSetting.findOneAndUpdate({}, { PlatformFeePercentage: feePercentage, updatedBy: admin._id, updateAt: new Date() }, { new: true, upsert: true });
+            if (feePercentage < 0 ||
+                feePercentage > 100 ||
+                taxRate < 0 ||
+                taxRate > 100)
+                throw new AppError_1.AppError(400, "Invalid fee or tax rate  . Must be between 0 and 100");
+            const updatedPlatformConfig = await paltformConfigSetting_1.PlatformConfigSetting.findOneAndUpdate({}, {
+                PlatformFeePercentage: feePercentage,
+                taxRate: taxRate,
+                updatedBy: admin._id,
+                updateAt: new Date(),
+            }, { new: true, upsert: true });
             if (!updatedPlatformConfig)
                 throw new AppError_1.AppError(500, "Failed to update platform fee");
             return updatedPlatformConfig;
@@ -242,7 +256,7 @@ exports.AdminService = {
     },
     getPlatformFee: async () => {
         try {
-            const platformFee = await paltformConfigSetting_1.PlatformConfigSetting.findOne().populate("PlatformFeePercentage");
+            const platformFee = await paltformConfigSetting_1.PlatformConfigSetting.findOne();
             if (!platformFee)
                 throw new AppError_1.AppError(404, "Platform configuration not found");
             return platformFee;
@@ -251,6 +265,77 @@ exports.AdminService = {
             if (error instanceof AppError_1.AppError) {
                 throw new AppError_1.AppError(error.statusCode, error.message);
             }
+            throw new AppError_1.AppError(500, "Internal Server Error");
+        }
+    },
+    getAllSellerActiveCounts: async () => {
+        try {
+            const totalSellersActive = await sellerModel_1.default.countDocuments({ applicantStatus: "approved" });
+            const growthPercentage = await sellerModel_1.default.aggregate([
+                {
+                    $match: { applicantStatus: "approved" },
+                },
+                {
+                    $group: {
+                        _id: null,
+                        count: { $sum: 1 },
+                        previousCount: {
+                            $sum: {
+                                $cond: [
+                                    { $lt: ["$createdAt", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)] },
+                                    1,
+                                    0,
+                                ],
+                            },
+                        },
+                    },
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        growthPercentage: {
+                            $cond: [
+                                { $eq: ["$previousCount", 0] },
+                                null,
+                                {
+                                    $multiply: [
+                                        { $divide: [{ $subtract: ["$count", "$previousCount"] }, "$previousCount"] },
+                                        100,
+                                    ],
+                                },
+                            ],
+                        },
+                    },
+                },
+            ]);
+            const growth = growthPercentage.length > 0 ? growthPercentage[0].growthPercentage : null;
+            return { totalSellersActive, growth };
+        }
+        catch (error) {
+            if (error instanceof AppError_1.AppError)
+                throw new AppError_1.AppError(error.statusCode, error.message);
+            throw new AppError_1.AppError(500, "Internal Server Error");
+        }
+    },
+    getAllSellerPendingCounts: async () => {
+        try {
+            const totalSellersPending = await sellerModel_1.default.countDocuments({ applicantStatus: "pending" });
+            return { totalSellersPending };
+        }
+        catch (error) {
+            if (error instanceof AppError_1.AppError)
+                throw new AppError_1.AppError(error.statusCode, error.message);
+            throw new AppError_1.AppError(500, "Internal Server Error");
+        }
+    },
+    getSellerProductsCategory: async () => {
+        try {
+            const getCategoryTypes = await categoryModel_1.default.find().select("categoryName");
+            return getCategoryTypes;
+        }
+        catch (error) {
+            if (error instanceof AppError_1.AppError)
+                throw new AppError_1.AppError(error.statusCode, error.message);
             throw new AppError_1.AppError(500, "Internal Server Error");
         }
     }

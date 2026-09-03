@@ -1,12 +1,22 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Landmark, Percent, Receipt, Info, Save, CheckCircle2 } from "lucide-react";
+import {
+  Landmark,
+  Percent,
+  Receipt,
+  Info,
+  Save,
+  CheckCircle2,
+} from "lucide-react";
 import { AlertContext } from "../../context/AlertContext";
 
 interface FinancialParametersFormProps {
   initialBaseFee?: number | string | null;
   initialTaxRate?: number | string | null;
   isSaving?: boolean;
-  onSubmit?: (data: { baseFee: number; taxRate: number }) => Promise<void> | void;
+  onSubmit?: (data: {
+    baseFee: number;
+    taxRate: number;
+  }) => Promise<void> | void;
   className?: string;
 }
 
@@ -20,12 +30,12 @@ export default function FinancialParametersForm({
   const [baseFee, setBaseFee] = useState<string>(
     initialBaseFee !== null && initialBaseFee !== undefined
       ? String(initialBaseFee)
-      : "5.0"
+      : "5.0",
   );
   const [taxRate, setTaxRate] = useState<string>(
     initialTaxRate !== null && initialTaxRate !== undefined
       ? String(initialTaxRate)
-      : "14.0"
+      : "14.0",
   );
   const [localSaving, setLocalSaving] = useState<boolean>(false);
 
@@ -78,7 +88,8 @@ export default function FinancialParametersForm({
               Financial Parameters
             </h2>
             <p className="text-xs text-gray-500 mt-0.5">
-              Configure your store's transaction fees, commission rates, and tax calculations.
+              Configure your store's transaction fees, commission rates, and tax
+              calculations.
             </p>
           </div>
         </div>
@@ -136,7 +147,8 @@ export default function FinancialParametersForm({
             <p className="text-xs text-gray-500 flex items-start gap-1.5 mt-3 pt-3 border-t border-gray-100/80">
               <Info className="w-3.5 h-3.5 text-gray-400 shrink-0 mt-0.5" />
               <span>
-                The base fee percentage charged by the platform for each completed transaction (e.g. 0.5% or 5.0%).
+                The base fee percentage charged by the platform for each
+                completed transaction (e.g. 0.5% or 5.0%).
               </span>
             </p>
           </div>
@@ -182,7 +194,8 @@ export default function FinancialParametersForm({
             <p className="text-xs text-gray-500 flex items-start gap-1.5 mt-3 pt-3 border-t border-gray-100/80">
               <Info className="w-3.5 h-3.5 text-gray-400 shrink-0 mt-0.5" />
               <span>
-                The statutory tax rate applied to calculate transaction tax across all orders (e.g. 14.0%).
+                The statutory tax rate applied to calculate transaction tax
+                across all orders (e.g. 14.0%).
               </span>
             </p>
           </div>
@@ -191,7 +204,8 @@ export default function FinancialParametersForm({
         {/* Form Actions Footer */}
         <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <span className="text-xs text-gray-400">
-            Updated financial rates take effect immediately on subsequent orders.
+            Updated financial rates take effect immediately on subsequent
+            orders.
           </span>
           <button
             type="submit"

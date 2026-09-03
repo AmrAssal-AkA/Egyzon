@@ -37,9 +37,12 @@ exports.initSocket = initSocket;
 exports.getIo = getIo;
 exports.isUserConnected = isUserConnected;
 exports.emitNotificationToUser = emitNotificationToUser;
+exports.emitSalesIndicatorUpdate = emitSalesIndicatorUpdate;
 const socket_io_1 = require("socket.io");
 const cookie = __importStar(require("cookie"));
 const jwt_util_1 = require("../utils/jwt.util");
+const analytics_services_1 = require("../services/analytics.services");
+const analyticalData_types_1 = require("../types/analyticalData.types");
 const userSockets = new Map();
 let ioInstance = null;
 function initSocket(server) {
@@ -49,6 +52,7 @@ function initSocket(server) {
             methods: ["GET", "POST"],
             credentials: true,
         },
+        transports: ["websocket", "polling"],
     });
     io.use((socket, next) => {
         try {
@@ -83,8 +87,15 @@ function initSocket(server) {
             userSockets.get(userId).add(socket.id);
             socket.join(`user-${userId}`);
         }
+        socket.on("sales-indicator:subscribe", async (timeframe) => {
+            if (!userId || socket.user?.role !== "seller")
+                return;
+            const validTimeframes = Object.values(analyticalData_types_1.AnalyticalDateTimeframe);
+            const safeTimeframe = validTimeframes.includes(timeframe) ? timeframe : analyticalData_types_1.AnalyticalDateTimeframe.SEVEN_DAYS;
+            const data = await analytics_services_1.Analytical.getSellerAnalytics(userId, safeTimeframe);
+            socket.emit("sales-Indicator:snapshot", data);
+        });
         socket.on("disconnect", () => {
-            console.log(`User disconnected: ${userId}`);
             if (userId) {
                 const userSocketSet = userSockets.get(userId);
                 userSocketSet?.delete(socket.id);
@@ -109,5 +120,11 @@ function emitNotificationToUser(userId, notification) {
     if (!ioInstance)
         return;
     ioInstance.to(`user-${userId}`).emit("notification", notification);
+}
+async function emitSalesIndicatorUpdate(sellerId, timeframe = analyticalData_types_1.AnalyticalDateTimeframe.SEVEN_DAYS) {
+    if (!isUserConnected(sellerId))
+        return;
+    const data = await analytics_services_1.Analytical.getSellerAnalytics(sellerId, timeframe);
+    getIo().to(`user-${sellerId}`).emit("sales-indicator:subscribe", data);
 }
 //# sourceMappingURL=socket.js.map

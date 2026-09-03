@@ -19,6 +19,9 @@ export interface User {
     image: string;
     role: "customer" | "seller";
     storeName?: string;
+    storeManagement?: {
+        storeLogo?: string;
+    };
     isCompleted?: boolean;
     orders?: Array<{
         id?: string;

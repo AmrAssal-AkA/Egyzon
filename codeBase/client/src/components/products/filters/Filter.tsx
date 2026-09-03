@@ -9,30 +9,11 @@ import {
   type AvailabilityFilter,
   type DiscountFilter,
 } from "@/stores/buyer/filter";
+import { useCategories } from "@/hooks/useCategory";
 
 import FilterAccordion from "./FilterAccordion";
 
 const DEFAULT_MAX_PRICE = 2000;
-
-const fallbackCategories = [
-  "beauty",
-  "fragrances",
-  "furniture",
-  "groceries",
-  "home-decoration",
-  "laptops",
-  "smartphones",
-];
-
-const fallbackBrands = [
-  "Apple",
-  "Samsung",
-  "Dior",
-  "Gucci",
-  "Essence",
-  "Annibale Colombo",
-  "Knoll",
-];
 
 const colors = [
   { name: "Black", className: "bg-gray-950" },
@@ -326,16 +307,22 @@ function FilterContent({
 }
 
 function Filterfeature({
-  categories = fallbackCategories,
-  brands = fallbackBrands,
+  categories: propCategories,
+  brands = [],
   maxPrice = DEFAULT_MAX_PRICE,
 }: FilterfeatureProps) {
+  const { categories: fetchedCategories } = useCategories();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const resetFilters = useFilterStore((state) => state.resetFilters);
-  const uniqueCategories = useMemo(
-    () => Array.from(new Set(categories)).sort(),
-    [categories],
-  );
+  const uniqueCategories = useMemo(() => {
+    if (propCategories && propCategories.length > 0) {
+      return Array.from(new Set(propCategories)).filter(Boolean).sort();
+    }
+    const names = (fetchedCategories || [])
+      .map((cat) => cat.categoryName || cat.name || "")
+      .filter(Boolean);
+    return Array.from(new Set(names)).sort();
+  }, [propCategories, fetchedCategories]);
   const uniqueBrands = useMemo(
     () => Array.from(new Set(brands)).filter(Boolean).sort(),
     [brands],

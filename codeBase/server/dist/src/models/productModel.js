@@ -68,12 +68,22 @@ const productSchema = new mongoose_1.Schema({
         required: true,
         unique: true,
         default: function () {
-            const categoryPart = this.category ? this.category.toString().slice(0, 4).toUpperCase() : "GEN";
-            const namePart = this.productName ? this.productName.replace(/\s+/g, "").slice(0, 4).toUpperCase() : "PROD";
-            const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-            const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+            const categoryPart = this.category
+                ? this.category.toString().slice(0, 4).toUpperCase()
+                : "GEN";
+            const namePart = this.productName
+                ? this.productName.replace(/\s+/g, "").slice(0, 4).toUpperCase()
+                : "PROD";
+            const datePart = new Date()
+                .toISOString()
+                .slice(0, 10)
+                .replace(/-/g, "");
+            const randomPart = Math.random()
+                .toString(36)
+                .substring(2, 6)
+                .toUpperCase();
             return `${categoryPart}-${namePart}-${datePart}-${randomPart}`;
-        }
+        },
     },
     status: {
         type: String,
@@ -93,21 +103,46 @@ const productSchema = new mongoose_1.Schema({
     category: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "Category",
-    }
+    },
 }, { timestamps: true });
 productSchema.pre("validate", async function () {
     if (this.sku)
         return;
     if (!this.category)
         return;
-    const categoryDoc = await categoryModel_1.default.findById(this.category).select("categoryName").exec();
+    const categoryDoc = await categoryModel_1.default.findById(this.category)
+        .select("categoryName")
+        .exec();
     if (!categoryDoc)
         return;
     const categoryPart = categoryDoc.categoryName.slice(0, 4).toUpperCase();
-    const namePart = this.productName.replace(/\s+/g, "").slice(0, 4).toUpperCase();
+    const namePart = this.productName
+        .replace(/\s+/g, "")
+        .slice(0, 4)
+        .toUpperCase();
     const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, "");
     const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
     this.sku = `${categoryPart}-${namePart}-${datePart}-${randomPart}`;
 });
+productSchema.pre("deleteOne", { document: true, query: false }, async function () {
+    const productId = this._id;
+    const categoryId = this.category;
+    await Promise.all([
+        mongoose_1.default.model("Review").deleteMany({ productId }),
+        mongoose_1.default
+            .model("category")
+            .updateOne({ _id: categoryId }, { $pull: { products: productId } }),
+        mongoose_1.default
+            .model("Seller")
+            .updateMany({ products: productId }, { $pull: { products: productId } }),
+        mongoose_1.default
+            .model("Order")
+            .updateMany({ "products.productId": productId }, { $pull: { products: { productId } } }),
+        mongoose_1.default
+            .model("wishlist")
+            .updateMany({ products: productId }, { $pull: { products: productId } }),
+    ]);
+});
+productSchema.index({ productName: "text", productDescription: "text", category: 1 });
 exports.default = mongoose_1.default.model("Product", productSchema);
 //# sourceMappingURL=productModel.js.map

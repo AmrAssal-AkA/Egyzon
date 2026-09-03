@@ -25,7 +25,7 @@ function WalletPage() {
         </p>
       </div>
       <div className="flex flex-col gap-4 px-4">
-        <BalanceWallet balance={1000} />
+        <BalanceWallet />
         <TransactionTable />
       </div>
     </main>

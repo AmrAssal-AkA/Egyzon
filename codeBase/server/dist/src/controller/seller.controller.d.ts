@@ -7,5 +7,8 @@ export declare const SellerController: {
     getAllOrders: (req: Request, res: Response) => Promise<void>;
     totalInventoryValue: (req: Request, res: Response) => Promise<void>;
     changeOrderStatus: (req: Request, res: Response) => Promise<void>;
+    getAvgOrderValue: (req: Request, res: Response) => Promise<void>;
+    salesPerformanceIndicator: (req: Request, res: Response) => Promise<void>;
+    getSalesByCategory: (req: Request, res: Response) => Promise<void>;
 };
 //# sourceMappingURL=seller.controller.d.ts.map

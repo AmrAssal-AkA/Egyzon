@@ -16,6 +16,20 @@ export const orderBaseSchema = z.object({
             postalCode: typeTextRegex.min(5, { message: "Postal code must be at least 5 characters long" }),
             country: typeTextRegex.min(2, { message: "Country must be at least 2 characters long" })
         }),
+        billingData: z.object({
+            firstName: z.string().min(1, { message: "Billing first name is required" }),
+            lastName: z.string().min(1, { message: "Billing last name is required" }),
+            email: z.string().email({ message: "Invalid billing email" }),
+            phoneNumber: phoneNumberSchema,
+            apartment: z.string().optional(),
+            floor: z.string().optional(),
+            street: z.string().optional(),
+            building: z.string().optional(),
+            city: z.string().optional(),
+            state: z.string().optional(),
+            country: z.string().optional(),
+            postalCode: z.string().optional(),
+        }).optional(),
         phoneNumber: phoneNumberSchema.optional(),
      })
 })

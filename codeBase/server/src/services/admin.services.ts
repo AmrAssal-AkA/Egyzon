@@ -1,14 +1,16 @@
 import Admin from "../models/adminModel";
 import User from "../models/userModel";
 import Seller from "../models/sellerModel";
-import { PlatformConfigSetting } from "../models/paltformConfigSetting";
 import { IPlatformConfig } from "../types/platformConfig.types";
 import { IAdmin, ISeller, IUser } from "../types/User.types";
 import refreshTokenModel from "../models/refreshToken";
 import { AppError } from "../utils/AppError";
 import { comparePasswords } from "../utils//password.ustils";
 import { signAccessToken, signRefreshToken } from "../utils/jwt.util";
-import { get } from "node:http";
+import logger from "../utils/logger";
+import Order from "../models/orderModel";
+import Product from "../models/productModel";
+import { Platform } from "../models/paltformConfigSetting";
 
 export const AdminService = {
   AdminLoggingin: async (email: string, password: string) => {
@@ -78,6 +80,7 @@ export const AdminService = {
         isBlocked: false,
       });
       await newAdmin.save();
+      logger.info(`User ${user.email} promoted to admin successfully`);
       return newAdmin;
     } catch (error) {
       if (error instanceof AppError) {
@@ -97,6 +100,7 @@ export const AdminService = {
         { new: true },
       );
       if (!blockUser) throw new AppError(500, "Failed to block user");
+      logger.info(`Admin: User ${user.email} blocked successfully`);
       return blockUser;
     } catch (error) {
       if (error instanceof AppError) {
@@ -117,6 +121,7 @@ export const AdminService = {
         { new: true },
       );
       if (!activateUser) throw new AppError(500, "Failed to activate user");
+      logger.info(`Admin: User ${user.email} activated successfully`);
       return activateUser;
     } catch (error) {
       if (error instanceof AppError)
@@ -223,6 +228,9 @@ export const AdminService = {
     sellerId: string,
     message: string,
   ): Promise<ISeller> => {
+    logger.info(
+      `Admin requesting additional documents for seller: ${sellerId}`,
+    );
     const seller = await User.findById(sellerId);
     try {
       const getSellerApplicationById = await Seller.findById(sellerId);
@@ -267,17 +275,16 @@ export const AdminService = {
           "Invalid fee or tax rate  . Must be between 0 and 100",
         );
 
-      const updatedPlatformConfig =
-        await PlatformConfigSetting.findOneAndUpdate(
-          {},
-          {
-            PlatformFeePercentage: feePercentage,
-            taxRate: taxRate,
-            updatedBy: admin._id,
-            updateAt: new Date(),
-          },
-          { new: true, upsert: true },
-        );
+      const updatedPlatformConfig = await Platform.findOneAndUpdate(
+        {},
+        {
+          PlatformFeePercentage: feePercentage,
+          taxRate: taxRate,
+          updatedBy: admin._id,
+          updateAt: new Date(),
+        },
+        { new: true, upsert: true },
+      );
       if (!updatedPlatformConfig)
         throw new AppError(500, "Failed to update platform fee");
       return updatedPlatformConfig;
@@ -290,7 +297,7 @@ export const AdminService = {
   },
   getPlatformFee: async (): Promise<IPlatformConfig> => {
     try {
-      const platformFee = await PlatformConfigSetting.findOne();
+      const platformFee = await Platform.findOne();
       if (!platformFee)
         throw new AppError(404, "Platform configuration not found");
       return platformFee;
@@ -299,6 +306,185 @@ export const AdminService = {
         throw new AppError(error.statusCode, error.message);
       }
       throw new AppError(500, "Internal Server Error");
+    }
+  },
+  getAllSellerActiveCounts: async () => {
+    try {
+      const totalSellersActive = await Seller.countDocuments({
+        applicantStatus: "approved",
+      });
+      const growthPercentage = await Seller.aggregate([
+        {
+          $match: { applicantStatus: "approved" },
+        },
+        {
+          $group: {
+            _id: null,
+            count: { $sum: 1 },
+            previousCount: {
+              $sum: {
+                $cond: [
+                  {
+                    $lt: [
+                      "$createdAt",
+                      new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+                    ],
+                  },
+                  1,
+                  0,
+                ],
+              },
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            growthPercentage: {
+              $cond: [
+                { $eq: ["$previousCount", 0] },
+                null,
+                {
+                  $multiply: [
+                    {
+                      $divide: [
+                        { $subtract: ["$count", "$previousCount"] },
+                        "$previousCount",
+                      ],
+                    },
+                    100,
+                  ],
+                },
+              ],
+            },
+          },
+        },
+      ]);
+      const growth =
+        growthPercentage.length > 0
+          ? growthPercentage[0].growthPercentage
+          : null;
+      return { totalSellersActive, growth };
+    } catch (error) {
+      if (error instanceof AppError)
+        throw new AppError(error.statusCode, error.message);
+      throw new AppError(500, "Internal Server Error");
+    }
+  },
+  getAllSellerPendingCounts: async () => {
+    try {
+      const totalSellersPending = await Seller.countDocuments({
+        applicantStatus: "pending",
+      });
+      return { totalSellersPending };
+    } catch (error) {
+      if (error instanceof AppError)
+        throw new AppError(error.statusCode, error.message);
+      throw new AppError(500, "Internal Server Error");
+    }
+  },
+  getSellerProductsCategory: async () => {
+    try {
+      const productDistribution = await Product.aggregate([
+        {
+          $group: {
+            _id: { category: "$category", sellerId: "$sellerId" },
+          },
+        },
+        {
+          $group: {
+            _id: "$_id.category",
+            sellerCount: { $sum: 1 },
+          },
+        },
+        {
+          $lookup: {
+            from: "categories",
+            localField: "_id",
+            foreignField: "_id",
+            as: "categoryInfo",
+          },
+        },
+        { $unwind: "$categoryInfo" },
+        {
+          $project: {
+            _id: 0,
+            categoryId: "$categoryInfo._id",
+            categoryName: "$categoryInfo.name",
+            sellerCount: 1,
+          },
+        },
+        { $sort: { sellerCount: -1 } },
+      ]);
+      const total = productDistribution.reduce(
+        (acc, curr) => acc + curr.sellerCount,
+        0,
+      );
+      return {
+        total,
+        categories: productDistribution.map((c) => ({
+          ...c,
+          percentage: total > 0 ? (c.sellerCount / total) * 100 : 0,
+        })),
+      };
+    } catch (error) {
+      if (error instanceof AppError)
+        throw new AppError(error.statusCode, error.message);
+      throw new AppError(500, "Internal Server Error");
+    }
+  },
+  getTotalRevenueInPlatform: async () => {
+    try {
+      
+    } catch (error) {
+      if (error instanceof AppError)
+        throw new AppError(error.statusCode, error.message);
+      throw new AppError(500, "Invalid Server Error");
+    }
+  },
+  getAllOrdersOnPlatform: async (
+    adminId: string,
+    page: number,
+    limit: number,
+  ) => {
+    try {
+      const admin = await Admin.findById(adminId);
+      if (!admin)
+        throw new AppError(
+          403,
+          "Forbidden you are not authorized to access this resources",
+        );
+
+      const currentPage = Math.max(1, parseInt(String(page), 10) || 1);
+      const currentLimit = Math.min(
+        Math.max(1, parseInt(String(limit), 10) || 10),
+        100,
+      );
+
+      const [orders, total] = await Promise.all([
+        Order.find()
+          .populate("customer", "FirstName LastName email")
+          .populate("orderItems.seller", "storeName email")
+          .populate("orderItems.product", "productName imageUrl category")
+          .sort({ createdAt: -1 })
+          .skip((currentPage - 1) * currentLimit)
+          .limit(currentLimit)
+          .limit(currentLimit),
+        Order.countDocuments(),
+      ]);
+      return {
+        orders,
+        pagination: {
+          page: currentPage,
+          limit: currentPage,
+          total,
+          totalPage: Math.ceil(total / currentLimit),
+        },
+      };
+    } catch (error) {
+      if (error instanceof AppError)
+        throw new AppError(error.statusCode, error.message);
+      throw new AppError(500, "Invalid Server Error");
     }
   },
 };

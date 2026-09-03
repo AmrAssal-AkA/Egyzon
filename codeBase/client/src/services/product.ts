@@ -1,7 +1,13 @@
 import axios from "axios";
 
 import { apiClient } from "@/lib/apiClient";
-import { productListResponse, Product, Products } from "@/types/product.type";
+import {
+  productListResponse,
+  Product,
+  Products,
+  SearchProductsParams,
+  SearchProductsResponse,
+} from "@/types/product.type";
 import {
   fetchCategories,
   fetchProductsByCategoryId,
@@ -142,9 +148,20 @@ export const fetchProductByCategoryName = async (category: string) => {
   return fetchProductsByCategory({ category });
 };
 
-export const addProduct = async (formData: FormData) => {
+export const addProduct = async (formData: FormData, onProgress?: (percent: number) => void) => {
   try {
-    const response = await apiClient.post("/api/product/addProduct", formData);
+    const response = await apiClient.post("/api/product/addProduct", formData, {
+      withCredentials: true,
+      headers: {
+        Accept: "application/json",
+      },
+      onUploadProgress: (progressEvent) => {
+        if (progressEvent.total && onProgress) {
+          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          onProgress(percent);
+        }
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error adding product:", error);
@@ -184,7 +201,8 @@ export interface EditProductPayload {
 
 export const editProduct = async (
   productIdOrData: string | number | EditProductPayload | FormData,
-  data?: EditProductPayload | FormData
+  data?: EditProductPayload | FormData,
+  onProgress?: (percent: number) => void,
 ) => {
   try {
     let productId: string | number | undefined;
@@ -212,6 +230,12 @@ export const editProduct = async (
 
     const response = await apiClient.put(url, payload, {
       withCredentials: true,
+      onUploadProgress: (progressEvent) => {
+        if (progressEvent.total && onProgress) {
+          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          onProgress(percent);
+        }
+      },
     });
     return response.data;
   } catch (error) {
@@ -242,5 +266,59 @@ export const applyDiscount = async (
       throw error.response.data;
     }
     throw new Error("Failed to apply discount");
+  }
+};
+
+export const searchProducts = async (
+  params: SearchProductsParams | string
+): Promise<SearchProductsResponse> => {
+  const queryParams = typeof params === "string" ? { q: params } : params;
+  if (!queryParams.q || !queryParams.q.trim()) {
+    return {
+      success: false,
+      message: "Query parameter is required",
+      data: { products: [] },
+    };
+  }
+
+  try {
+    const response = await apiClient.get<SearchProductsResponse>(
+      "/api/product/search",
+      {
+        params: queryParams,
+      }
+    );
+    const data = response.data;
+
+    if (!data?.success) {
+      return {
+        success: false,
+        message: data?.message || "Search failed",
+        data: { products: [] },
+      };
+    }
+
+    return data;
+  } catch (error: unknown) {
+    console.error("Search products error:", error);
+    const axiosError = error as {
+      response?: {
+        data?: {
+          message?: string;
+          error?: string;
+        };
+      };
+      message?: string;
+    };
+    const message =
+      axiosError?.response?.data?.message ||
+      axiosError?.response?.data?.error ||
+      axiosError?.message ||
+      "Failed to search products";
+    return {
+      success: false,
+      message,
+      data: { products: [] },
+    };
   }
 };

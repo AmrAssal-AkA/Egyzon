@@ -2,6 +2,10 @@ import type { Request, Response } from "express";
 
 import {SellerServices} from "../services//seller.services";
 import { sendErrorResponse, sendSuccessResponse } from "../utils/Responses";
+import {AppError} from "../utils/AppError";
+import {Analytical} from "../services/analytics.services";
+import {getIo, isUserConnected} from "../config/socket";
+import {AnalyticalDateTimeframe} from "../types/analyticalData.types"
 
 
 export const SellerController = {
@@ -82,6 +86,59 @@ export const SellerController = {
       return sendSuccessResponse(res, 200, "Order status updated successfully", updatedOrder);
     }catch(error){
       return sendErrorResponse(res, 500, "Internal Server Error")
+    }
+  },
+  getAvgOrderValue: async (req: Request, res: Response) => {
+    try {
+      const sellerId = req.user?.userId;
+      const seller = req.user?.role;
+      if(!sellerId || seller !== "seller") return sendErrorResponse(res, 403, "Forbidden", "You are not authorized to access this resource");
+      const avgOrderValue = await SellerServices.getAvgOrderValue(sellerId);
+      return sendSuccessResponse(res, 200, "Average order value fetched successfully", avgOrderValue);
+    }catch(error){
+      if (error instanceof AppError) return sendErrorResponse(res, error.statusCode, error.status, error.message);
+      return sendErrorResponse(res, 500, "Internal Server Error");
+    }
+  },
+  salesPerformanceIndicator: async (req: Request, res: Response) => {
+    try {
+      const sellerId = req.user?.userId;
+      const seller = req.user?.role;
+      if(!sellerId || seller !== "seller") return sendErrorResponse(res, 403, "Forbidden", "You are not authorized to access this resource");
+      const { timeframe } = req.query as { timeframe: AnalyticalDateTimeframe };
+      const validTimeframes = Object.values(AnalyticalDateTimeframe);
+      const safeTimeframe = validTimeframes.includes(timeframe) ? timeframe as AnalyticalDateTimeframe : AnalyticalDateTimeframe.SEVEN_DAYS;
+      const data = await Analytical.getSellerAnalytics(sellerId, safeTimeframe);
+     if (isUserConnected(sellerId)) {
+         getIo().to(`user-${sellerId}`).emit("sales-indicator:subscribe", data);
+      }
+      sendSuccessResponse(res, 200, "Sales performance indicator fetched successfully", data);
+    }catch(error){
+        if (error instanceof AppError) return sendErrorResponse(res, error.statusCode, error.status, error.message);
+        return sendErrorResponse(res, 500, "Internal Server Error");
+    }
+  },
+  getSalesByCategory: async (req: Request, res: Response) => {
+    try {
+      const sellerId = req.user?.userId;
+      const seller = req.user?.role;
+      if(!sellerId || seller !== "seller") return sendErrorResponse(res, 403, "Forbidden", "You are not authorized to access this resource");
+      const salesByCategory = await SellerServices.getSalesByCategory(sellerId);
+      sendSuccessResponse(res, 200, "Sales by category fetched successfully", salesByCategory);
+    }catch(error){
+      if(error instanceof AppError) return sendErrorResponse(res, error.statusCode, error.status, error.message);
+       return sendErrorResponse(res, 500, "Internal Server Error");
+    }
+  },
+  getStoreDetails: async (req: Request, res: Response) => {
+    try{
+      const sellerId = req.params.sellerId as string;
+      if(!sellerId) return sendErrorResponse(res, 400, "Bad Request", "Seller ID is required");
+      const storeDetails = await SellerServices.getStoreFront(sellerId);
+      sendSuccessResponse(res, 200, "Store details fetched successfully", storeDetails);
+    }catch(error){
+      if (error instanceof AppError) return sendErrorResponse(res, error.statusCode, error.status, error.message);
+      return sendErrorResponse(res, 500, "Internal Server Error");
     }
   }
 }

@@ -64,24 +64,20 @@ exports.ProductServices = {
     },
     // Service function to update a product by a seller
     UpdateProduct: async (sellerId, productId, productData) => {
-        const seller = await sellerModel_1.default.findById(sellerId);
+        const seller = await sellerModel_1.default.findById(sellerId).populate("products");
+        console.log(seller?.products);
         if (!seller)
             throw new AppError_1.AppError(404, "Seller not found");
         const isObjectId = mongoose_1.default.Types.ObjectId.isValid(productId);
         const query = isObjectId
             ? { _id: productId, sellerId }
             : { sku: productId, sellerId };
+        console.log("Query for finding product:", query);
         const product = await productModel_1.default.findOne(query);
         if (!product)
             throw new AppError_1.AppError(404, "Product not found");
         if (product.sellerId.toString() !== sellerId) {
             throw new AppError_1.AppError(403, "Unauthorized to update this product");
-        }
-        const category = await categoryModel_1.default.findOne({
-            categoryName: productData.category,
-        });
-        if (!category) {
-            throw new AppError_1.AppError(404, "Category not found");
         }
         if (!product)
             throw new AppError_1.AppError(404, "Product not found");
@@ -187,7 +183,7 @@ exports.ProductServices = {
             const query = isObjectId
                 ? { $or: [{ _id: productId }, { sku: productId }] }
                 : { sku: productId };
-            const product = await productModel_1.default.findOne(query).populate("sellerId", "storeName FirstName LastName");
+            const product = await productModel_1.default.findOne(query).populate("sellerId", "storeName FirstName LastName").populate("category", "categoryName");
             if (!product) {
                 throw new AppError_1.AppError(404, "Product not found");
             }
@@ -203,7 +199,7 @@ exports.ProductServices = {
     },
     getSellerProducts: async (sellerId) => {
         try {
-            const products = await productModel_1.default.find({ sellerId });
+            const products = await productModel_1.default.find({ sellerId }).populate("category", "categoryName");
             return products;
         }
         catch (error) {

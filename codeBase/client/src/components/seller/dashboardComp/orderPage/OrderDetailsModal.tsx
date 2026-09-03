@@ -143,15 +143,15 @@ export default function OrderDetailsModal({
                 <MapPin className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 <span>Shipping Address</span>
               </div>
-              {order.Address ? (
+              {order.address ? (
                 <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
-                  {order.Address.address1}
-                  {order.Address.address2 ? `, ${order.Address.address2}` : ""}
+                  {order.address.address1}
+                  {order.address.address2 ? `, ${order.address.address2}` : ""}
                   <br />
-                  {order.Address.city}, {order.Address.state}{" "}
-                  {order.Address.postalCode}
+                  {order.address.city}, {order.address.state}{" "}
+                  {order.address.postalCode}
                   <br />
-                  {order.Address.country}
+                  {order.address.country}
                 </p>
               ) : (
                 <p className="text-xs text-slate-400">Standard Delivery</p>

@@ -7,6 +7,9 @@ const product_services_1 = require("../services/product.services");
 const notification_services_1 = require("../services/notification.services");
 const Responses_1 = require("../utils/Responses");
 const cloudainry_config_1 = __importDefault(require("../config/cloudainry.config"));
+const virusScan_1 = require("../utils/virusScan");
+const logger_1 = __importDefault(require("../utils/logger"));
+const senitize_1 = require("../utils/senitize");
 const createProduct = async (req, res) => {
     try {
         const sellerId = req.user?.userId ||
@@ -22,17 +25,26 @@ const createProduct = async (req, res) => {
             stock === undefined) {
             return (0, Responses_1.sendErrorResponse)(res, 400, "All required product fields must be provided");
         }
+        const cleanedDescription = (0, senitize_1.sentizeRichText)(productDescription);
+        const sanitizedProductName = (0, senitize_1.sentizePlainText)(productName);
         const images = req.files;
         if (!images || images.length === 0 || !images[0]?.buffer) {
             return (0, Responses_1.sendErrorResponse)(res, 400, "Image file is required");
+        }
+        for (const image of images) {
+            const { isInfected, viruses } = await (0, virusScan_1.scanFile)(image.buffer);
+            if (isInfected) {
+                logger_1.default.warn(`Product Image is infected with viruses: ${viruses.join(", ")}`);
+                return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", `Product Image is infected with viruses: ${viruses.join(", ")}`);
+            }
         }
         const imageUrl = await Promise.all(images.map((image) => (0, cloudainry_config_1.default)(image.buffer, "Egyzon/Products")));
         if (!imageUrl || imageUrl.length === 0) {
             return (0, Responses_1.sendErrorResponse)(res, 400, "Image upload failed");
         }
         const newProduct = await product_services_1.ProductServices.createProduct(sellerId, {
-            productName,
-            productDescription,
+            productName: sanitizedProductName,
+            productDescription: cleanedDescription,
             price: Number(price),
             discount: discount !== undefined ? Number(discount) : 0,
             stock: Number(stock),
@@ -102,14 +114,19 @@ const updateProduct = async (req, res) => {
         if (!productId)
             return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "Product ID is required");
         const { productName, productDescription, price, discount, stock, category } = req.body;
+        const cleanedDescription = (0, senitize_1.sentizeRichText)(productDescription);
+        const sanitizedProductName = (0, senitize_1.sentizePlainText)(productName);
+        if (!sanitizedProductName || !cleanedDescription || price === undefined || stock === undefined) {
+            return (0, Responses_1.sendErrorResponse)(res, 400, "Bad Request", "All required product fields must be provided");
+        }
         const images = req.files;
         let imageUrl;
         if (images && images.length > 0) {
             imageUrl = await Promise.all(images.map((image) => (0, cloudainry_config_1.default)(image.buffer, "Egyzon/Products"))).then((urls) => urls.map((url) => url.secure_url));
         }
         const editProduct = await product_services_1.ProductServices.UpdateProduct(user, productId, {
-            productName,
-            productDescription,
+            productName: sanitizedProductName,
+            productDescription: cleanedDescription,
             price: price !== undefined ? Number(price) : undefined,
             discount: discount !== undefined ? Number(discount) : undefined,
             stock: stock !== undefined ? Number(stock) : undefined,

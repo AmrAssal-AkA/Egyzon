@@ -6,6 +6,7 @@ import { getNotifications } from "@/services/notificationService";
 import { useAuth } from "./useAuth";
 
 export function useSocket() {
+  const socket = useNotificationStore((state) => state.socket);
   const connect = useNotificationStore((state) => state.connect);
   const disconnect = useNotificationStore((state) => state.disconnect);
   const initialNotifications = useNotificationStore((state) => state.setInitialNotifications);
@@ -29,7 +30,7 @@ export function useSocket() {
           initialNotifications(response.data);
         }
       } catch (error) {
-        console.error("Failed to fetch initial notifications:", error);
+        console.error("Error fetching initial notifications:", error);
       } finally {
         if (!cancelled) {
           setLoading(false);
@@ -41,8 +42,15 @@ export function useSocket() {
     return () => {
       cancelled = true;
       disconnect();
+      console.log("Socket disconnected and cleanup done.");
     };
   }, [connect, disconnect, initialNotifications, setLoading, user]);
 
-  return {notifications, isConnected, isLoading, markAsRead, markAllAsRead};
+  useEffect(() => {
+    if (isConnected && socket && user?.role === "seller") {
+      socket.emit("sales-indicator:subscribe");
+    }
+  }, [isConnected, socket, user?.role]);
+
+  return { socket, notifications, isConnected, isLoading, markAsRead, markAllAsRead };
 }

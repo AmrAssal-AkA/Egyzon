@@ -1,21 +1,21 @@
 import multer from "multer";
 import path from "path";
+import {fileTypeFromBuffer} from "file-type";
 
 
 const storage = multer.memoryStorage();
+const allowedimageTypes = new Set(["image/jpeg", "image/png", "image/gif", "image/jpg"]);
 
-export const upload = multer({
+const Max_Image_Size = 25 * 1024 * 1024; 
+
+const upload = multer({
   storage: storage,
-  fileFilter: (req, file, cb) => {
-    const filetypes = /jpeg|jpg|png|gif/;
-    const mimetype = filetypes.test(file.mimetype);
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-
-    if (mimetype && extname) {
-      return cb(null, true);
-    }
-    console.log("Error: File upload only supports the following filetypes - " + filetypes);
-    cb(new Error("Error: File upload only supports the following filetypes - " + filetypes));
-  },
-  limits: { fileSize: 25 * 1024 * 1024 }, 
+  limits: { fileSize: Max_Image_Size },
 })
+
+const validateImageFile = async (file: Express.Multer.File): Promise<void> => {
+  const fileType = await fileTypeFromBuffer(file.buffer);
+  if (!fileType || !allowedimageTypes.has(fileType.mime)) return;
+}
+
+export { upload, validateImageFile, Max_Image_Size, allowedimageTypes };

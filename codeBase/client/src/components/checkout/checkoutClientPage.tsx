@@ -24,11 +24,24 @@ import { ShippingInfo, ValidationErrors } from "@/types/cart.type";
 import { PaymentMethodType } from "@/types/order.types";
 import { placeOrder } from "@/services/checkoutService";
 import { useAuth } from "@/hooks/useAuth";
+import { OrderSummaryCard } from "./_components/OrderSummaryCard";
 
 export default function CheckoutClientPage() {
-  const { cartItems, clearCart, setLastOrder, clearLocalCart } = useCartStore();
+  const {
+    cartItems,
+    clearCart,
+    setLastOrder,
+    clearLocalCart,
+    fetchCartFromServer,
+  } = useCartStore();
   const router = useRouter();
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      fetchCartFromServer();
+    }
+  }, [user, fetchCartFromServer]);
 
   // State Management
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
@@ -70,18 +83,18 @@ export default function CheckoutClientPage() {
   const [orderNotes, setOrderNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Price Calculations (Memoized)
+  // Price Calculations ()
   const subtotal = useMemo(() => {
     return cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   }, [cartItems]);
 
   const shipping = useMemo(() => {
-    return subtotal > 0 ? 50 : 0;
+    return subtotal > 0 ? 10 : 0;
   }, [subtotal]);
 
   const taxes = useMemo(() => {
-    return Math.round(subtotal * 0.14);
-  }, [subtotal]);
+    return 0;
+  }, []);
 
   const discount = useMemo(() => {
     return 0;
@@ -242,9 +255,7 @@ export default function CheckoutClientPage() {
     setIsSubmitting(true);
     try {
       const addressPayload = {
-        address1: shippingInfo.address1
-          .trim()
-          .replace(/[^a-zA-Z0-9\s-]/g, ""),
+        address1: shippingInfo.address1.trim().replace(/[^a-zA-Z0-9\s-]/g, ""),
         address2: address2Clean
           ? address2Clean.replace(/[^a-zA-Z0-9\s-]/g, "")
           : undefined,
@@ -263,14 +274,20 @@ export default function CheckoutClientPage() {
         lastName: shippingInfo.lastName.trim(),
         email: user?.email || "customer@egyzon.com",
         phoneNumber: cleanPhone,
-        apartment: address2Clean ? address2Clean.replace(/[^a-zA-Z0-9\s-]/g, "") : "N/A",
+        apartment: address2Clean
+          ? address2Clean.replace(/[^a-zA-Z0-9\s-]/g, "")
+          : "N/A",
         floor: "N/A",
         street: shippingInfo.address1.trim().replace(/[^a-zA-Z0-9\s-]/g, ""),
         building: "N/A",
         city: shippingInfo.city.trim().replace(/[^a-zA-Z0-9\s-]/g, ""),
         state: shippingInfo.state.trim().replace(/[^a-zA-Z0-9\s-]/g, ""),
-        country: (shippingInfo.country || "Egypt").trim().replace(/[^a-zA-Z0-9\s-]/g, ""),
-        postalCode: shippingInfo.postalCode.trim().replace(/[^a-zA-Z0-9\s-]/g, ""),
+        country: (shippingInfo.country || "Egypt")
+          .trim()
+          .replace(/[^a-zA-Z0-9\s-]/g, ""),
+        postalCode: shippingInfo.postalCode
+          .trim()
+          .replace(/[^a-zA-Z0-9\s-]/g, ""),
       };
 
       const res = await placeOrder({
@@ -282,7 +299,19 @@ export default function CheckoutClientPage() {
         notes: cleanNotes || undefined,
       });
 
-      const orderData = res.data;
+      const responsePayload = res.data;
+      const orderData =
+        (responsePayload as { order?: typeof responsePayload })?.order ||
+        responsePayload;
+
+      const serverSubtotal = orderData?.subTotal ?? subtotal;
+      const serverShipping = orderData?.shippingFee ?? shipping;
+      const serverTax = orderData?.taxAmount ?? 0;
+      const serverDiscount = orderData?.discount ?? discount;
+      const serverTotal =
+        orderData?.totalAmount ??
+        serverSubtotal + serverShipping - serverDiscount;
+
       const paymentLabels: Record<PaymentMethodType, string> = {
         cashOnDelivery: "Cash on Delivery",
         creditCard: "Credit Card",
@@ -299,24 +328,30 @@ export default function CheckoutClientPage() {
           `EGY-${new Date().getFullYear()}-${Math.floor(
             100000 + Math.random() * 900000,
           )}`,
-        orderDate: (orderData?.orderDate || orderData?.createdAt)
-          ? new Date(orderData.orderDate || orderData.createdAt!).toLocaleDateString("en-US", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })
-          : new Date().toLocaleDateString("en-US", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            }),
+        orderDate:
+          orderData?.orderDate || orderData?.createdAt
+            ? new Date(
+                orderData.orderDate || orderData.createdAt!,
+              ).toLocaleDateString("en-US", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })
+            : new Date().toLocaleDateString("en-US", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              }),
         orderItems: [...cartItems],
-        subtotal: orderData?.subTotal ?? subtotal,
-        shipping: orderData?.shippingFee ?? shipping,
-        tax: orderData?.taxAmount ?? taxes,
-        discount: orderData?.discount ?? discount,
-        total: orderData?.totalAmount ?? grandTotal,
-        orderStatus: orderData?.orderStatus || "Confirmed",
+        subtotal: serverSubtotal,
+        shipping: serverShipping,
+        tax: serverTax,
+        discount: serverDiscount,
+        total: serverTotal,
+        orderStatus:
+          paymentMethod === "creditCard"
+            ? "Pending Payment"
+            : orderData?.orderStatus || "Confirmed",
         delivery: {
           method: "Standard Shipping",
           estimatedDelivery: "3-5 business days",
@@ -325,15 +360,19 @@ export default function CheckoutClientPage() {
         payment: {
           type: paymentLabels[paymentMethod] || "Cash on Delivery",
           provider: paymentProviders[paymentMethod] || "Cash Payment",
-          last4: paymentMethod === "creditCard" ? "••••" : "COD",
-          status: orderData?.paymentStatus === "completed" ? "Paid" : "Pending",
+          last4: paymentMethod === "creditCard" ? "••••" : "",
+          status:
+            orderData?.paymentStatus === "completed" ||
+            orderData?.paymentStatus === "paid"
+              ? "Paid"
+              : "Pending",
         },
         summary: {
-          subtotal: orderData?.subTotal ?? subtotal,
-          shipping: orderData?.shippingFee ?? shipping,
-          tax: orderData?.taxAmount ?? taxes,
-          discount: orderData?.discount ?? discount,
-          total: orderData?.totalAmount ?? grandTotal,
+          subtotal: serverSubtotal,
+          shipping: serverShipping,
+          tax: serverTax,
+          discount: serverDiscount,
+          total: serverTotal,
           currency: "EGP",
         },
         address: {
@@ -351,10 +390,20 @@ export default function CheckoutClientPage() {
       });
 
       clearLocalCart();
-      toast.success("Order placed successfully!");
-        router.push("/checkout/confirmation");
-      
 
+      const paymentUrl =
+        res?.data?.paymentUrl ||
+        (res?.data as { order?: { paymentUrl?: string } })?.order?.paymentUrl ||
+        (orderData as { paymentUrl?: string })?.paymentUrl;
+
+      if (paymentMethod === "creditCard" && paymentUrl) {
+        toast.info("Redirecting to secure payment gateway...");
+        window.location.href = paymentUrl;
+        return;
+      }
+
+      toast.success("Order placed successfully!");
+      router.push("/checkout/confirmation");
     } catch (error: any) {
       toast.error(error.message || "Failed to place order. Please try again.");
     } finally {
@@ -894,59 +943,18 @@ export default function CheckoutClientPage() {
           </div>
 
           {/* Order Summary Card */}
-          <div className="border border-border rounded-lg p-6 bg-card text-card-foreground shadow-sm flex flex-col gap-4">
-            <h2 className="text-xl font-semibold border-b border-border pb-3">
-              Order Summary
-            </h2>
-
-            <div className="flex flex-col gap-2.5 text-sm">
-              <div className="flex justify-between text-muted-foreground">
-                <span>Subtotal</span>
-                <span className="font-medium text-foreground">
-                  {subtotal.toFixed(2)} EGP
-                </span>
-              </div>
-              <div className="flex justify-between text-muted-foreground">
-                <span>Taxes (14%)</span>
-                <span className="font-medium text-foreground">
-                  {taxes.toFixed(2)} EGP
-                </span>
-              </div>
-              <div className="flex justify-between text-muted-foreground">
-                <span>Shipping</span>
-                <span className="font-medium text-foreground">
-                  {shipping === 0 ? "Free" : `${shipping.toFixed(2)} EGP`}
-                </span>
-              </div>
-              <div className="flex justify-between text-muted-foreground">
-                <span>Discount</span>
-                <span className="font-medium text-foreground">
-                  {discount === 0 ? "0.00 EGP" : `-${discount.toFixed(2)} EGP`}
-                </span>
-              </div>
-              <div className="border-t border-border my-2 pt-2 flex justify-between font-semibold text-base">
-                <span>Grand Total</span>
-                <span className="text-foreground">
-                  {grandTotal.toFixed(2)} EGP
-                </span>
-              </div>
-            </div>
-
-            <button
-              onClick={handleConfirmOrder}
-              disabled={isSubmitting || cartItems.length === 0}
-              className="w-full mt-2 bg-primary text-primary-foreground font-semibold py-3 rounded-lg hover:bg-primary/90 transition-colors cursor-pointer text-center flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Placing Order...</span>
-                </>
-              ) : (
-                "Confirm Order"
-              )}
-            </button>
-          </div>
+          <OrderSummaryCard
+            subtotal={subtotal}
+            shipping={shipping}
+            taxes={taxes}
+            discount={discount}
+            grandTotal={grandTotal}
+            currency="EGP"
+            itemCount={cartItems.length}
+            isSubmitting={isSubmitting}
+            paymentMethod={paymentMethod}
+            onConfirmOrder={handleConfirmOrder}
+          />
         </div>
       )}
     </div>

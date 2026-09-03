@@ -3,7 +3,7 @@ import { AppError } from "../utils/AppError";
 import { PaymentStatus } from "../types/payment.type";
 import { OrderStatus } from "../types/order.type";
 import Order from "../models/orderModel";
-
+import logger from "../utils/logger";
 export class PaymentService {
   constructor(
     private payment: typeof Payment,
@@ -43,7 +43,6 @@ export class PaymentService {
       params.amount,
       params.billingData,
     );
-    console.log("Payment initialized with Paymob order ID:", paymobOrderId);
     const paymentDoc = await this.payment.create({
       paymobOrderId,
       order: params.orderMongoId,
@@ -53,7 +52,6 @@ export class PaymentService {
       paymentStatus: PaymentStatus.pending,
       gateway: "paymob",
     });
-    console.log("Payment document created in database:", paymentDoc);
     return {
       paymentDoc,
       paymentUrl: this.paymobClient.buildPaymobIframeUrl(paymentKey),
@@ -79,6 +77,7 @@ export class PaymentService {
         "Payment not found for the given Paymob order ID",
       );
     }
+    logger.info(`Handling Paymob transaction for order: ${paymobOrderId}`);
     payment.transactionId = transaction.id;
     payment.paymentStatus = isSuccess
       ? PaymentStatus.paid
@@ -89,6 +88,7 @@ export class PaymentService {
       payment.cardLast4 = transaction.source_data.pan;
       payment.cardBrand = transaction.source_data.sub_type;
     }
+    logger.info(`Payment status for order ${paymobOrderId}: ${payment.paymentStatus}`);
     await payment.save();
     const order = await Order.findOne({ payment: payment._id });
     if (order) {

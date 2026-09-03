@@ -12,9 +12,11 @@ export enum OrderStatus {
 
 export interface IOrderItem {
     product: Types.ObjectId;
+    seller: Types.ObjectId;
     quantity: number;
     unitPrice: number;
-    subtotal: number;
+    discount: number;
+    total: number;
 }
 
 export interface PaymentMethod{
@@ -45,4 +47,5 @@ export interface IOrder extends Document{
         country: string;
     };
     orderItems: IOrderItem[];
+    platformFee: number;
 }

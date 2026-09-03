@@ -6,6 +6,7 @@ import SellerFooter from '@/components/seller/dashboardComp/footer'
 import { PrivateRoute } from '@/components/auth/PrivateRoute'
 import { Roles } from '@/lib/auth/roles'
 import NotificationListener from '@/components/seller/common/NotificationListener'
+import {ToastContainer} from "@/components/toast/ToastContainer";
 
 
 export const metadata = {
@@ -27,6 +28,7 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
         <div className="flex-1 flex flex-col gap-6 min-w-0">
           <SellerHeader />
           <section className="flex-1">{children}</section>
+          <ToastContainer />
           <SellerFooter />
         </div>
       </div>

@@ -1,4 +1,5 @@
 import {z} from "zod";
+import { sentizePlainText } from "../utils/senitize";
 
 const safeTextSchema = z.string().regex(/^[a-zA-Z0-9\s]+$/, { message: "Only alphanumeric characters and spaces are allowed" });
 const PasswordSchema = z
@@ -11,15 +12,15 @@ const phoneNumberSchema = z.string().regex(/^\+?[1-9]\d{1,14}$/, { message: "Inv
 
 
 export const userBaseSchema = z.object({
-    FirstName: safeTextSchema.min(1, { message: "First name is required" }),
-    LastName: safeTextSchema.min(1, { message: "Last name is required" }),
+    FirstName: safeTextSchema.min(1, { message: "First name is required" }).transform(sentizePlainText),
+    LastName: safeTextSchema.min(1, { message: "Last name is required" }).transform(sentizePlainText),
     email: z.string().email({ message: "Invalid email address" }),
 });
 
 export const RegisterSchema = z.object({
     body: z.object({
-        FirstName: safeTextSchema.min(1, { message: "First name is required" }),
-        LastName: safeTextSchema.min(1, { message: "Last name is required" }),
+        FirstName: safeTextSchema.min(1, { message: "First name is required" }).transform(sentizePlainText),
+        LastName: safeTextSchema.min(1, { message: "Last name is required" }).transform(sentizePlainText),
         email: z.string().email({ message: "Invalid email address" }),
         password: PasswordSchema,
     })
@@ -35,16 +36,16 @@ export const updateUserSchema = z.object({
 
 export const LoginSchema = z.object({
     body: z.object({
-        email: z.string().email (),
-        password: z.string().min(1, 'Password is required'),
+        email: z.string().email ().transform(sentizePlainText),
+        password: z.string().min(1, 'Password is required').transform(sentizePlainText),
     })
 });
 
 
 export const userResposnseSchema = z.object({
     role: z.enum(['customer', 'seller', 'admin']),
-    address: z.array(safeTextSchema),
-    phoneNumber: z.array(phoneNumberSchema),
+    address: z.array(safeTextSchema).transform((address) => address.map(sentizePlainText)),
+    phoneNumber: z.array(phoneNumberSchema).transform((phoneNumbers) => phoneNumbers.map((phone) => phone)),
     isBlocked: z.boolean(),
     createdAt: z.date(),
 })

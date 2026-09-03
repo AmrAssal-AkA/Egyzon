@@ -22,8 +22,7 @@ import {
   addProductToCategory,
 } from "@/services/product";
 import { Product } from "@/types/product.type";
-import { toast } from "sonner";
-
+import { addToast, updateToast } from "@/stores/toast";
 
 interface CategoryOption {
   id: string;
@@ -56,17 +55,14 @@ export default function AddProductModel({
       ? editingProduct.name || editingProduct.productName || ""
       : "",
     description: editingProduct
-      ? editingProduct.description ||
-        editingProduct.productDescription ||
-        ""
+      ? editingProduct.description || editingProduct.productDescription || ""
       : "",
-    category: editingProduct
-      ? typeof editingProduct.category === "object" && editingProduct.category !== null
-        ? (editingProduct.category as any).categoryName || (editingProduct.category as any).name || ""
-        : typeof editingProduct.category === "string"
-          ? editingProduct.category
-          : ""
-      : "",
+    category:
+      typeof editingProduct?.category === "string"
+        ? editingProduct.category
+        : (editingProduct?.category as any)?.categoryName ||
+          (editingProduct?.category as any)?.name ||
+          "",
     price: editingProduct ? editingProduct.price.toString() : "",
     discount: editingProduct
       ? (
@@ -85,10 +81,16 @@ export default function AddProductModel({
   const [productImages, setProductImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>(() => {
     if (!editingProduct) return [];
-    if (Array.isArray(editingProduct.imageUrl) && editingProduct.imageUrl.length > 0) {
+    if (
+      Array.isArray(editingProduct.imageUrl) &&
+      editingProduct.imageUrl.length > 0
+    ) {
       return editingProduct.imageUrl;
     }
-    if (typeof editingProduct.imageUrl === "string" && editingProduct.imageUrl) {
+    if (
+      typeof editingProduct.imageUrl === "string" &&
+      editingProduct.imageUrl
+    ) {
       return [editingProduct.imageUrl];
     }
     if (editingProduct.image) {
@@ -102,12 +104,13 @@ export default function AddProductModel({
       setFormData({
         name: editingProduct.name || editingProduct.productName || "",
         description:
-          editingProduct.description ||
-          editingProduct.productDescription ||
-          "",
+          editingProduct.description || editingProduct.productDescription || "",
         category:
-          typeof editingProduct.category === "object" && editingProduct.category !== null
-            ? (editingProduct.category as any).categoryName || (editingProduct.category as any).name || ""
+          typeof editingProduct.category === "object" &&
+          editingProduct.category !== null
+            ? (editingProduct.category as any).categoryName ||
+              (editingProduct.category as any).name ||
+              ""
             : typeof editingProduct.category === "string"
               ? editingProduct.category
               : "",
@@ -121,13 +124,16 @@ export default function AddProductModel({
         status: (editingProduct.status as Product["status"]) || "Active",
       });
 
-      const initialImgs = Array.isArray(editingProduct.imageUrl) && editingProduct.imageUrl.length > 0
-        ? editingProduct.imageUrl
-        : typeof editingProduct.imageUrl === "string" && editingProduct.imageUrl
-          ? [editingProduct.imageUrl]
-          : editingProduct.image
-            ? [editingProduct.image]
-            : [];
+      const initialImgs =
+        Array.isArray(editingProduct.imageUrl) &&
+        editingProduct.imageUrl.length > 0
+          ? editingProduct.imageUrl
+          : typeof editingProduct.imageUrl === "string" &&
+              editingProduct.imageUrl
+            ? [editingProduct.imageUrl]
+            : editingProduct.image
+              ? [editingProduct.image]
+              : [];
       setImagePreviews(initialImgs);
     }
   }, [editingProduct]);
@@ -168,16 +174,19 @@ export default function AddProductModel({
           setCategoriesList(options);
 
           if (options.length > 0) {
-            const targetCategory = editingProduct?.category || formData.category;
+            const targetCategory =
+              editingProduct?.category || formData.category;
             const initialMatch = options.find(
               (c) =>
-                c.name.toLowerCase() ===
-                (targetCategory || "").toLowerCase(),
+                c.name.toLowerCase() === (targetCategory || "").toLowerCase(),
             );
             if (initialMatch) {
               setSelectedCategoryId(initialMatch.id);
               if (!formData.category) {
-                setFormData((prev) => ({ ...prev, category: initialMatch.name }));
+                setFormData((prev) => ({
+                  ...prev,
+                  category: initialMatch.name,
+                }));
               }
             } else if (!formData.category && options[0]) {
               setFormData((prev) => ({ ...prev, category: options[0].name }));
@@ -308,31 +317,54 @@ export default function AddProductModel({
 
       const discountValue = Number(formData.discount || 0);
       if (isNaN(discountValue) || discountValue < 0 || discountValue > 100) {
-        setFormError("Please enter a valid discount percentage between 0 and 100.");
+        setFormError(
+          "Please enter a valid discount percentage between 0 and 100.",
+        );
         return;
       }
 
-      try {
-        setIsSubmitting(true);
-      await applyDiscount(prodId, discountValue);
+      const prodName =
+        editingProduct?.name || editingProduct?.productName || "Product";
+      const toastId = `discount-${prodId}-${Date.now()}`;
+      onClose();
 
-
-        onSave({
-          ...editingProduct,
-          discount: discountValue,
+      const executeDiscount = async () => {
+        addToast({
+          id: toastId,
+          message: `Applying ${discountValue}% discount to "${prodName}"...`,
+          progress: 30,
+          status: "loading",
+          onRetry: () => executeDiscount(),
         });
-        onClose();
-      } catch (err: any) {
-        console.error("Apply discount failed:", err);
-        const errorMessage =
-          err?.response?.data?.message ||
-          err?.message ||
-          err?.error ||
-          (typeof err === "string" ? err : "Failed to apply discount");
-        setFormError(errorMessage);
-      } finally {
-        setIsSubmitting(false);
-      }
+
+        try {
+          await applyDiscount(prodId, discountValue);
+          updateToast(toastId, {
+            progress: 100,
+            status: "success",
+            message: `Discount of ${discountValue}% applied to "${prodName}" successfully!`,
+          });
+          onSave({
+            ...editingProduct,
+            discount: discountValue,
+          });
+        } catch (err: any) {
+          console.error("Apply discount failed:", err);
+          const errorMessage =
+            err?.response?.data?.message ||
+            err?.message ||
+            err?.error ||
+            (typeof err === "string"
+              ? err
+              : "Failed to apply discount. Try again.");
+          updateToast(toastId, {
+            status: "error",
+            message: errorMessage,
+          });
+        }
+      };
+
+      executeDiscount();
       return;
     }
 
@@ -365,144 +397,224 @@ export default function AddProductModel({
       return;
     }
 
-    try {
-      setIsSubmitting(true);
+    const isEditing = Boolean(editingProduct);
+    const prodId = editingProduct?._id || editingProduct?.id;
+    const targetProdId = prodId ? String(prodId) : "";
+    if (isEditing && !targetProdId) {
+      setFormError("Product ID is required for editing.");
+      return;
+    }
 
-      if (editingProduct) {
-        const prodId = editingProduct._id || editingProduct.id;
-        if (!prodId) {
-          setFormError("Product ID is required for editing.");
-          return;
-        }
+    const currentFormData = { ...formData };
+    const currentImages = [...productImages];
+    const toastId = isEditing
+      ? `edit-product-${targetProdId}-${Date.now()}`
+      : `add-product-${Date.now()}`;
+    const actionLabel = isEditing ? "Saving changes for" : "Creating product";
 
-        const editFormData = new FormData();
-        editFormData.append("productId", String(prodId));
-        editFormData.append("productName", formData.name.trim());
-        editFormData.append("productDescription", formData.description.trim());
-        editFormData.append("price", String(Number(formData.price)));
-        editFormData.append("discount", String(Number(formData.discount || 0)));
-        editFormData.append("category", (formData.category || "").trim());
-        editFormData.append("stock", String(Number(formData.stock)));
+    onClose();
 
-        if (productImages.length > 0) {
-          productImages.forEach((file) => {
-            editFormData.append("image", file, file.name);
-          });
-        }
+    const executeSave = async () => {
+      addToast({
+        id: toastId,
+        message: `${actionLabel} "${currentFormData.name}"...`,
+        progress: 10,
+        status: "loading",
+        onRetry: () => executeSave(),
+      });
 
-        const res = await editProduct(prodId, editFormData);
-        toast.success(res?.message || "Product updated successfully");
-
-        let activeCatId = selectedCategoryId;
-        if (!activeCatId) {
-          const match = categoriesList.find(
-            (c) =>
-              c.name.toLowerCase() === (formData.category || "").toLowerCase(),
+      try {
+        if (isEditing) {
+          const editFormData = new FormData();
+          editFormData.append("productId", targetProdId);
+          editFormData.append("productName", currentFormData.name.trim());
+          editFormData.append(
+            "productDescription",
+            currentFormData.description.trim(),
           );
-          if (match?.id) {
-            activeCatId = match.id;
-          }
-        }
+          editFormData.append("price", String(Number(currentFormData.price)));
+          editFormData.append(
+            "discount",
+            String(Number(currentFormData.discount || 0)),
+          );
+          editFormData.append(
+            "category",
+            (currentFormData.category || "").trim(),
+          );
+          editFormData.append("stock", String(Number(currentFormData.stock)));
 
-        if (activeCatId) {
-          try {
-            await addProductToCategory({
-              categoryId: activeCatId,
-              productId: String(prodId),
+          if (currentImages.length > 0) {
+            currentImages.forEach((file) => {
+              editFormData.append("image", file, file.name);
             });
-          } catch (catErr) {
-            console.warn("Category linking notice:", catErr);
           }
+
+          const res = await editProduct(
+            targetProdId,
+            editFormData,
+            (percent) => {
+              updateToast(toastId, {
+                progress: Math.min(95, percent),
+                status: "loading",
+                message:
+                  currentImages.length > 0
+                    ? `Uploading product images... ${percent}%`
+                    : `Saving "${currentFormData.name}"... ${percent}%`,
+              });
+            },
+          );
+
+          let activeCatId = selectedCategoryId;
+          if (!activeCatId) {
+            const match = categoriesList.find(
+              (c) =>
+                c.name.toLowerCase() ===
+                (currentFormData.category || "").toLowerCase(),
+            );
+            if (match?.id) {
+              activeCatId = match.id;
+            }
+          }
+
+          if (activeCatId) {
+            try {
+              await addProductToCategory({
+                categoryId: activeCatId,
+                productId: String(prodId),
+              });
+            } catch (catErr) {
+              console.warn("Category linking notice:", catErr);
+            }
+          }
+
+          updateToast(toastId, {
+            progress: 100,
+            status: "success",
+            message:
+              res?.message ||
+              `Product "${currentFormData.name}" updated successfully!`,
+          });
+
+          onSave(
+            res?.data || {
+              ...editingProduct,
+              name: currentFormData.name,
+              productName: currentFormData.name,
+              description: currentFormData.description,
+              productDescription: currentFormData.description,
+              category: currentFormData.category,
+              price: parseFloat(currentFormData.price) || 0,
+              discount: parseFloat(currentFormData.discount) || 0,
+              stock: parseInt(currentFormData.stock, 10) || 0,
+              status: currentFormData.status,
+            },
+          );
+        } else {
+          const dataToSend = new FormData();
+          dataToSend.append("productName", currentFormData.name.trim());
+          dataToSend.append(
+            "productDescription",
+            currentFormData.description.trim(),
+          );
+          dataToSend.append("price", String(Number(currentFormData.price)));
+          dataToSend.append(
+            "discount",
+            String(Number(currentFormData.discount || 0)),
+          );
+          dataToSend.append(
+            "category",
+            (currentFormData.category || "").trim(),
+          );
+          dataToSend.append("stock", String(Number(currentFormData.stock)));
+
+          if (currentImages.length > 0) {
+            currentImages.forEach((file) => {
+              dataToSend.append("image", file, file.name);
+            });
+          }
+
+          const res = await addProduct(dataToSend, (percent) => {
+            updateToast(toastId, {
+              progress: Math.min(95, percent),
+              status: "loading",
+              message:
+                currentImages.length > 0
+                  ? `Uploading product images... ${percent}%`
+                  : `Creating product "${currentFormData.name}"... ${percent}%`,
+            });
+          });
+
+          const createdProductId = String(
+            res?.data?._id ||
+              res?.data?.product?._id ||
+              res?.data?.id ||
+              res?._id ||
+              res?.product?._id ||
+              "",
+          );
+
+          let activeCatId = selectedCategoryId;
+          if (!activeCatId) {
+            const match = categoriesList.find(
+              (c) =>
+                c.name.toLowerCase() ===
+                (currentFormData.category || "").toLowerCase(),
+            );
+            if (match?.id) {
+              activeCatId = match.id;
+            }
+          }
+
+          if (createdProductId && activeCatId) {
+            try {
+              await addProductToCategory({
+                categoryId: activeCatId,
+                productId: createdProductId,
+              });
+            } catch (catErr) {
+              console.warn(
+                "Product created, but category linking notice:",
+                catErr,
+              );
+            }
+          }
+
+          updateToast(toastId, {
+            progress: 100,
+            status: "success",
+            message:
+              res?.message ||
+              `Product "${currentFormData.name}" created successfully!`,
+          });
+
+          onSave(
+            res?.data || {
+              name: currentFormData.name,
+              category: currentFormData.category,
+              price: parseFloat(currentFormData.price) || 0,
+              stock: parseInt(currentFormData.stock, 10) || 0,
+              sku: "AUTO-GENERATED",
+              status: currentFormData.status,
+            },
+          );
         }
-
-        onSave(
-          res?.data || {
-            ...editingProduct,
-            name: formData.name,
-            productName: formData.name,
-            description: formData.description,
-            productDescription: formData.description,
-            category: formData.category,
-            price: parseFloat(formData.price) || 0,
-            discount: parseFloat(formData.discount) || 0,
-            stock: parseInt(formData.stock, 10) || 0,
-            status: formData.status,
-          },
-        );
-        onClose();
-        return;
-      }
-
-      const dataToSend = new FormData();
-      dataToSend.append("productName", formData.name.trim());
-      dataToSend.append("productDescription", formData.description.trim());
-      dataToSend.append("price", String(Number(formData.price)));
-      dataToSend.append("discount", String(Number(formData.discount || 0)));
-      dataToSend.append("category", (formData.category || "").trim());
-      dataToSend.append("stock", String(Number(formData.stock)));
-
-      if (productImages.length > 0) {
-        productImages.forEach((file) => {
-          dataToSend.append("image", file, file.name);
+      } catch (err: any) {
+        console.error("Product submission failed:", err);
+        const errorMessage =
+          err?.response?.data?.message ||
+          err?.message ||
+          err?.error ||
+          (typeof err === "string"
+            ? err
+            : "Failed to process product. Try again.");
+        updateToast(toastId, {
+          status: "error",
+          message: errorMessage,
         });
       }
+    };
 
-      const res = await addProduct(dataToSend);
-      toast.success(res?.message || "Product created successfully");
-
-      const createdProductId = String(
-        res?.data?._id ||
-          res?.data?.product?._id ||
-          res?.data?.id ||
-          res?._id ||
-          res?.product?._id ||
-          "",
-      );
-
-      let activeCatId = selectedCategoryId;
-      if (!activeCatId) {
-        const match = categoriesList.find(
-          (c) =>
-            c.name.toLowerCase() === (formData.category || "").toLowerCase(),
-        );
-        if (match?.id) {
-          activeCatId = match.id;
-        }
-      }
-
-      if (createdProductId && activeCatId) {
-        try {
-          await addProductToCategory({
-            categoryId: activeCatId,
-            productId: createdProductId,
-          });
-        } catch (catErr) {
-          console.warn("Product created, but category linking notice:", catErr);
-        }
-      }
-
-      onSave(
-        res?.data || {
-          name: formData.name,
-          category: formData.category,
-          price: parseFloat(formData.price) || 0,
-          stock: parseInt(formData.stock, 10) || 0,
-          sku: "AUTO-GENERATED",
-          status: formData.status,
-        },
-      );
-      onClose();
-    } catch (err: any) {
-      console.error("Product submission failed:", err);
-      const errorMessage =
-        err?.response?.data?.message ||
-        err?.message ||
-        err?.error ||
-        (typeof err === "string" ? err : "Failed to process product");
-      setFormError(errorMessage);
-    } finally {
-      setIsSubmitting(false);
-    }
+    executeSave();
   };
 
   return (
@@ -610,7 +722,9 @@ export default function AddProductModel({
                 disabled={isDiscountOnly}
                 onClick={() => setCategoryMode("existing")}
                 className={`py-1.5 px-3 rounded-md text-xs font-medium transition-all ${
-                  isDiscountOnly ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+                  isDiscountOnly
+                    ? "cursor-not-allowed opacity-60"
+                    : "cursor-pointer"
                 } ${
                   categoryMode === "existing"
                     ? "bg-blue-600 text-white shadow-xs"
@@ -624,7 +738,9 @@ export default function AddProductModel({
                 disabled={isDiscountOnly}
                 onClick={() => setCategoryMode("new")}
                 className={`py-1.5 px-3 rounded-md text-xs font-medium transition-all flex items-center justify-center gap-1 ${
-                  isDiscountOnly ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+                  isDiscountOnly
+                    ? "cursor-not-allowed opacity-60"
+                    : "cursor-pointer"
                 } ${
                   categoryMode === "new"
                     ? "bg-blue-600 text-white shadow-xs"
@@ -782,7 +898,7 @@ export default function AddProductModel({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 items-center gap-1">
                 <span>Discount (%)</span>
                 {isDiscountOnly && (
                   <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold">
@@ -826,30 +942,6 @@ export default function AddProductModel({
               />
             </div>
           </div>
-
-          {/* SKU Field - Disabled & Server Auto-Generated */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center justify-between">
-              <span>SKU Code</span>
-              <span className="text-[10px] text-slate-400 font-normal">
-                Auto-generated by server
-              </span>
-            </label>
-            <input
-              type="text"
-              disabled
-              value={
-                editingProduct
-                  ? editingProduct.sku ||
-                    (editingProduct.id || editingProduct._id
-                      ? `SKU-${String(editingProduct.id || editingProduct._id).slice(-6)}`
-                      : "Auto-generated by server")
-                  : "Auto-generated by server"
-              }
-              className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-500 dark:text-slate-400 font-mono cursor-not-allowed select-none"
-            />
-          </div>
-
           {/* Product Image Upload */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">

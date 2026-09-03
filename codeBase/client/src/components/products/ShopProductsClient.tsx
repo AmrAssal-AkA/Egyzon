@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { useFilterStore } from "@/stores/buyer/filter";
 
@@ -24,9 +25,11 @@ import ProductsLoading from "@/app/(store)/products/loading";
 function ShopProductsClient({
   products: initialProducts,
 }: { products?: Product[] } = {}) {
+  const searchParams = useSearchParams();
   const { products: fetchedProducts, isLoading, error } = useAllProducts();
 
   const searchQuery = useFilterStore((state) => state.searchQuery);
+  const setSearchQuery = useFilterStore((state) => state.setSearchQuery);
   const minPrice = useFilterStore((state) => state.minPrice);
   const maxPrice = useFilterStore((state) => state.maxPrice);
   const rating = useFilterStore((state) => state.rating);
@@ -35,6 +38,13 @@ function ShopProductsClient({
   const color = useFilterStore((state) => state.color);
   const selectedCategories = useFilterStore((state) => state.category);
   const selectedBrands = useFilterStore((state) => state.brand);
+
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q !== null && q !== searchQuery) {
+      setSearchQuery(q);
+    }
+  }, [searchParams, searchQuery, setSearchQuery]);
 
   const products = useMemo(
     () =>

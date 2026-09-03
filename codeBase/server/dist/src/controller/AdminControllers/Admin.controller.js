@@ -55,10 +55,12 @@ exports.AdminController = {
             const role = req.user?.role;
             if (!adminId || role !== "admin")
                 return (0, Responses_1.sendErrorResponse)(res, 403, "Unauthorized access");
-            const { feePercentage } = req.body;
+            const { feePercentage, taxRate } = req.body;
             if (feePercentage === undefined)
                 return (0, Responses_1.sendErrorResponse)(res, 400, "feePercentage is required");
-            const updatedPlatformConfig = await admin_services_1.AdminService.setPlatformFee(feePercentage, adminId);
+            if (taxRate === undefined)
+                return (0, Responses_1.sendErrorResponse)(res, 400, "taxRate is required");
+            const updatedPlatformConfig = await admin_services_1.AdminService.setPlatformFee(feePercentage, taxRate, adminId);
             return (0, Responses_1.sendSuccessResponse)(res, 200, "Platform fee updated successfully", updatedPlatformConfig);
         }
         catch (error) {

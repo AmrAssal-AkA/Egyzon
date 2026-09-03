@@ -1,4 +1,3 @@
-
 import { apiClient } from "@/lib/apiClient";
 import {
   SellerFormData,
@@ -9,16 +8,25 @@ import {
   TopSellingProductsResponse,
   SellerOrdersResponse,
   TotalInventoryValueResponse,
+  WalletBalanceResponse,
+  SalesPerformanceResponse,
+  AvgOrderValueResponse,
+  AvgOrderValueData,
+  SalesByCategoryResponse,
+  StoreDetailsResponse,
 } from "@/types/seller";
+import { CreateStoreResponse, StorefrontFormData } from "@/types/store";
 import { ApiResponse } from "@/types/auth";
-
 
 export const sellerService = {
   getSellerProducts: async (): Promise<SellerProductsResponse> => {
     try {
-      const response = await apiClient.get<SellerProductsResponse>("/api/seller/getSellerProduct", {
-        withCredentials: true,
-      });
+      const response = await apiClient.get<SellerProductsResponse>(
+        "/api/seller/getSellerProduct",
+        {
+          withCredentials: true,
+        },
+      );
 
       const data = response.data;
       if (!data?.success) {
@@ -56,6 +64,7 @@ export const sellerService = {
 
   applyAsSeller: async (
     data: SellerFormData,
+    onProgress?: (percent: number) => void,
   ): Promise<ApiResponse<unknown>> => {
     try {
       const formData = new FormData();
@@ -70,14 +79,14 @@ export const sellerService = {
         formData.append(
           "commercialRegisterImage",
           data.commercialRegisterImage,
-          data.commercialRegisterImage.name
+          data.commercialRegisterImage.name,
         );
       }
       if (data.taxCardImage) {
         formData.append(
-          "taxCardImage", 
+          "taxCardImage",
           data.taxCardImage,
-          data.taxCardImage.name
+          data.taxCardImage.name,
         );
       }
 
@@ -85,6 +94,12 @@ export const sellerService = {
         withCredentials: true,
         headers: {
           Accept: "application/json",
+        },
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total && onProgress) {
+            const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            onProgress(percent);
+          }
         },
       });
 
@@ -111,15 +126,18 @@ export const sellerService = {
         "Failed to apply as seller";
       return { success: false, message };
     }
-  },
+  }, 
 
   deleteProduct: async (
-    productId: string | number
+    productId: string | number,
   ): Promise<ApiResponse<unknown>> => {
     try {
-      const response = await apiClient.delete(`/api/product/deleteProduct?productId=${productId}`, {
-        withCredentials: true,
-      });
+      const response = await apiClient.delete(
+        `/api/product/deleteProduct?productId=${productId}`,
+        {
+          withCredentials: true,
+        },
+      );
 
       return {
         success: response.data?.success ?? true,
@@ -147,14 +165,16 @@ export const sellerService = {
   },
   editProduct: async (
     productId: string | number,
-    data: {
-      productName?: string;
-      productDescription?: string;
-      price?: number;
-      discount?: number;
-      category?: string;
-      stock?: number;
-    } | FormData
+    data:
+      | {
+          productName?: string;
+          productDescription?: string;
+          price?: number;
+          discount?: number;
+          category?: string;
+          stock?: number;
+        }
+      | FormData,
   ): Promise<ApiResponse<unknown>> => {
     try {
       const response = await apiClient.put(
@@ -162,7 +182,7 @@ export const sellerService = {
         data,
         {
           withCredentials: true,
-        }
+        },
       );
 
       return {
@@ -191,7 +211,7 @@ export const sellerService = {
   },
   applyDiscount: async (
     productId: string | number,
-    discount: number
+    discount: number,
   ): Promise<ApiResponse<unknown>> => {
     try {
       const response = await apiClient.patch(
@@ -199,7 +219,7 @@ export const sellerService = {
         { discount: Number(discount) },
         {
           withCredentials: true,
-        }
+        },
       );
 
       return {
@@ -226,11 +246,51 @@ export const sellerService = {
       return { success: false, message };
     }
   },
+  editStock: async (
+    productId: string | number,
+    newStock: number,
+  ): Promise<ApiResponse<unknown>> => {
+    try {
+      const response = await apiClient.patch(
+        `/api/product/editStock?productId=${productId}`,
+        { newStock: Number(newStock) },
+        {
+          withCredentials: true,
+        },
+      );
+
+      return {
+        success: response.data?.success ?? true,
+        message: response.data?.message || "Stock updated successfully",
+        data: response.data?.data,
+      };
+    } catch (error: unknown) {
+      console.error("Seller edit stock error:", error);
+      const axiosError = error as {
+        response?: {
+          data?: {
+            message?: string;
+            error?: string;
+          };
+        };
+        message?: string;
+      };
+      const message =
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
+        axiosError?.message ||
+        "Failed to update stock";
+      return { success: false, message };
+    }
+  },
   getTotalProducts: async (): Promise<TotalProductsResponse> => {
     try {
-      const response = await apiClient.get<TotalProductsResponse>("/api/seller/getTotalProduct", {
-        withCredentials: true,
-      });
+      const response = await apiClient.get<TotalProductsResponse>(
+        "/api/seller/getTotalProduct",
+        {
+          withCredentials: true,
+        },
+      );
 
       const data = response.data;
       if (!data?.success) {
@@ -267,9 +327,12 @@ export const sellerService = {
   },
   getTotalOrders: async (): Promise<TotalOrdersResponse> => {
     try {
-      const response = await apiClient.get<TotalOrdersResponse>("/api/seller/getTotalOrders", {
-        withCredentials: true,
-      });
+      const response = await apiClient.get<TotalOrdersResponse>(
+        "/api/seller/getTotalOrders",
+        {
+          withCredentials: true,
+        },
+      );
 
       const data = response.data;
       if (!data?.success) {
@@ -306,9 +369,12 @@ export const sellerService = {
   },
   getTotalRevenue: async (): Promise<TotalRevenueResponse> => {
     try {
-      const response = await apiClient.get<TotalRevenueResponse>("/api/seller/getTotalRevenue", {
-        withCredentials: true,
-      });
+      const response = await apiClient.get<TotalRevenueResponse>(
+        "/api/seller/getTotalRevenue",
+        {
+          withCredentials: true,
+        },
+      );
 
       const data = response.data;
       if (!data?.success) {
@@ -345,9 +411,12 @@ export const sellerService = {
   },
   getTopProducts: async (): Promise<TopSellingProductsResponse> => {
     try {
-      const response = await apiClient.get<TopSellingProductsResponse>("/api/seller/getTopProduct", {
-        withCredentials: true,
-      });
+      const response = await apiClient.get<TopSellingProductsResponse>(
+        "/api/seller/getTopProduct",
+        {
+          withCredentials: true,
+        },
+      );
 
       const data = response.data;
       if (!data?.success) {
@@ -384,9 +453,12 @@ export const sellerService = {
   },
   getAllOrders: async (): Promise<SellerOrdersResponse> => {
     try {
-      const response = await apiClient.get<SellerOrdersResponse>("/api/seller/getAllOrders", {
-        withCredentials: true,
-      });
+      const response = await apiClient.get<SellerOrdersResponse>(
+        "/api/seller/getAllOrders",
+        {
+          withCredentials: true,
+        },
+      );
 
       const data = response.data;
       if (!data?.success) {
@@ -435,7 +507,7 @@ export const sellerService = {
         "/api/seller/getTotalInventoryValue",
         {
           withCredentials: true,
-        }
+        },
       );
 
       const data = response.data;
@@ -471,19 +543,368 @@ export const sellerService = {
       return { success: false, message, data: { totalInventoryValue: 0 } };
     }
   },
+  getWalletBalance: async (): Promise<WalletBalanceResponse> => {
+    try {
+      const response = await apiClient.get<WalletBalanceResponse>(
+        "/api/seller/walletPageApis/getWalletBalance",
+        {
+          withCredentials: true,
+        },
+      );
+
+      const data = response.data;
+      if (!data?.success) {
+        return {
+          success: false,
+          message: data?.message || "Failed to fetch wallet balance",
+          data: { balance: 0 },
+        };
+      }
+
+      console.log(
+        "[getWalletBalance] API response:",
+        data,
+        "Status:",
+        response.status,
+      );
+      return {
+        success: true,
+        message: data.message || "Wallet balance retrieved successfully",
+        data: data.data || { balance: 0 },
+      };
+    } catch (error: unknown) {
+      console.error("Get wallet balance error:", error);
+      const axiosError = error as {
+        response?: {
+          data?: {
+            message?: string;
+            error?: string;
+          };
+        };
+        message?: string;
+      };
+      const message =
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
+        axiosError?.message ||
+        "Failed to get wallet balance";
+      return { success: false, message, data: { balance: 0 } };
+    }
+  },
+  createStore: async (
+    data: StorefrontFormData | FormData,
+  ): Promise<CreateStoreResponse> => {
+    try {
+      let body: FormData;
+
+      if (data instanceof FormData) {
+        body = data;
+        body.delete("storeName");
+      } else {
+        body = new FormData();
+        body.append("storeDescription", data.description || "");
+        body.append("storeType", data.storeType || "physical");
+
+        if (data.storeType === "physical") {
+          body.append("storephysicalAddress", data.address || "");
+        } else {
+          body.append("storeOnlineAddress", data.address || "Online");
+        }
+
+        if (data.logo) {
+          body.append("storeLogo", data.logo, data.logo.name);
+        }
+        if (data.banner) {
+          body.append("storeBanner", data.banner, data.banner.name);
+        }
+      }
+
+      const response = await apiClient.post<CreateStoreResponse>(
+        "/api/seller/createStore",
+        body,
+        {
+          withCredentials: true,
+          headers: {
+            Accept: "application/json",
+          },
+        },
+      );
+
+      const resData = response.data;
+      return {
+        success: resData?.success ?? true,
+        message: resData?.message || "Store setup successful",
+        data: resData?.data,
+      };
+    } catch (error: unknown) {
+      console.error("Create store error:", error);
+      const axiosError = error as {
+        response?: {
+          data?: {
+            message?: string;
+            error?: string;
+          };
+        };
+        message?: string;
+      };
+      const message =
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
+        axiosError?.message ||
+        "Failed to create store";
+      return { success: false, message };
+    }
+  },
+  setupStore: async (
+    data: StorefrontFormData | FormData,
+  ): Promise<CreateStoreResponse> => {
+    return sellerService.createStore(data);
+  },
+  getSalesPerformanceIndicator: async (
+    timeframe: string = "7days",
+  ): Promise<SalesPerformanceResponse> => {
+    try {
+      const response = await apiClient.get<SalesPerformanceResponse>(
+        "/api/seller/salesPerformanceIndecator",
+        {
+          params: { timeframe },
+          withCredentials: true,
+        },
+      );
+
+      const data = response.data;
+      if (!data?.success) {
+        return {
+          success: false,
+          message:
+            data?.message || "Failed to fetch sales performance indicator",
+        };
+      }
+
+      return {
+        success: true,
+        message:
+          data.message || "Sales performance indicator retrieved successfully",
+        data: data.data,
+      };
+    } catch (error: unknown) {
+      console.error("Get sales performance indicator error:", error);
+      const axiosError = error as {
+        response?: {
+          data?: {
+            message?: string;
+            error?: string;
+          };
+        };
+        message?: string;
+      };
+      const message =
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
+        axiosError?.message ||
+        "Failed to get sales performance indicator";
+      return { success: false, message };
+    }
+  },
+  getAverageOrderValue: async (): Promise<AvgOrderValueResponse> => {
+    try {
+      const response = await apiClient.get<AvgOrderValueResponse>(
+        "/api/seller/AverageOrderValue",
+        {
+          withCredentials: true,
+        },
+      );
+
+      const data = response.data;
+      if (!data?.success) {
+        return {
+          success: false,
+          message: data?.message || "Failed to fetch average order value",
+          data: { avgOrderValue: 0, changePercent: 0 },
+        };
+      }
+
+      let resultData: AvgOrderValueData = {
+        avgOrderValue: 0,
+        changePercent: 0,
+      };
+      if (data.data) {
+        const raw = data.data as unknown as Record<string, unknown>;
+        if (raw.data && typeof raw.data === "object") {
+          const nested = raw.data as Record<string, unknown>;
+          resultData = {
+            avgOrderValue: Number(
+              nested.avgOrderValue ?? nested.averageOrderValue ?? 0,
+            ),
+            changePercent: Number(nested.changePercent ?? 0),
+            message:
+              typeof nested.message === "string" ? nested.message : undefined,
+          };
+        } else {
+          resultData = {
+            avgOrderValue: Number(
+              raw.avgOrderValue ?? raw.averageOrderValue ?? 0,
+            ),
+            changePercent: Number(raw.changePercent ?? 0),
+            message: typeof raw.message === "string" ? raw.message : undefined,
+          };
+        }
+      }
+
+      return {
+        success: true,
+        message: data.message || "Average order value retrieved successfully",
+        data: resultData,
+      };
+    } catch (error: unknown) {
+      console.error("Get average order value error:", error);
+      const axiosError = error as {
+        response?: {
+          data?: {
+            message?: string;
+            error?: string;
+          };
+        };
+        message?: string;
+      };
+      const message =
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
+        axiosError?.message ||
+        "Failed to get average order value";
+      return {
+        success: false,
+        message,
+        data: { avgOrderValue: 0, changePercent: 0 },
+      };
+    }
+  },
+  getSalesByCategory: async (): Promise<SalesByCategoryResponse> => {
+    try {
+      const response = await apiClient.get<SalesByCategoryResponse>(
+        "/api/seller/getSalesByCategory",
+        {
+          withCredentials: true,
+        },
+      );
+
+      const data = response.data;
+      if (!data?.success) {
+        return {
+          success: false,
+          message: data?.message || "Failed to fetch sales by category",
+          data: {},
+        };
+      }
+
+      return {
+        success: true,
+        message: data.message || "Sales by category retrieved successfully",
+        data: data.data || {},
+      };
+    } catch (error: unknown) {
+      console.error("Get sales by category error:", error);
+      const axiosError = error as {
+        response?: {
+          data?: {
+            message?: string;
+            error?: string;
+          };
+        };
+        message?: string;
+      };
+      const message =
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
+        axiosError?.message ||
+        "Failed to get sales by category";
+      return {
+        success: false,
+        message,
+        data: {},
+      };
+    }
+  },
+  getStoreDetails: async (
+    sellerId: string
+  ): Promise<StoreDetailsResponse> => {
+    if (
+      !sellerId ||
+      sellerId === "undefined" ||
+      sellerId === "null" ||
+      sellerId.trim() === ""
+    ) {
+      return {
+        success: false,
+        message: "Seller ID is required",
+        data: null,
+      };
+    }
+
+    try {
+      const response = await apiClient.get<StoreDetailsResponse>(
+        `/api/seller/storeFront?sellerId=${encodeURIComponent(sellerId)}`,
+        {
+          withCredentials: true,
+          validateStatus: (status) => status < 500,
+        }
+      );
+
+      const data = response.data;
+      if (!data?.success) {
+        return {
+          success: false,
+          message: data?.message || "Failed to fetch store details",
+          data: null,
+        };
+      }
+
+      return {
+        success: true,
+        message: data.message || "Store details retrieved successfully",
+        data: data.data,
+      };
+    } catch (error: unknown) {
+      console.error("Get store details error:", error);
+      const axiosError = error as {
+        response?: {
+          data?: {
+            message?: string;
+            error?: string;
+          };
+        };
+        message?: string;
+      };
+      const message =
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
+        axiosError?.message ||
+        "Failed to get store details";
+      return { success: false, message, data: null };
+    }
+  },
 };
 
 export const fetchSellerProducts = sellerService.getSellerProducts;
 export const deleteSellerProduct = sellerService.deleteProduct;
 export const editSellerProduct = sellerService.editProduct;
 export const applySellerProductDiscount = sellerService.applyDiscount;
+export const editSellerStock = sellerService.editStock;
+export const editStock = sellerService.editStock;
 export const fetchTotalProducts = sellerService.getTotalProducts;
 export const fetchTotalOrders = sellerService.getTotalOrders;
 export const fetchTotalRevenue = sellerService.getTotalRevenue;
 export const fetchTopProducts = sellerService.getTopProducts;
 export const fetchSellerOrders = sellerService.getAllOrders;
 export const fetchTotalInventoryValue = sellerService.getTotalInventoryValue;
-
-
-
+export const fetchWalletBalance = sellerService.getWalletBalance;
+export const createStore = sellerService.createStore;
+export const setupStore = sellerService.setupStore;
+export const fetchSalesPerformanceIndicator =
+  sellerService.getSalesPerformanceIndicator;
+export const fetchAverageOrderValue = sellerService.getAverageOrderValue;
+export const fetchSalesByCategory = sellerService.getSalesByCategory;
+export const fetchStoreDetails = sellerService.getStoreDetails;
+export const getStoreDetails = sellerService.getStoreDetails;
+export const fetchStorefrontDetails = sellerService.getStoreDetails;
 

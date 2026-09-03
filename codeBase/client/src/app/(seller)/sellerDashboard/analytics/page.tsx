@@ -7,6 +7,7 @@ import TotalProductsCard from "@/components/seller/dashboardComp/TotalProductsCa
 import { ChartPieDonutText } from "@/components/seller/dashboardComp/analyticalPage/ChartPieDonutText";
 import RevenueGraph from "@/components/seller/dashboardComp/analyticalPage/RevenueGraph";
 import TopProduct from "@/components/seller/dashboardComp/topProduct";
+import AverageOrderValueCard from '@/components/seller/dashboardComp/AverageOrderValueCard'
 
 export const metadata = {
   title: "Egyzon - Seller Analytics",
@@ -16,6 +17,7 @@ export const metadata = {
     robots: "noindex, nofollow",
   },
 }
+
 
 
 function AnalyticsPage() {
@@ -42,11 +44,9 @@ function AnalyticsPage() {
           change="+1.2%"
           description="Increase in products listed"
         />
-        <AnalyticCard
-          title="Conversion Rate"
-          value="890"
-          change="+4.5%"
-          description="Improvement in conversion rate"
+       <AverageOrderValueCard
+          change="+3.5%"
+          description="Improvement in average order value"
         />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

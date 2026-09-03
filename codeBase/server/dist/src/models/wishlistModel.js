@@ -37,7 +37,7 @@ const mongoose_1 = __importStar(require("mongoose"));
 const wishlistSchema = new mongoose_1.Schema({
     userId: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: 'Customer',
+        ref: 'customer',
         required: true,
         unique: true
     },

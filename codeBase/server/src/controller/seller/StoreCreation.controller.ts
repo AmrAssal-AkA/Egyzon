@@ -4,9 +4,10 @@ import { SellerServices } from "../../services/seller.services";
 import { sendSuccessResponse, sendErrorResponse } from "../../utils/Responses";
 import uploadImage from "../../config/cloudainry.config";
 import { AppError } from "../../utils/AppError";
+import { scanFile } from "../../utils/virusScan";
+import logger from "../../utils/logger";
 
-
-const createRequestToJoin = async (req: Request, res: Response) => {
+export const createRequestToJoin = async (req: Request, res: Response) => {
   let uploadedCommercialRegister: { public_id: string } | undefined;
   let uploadedTaxCard: { public_id: string } | undefined;
   try {
@@ -60,8 +61,37 @@ const createRequestToJoin = async (req: Request, res: Response) => {
         "Bad Request",
         "Invalid image format. Only JPEG and PNG are allowed",
       );
-
+    // Check if the user is already a seller
     await SellerServices.checkExistingSeller(userId);
+    // Scan the uploaded images for viruses
+    for (const file of files.commercialRegisterImage ?? []) {
+      const { isInfected, viruses } = await scanFile(file.buffer);
+      if (isInfected) {
+        logger.warn(
+          `Commercial Register Image is infected with viruses: ${viruses.join(", ")}`,
+        );
+        return sendErrorResponse(
+          res,
+          400,
+          "Bad Request",
+          `Commercial Register Image is infected with viruses: ${viruses.join(", ")}`,
+        );
+      }
+    }
+    for (const file of files.taxCardImage ?? []) {
+      const { isInfected, viruses } = await scanFile(file.buffer);
+      if (isInfected) {
+        logger.warn(
+          `Tax Card Image is infected with viruses: ${viruses.join(", ")}`,
+        );
+        return sendErrorResponse(
+          res,
+          400,
+          "Bad Request",
+          `Tax Card Image is infected with viruses: ${viruses.join(", ")}`,
+        );
+      }
+    }
     const [crUpload, taxUpload] = await Promise.all([
       uploadImage(
         files.commercialRegisterImage[0].buffer,
@@ -76,41 +106,43 @@ const createRequestToJoin = async (req: Request, res: Response) => {
       storeName,
       commercialRegisterNumber,
       taxCardNumber,
-      sellerDocuments:{
+      sellerDocuments: {
         commercialRegisterUrl: crUpload.secure_url,
         taxCardUrl: taxUpload.secure_url,
-      }
+      },
     };
     await SellerServices.ApplyAsPartner(sellerData, userId);
 
     return sendSuccessResponse(res, 200, "Request sent successfully");
   } catch (error) {
     if (error instanceof AppError) {
-      return sendErrorResponse(res, error.statusCode, "Bad Request", error.message);
+      return sendErrorResponse(
+        res,
+        error.statusCode,
+        "Bad Request",
+        error.message,
+      );
     }
 
     console.log(error);
-    return sendErrorResponse(res, 500, "Internal Server Error", "Something went wrong");
+    return sendErrorResponse(
+      res,
+      500,
+      "Internal Server Error",
+      "Something went wrong",
+    );
   }
 };
 
 {
   /*  second step After the seller document Approval */
 }
-const setupStore = async (req: Request, res: Response) => {
+export const setupStore = async (req: Request, res: Response) => {
   try {
     // Check if user is authenticated
-    const userId =
-      req.user?.userId ||
-      (process.env.NODE_ENV !== "production" && req.body?.userId);
-    if (!userId) {
-      return sendErrorResponse(
-        res,
-        401,
-        "Unauthorized",
-        "User not authenticated",
-      );
-    }
+    const userId = req.user?.userId 
+    const seller = req.user?.role
+    if (!userId || seller !== "seller") return sendErrorResponse(res, 401, "Unauthorized", "User not authenticated");
     // Validate request body
     const {
       storeDescription,
@@ -118,15 +150,12 @@ const setupStore = async (req: Request, res: Response) => {
       storephysicalAddress,
       storeOnlineAddress,
     } = req.body;
+    console.log("Request body:", req.body);
     if (
       !storeDescription ||
       storeDescription.trim() === "" ||
       !storeType ||
-      storeType.trim() === "" ||
-      !storephysicalAddress ||
-      storephysicalAddress.trim() === "" ||
-      !storeOnlineAddress ||
-      storeOnlineAddress.trim() === ""
+      storeType.trim() === "" 
     ) {
       return sendErrorResponse(
         res,
@@ -135,14 +164,14 @@ const setupStore = async (req: Request, res: Response) => {
         "All fields are required",
       );
     }
+
     if (
       storeType !== "physical" &&
-      storeType !== "online" &&
-      storeType !== "both"
+      storeType !== "online" 
     ) {
       return sendErrorResponse(res, 400, "Bad Request", "Invalid store type");
     }
-    if (storeType === "physical" && !storephysicalAddress) {
+    if (storeType === "physical" && (!storephysicalAddress || storephysicalAddress.trim() === "")) {
       return sendErrorResponse(
         res,
         400,
@@ -150,22 +179,9 @@ const setupStore = async (req: Request, res: Response) => {
         "Physical address is required",
       );
     }
-    if (storeType === "online" && !storeOnlineAddress) {
-      return sendErrorResponse(
-        res,
-        400,
-        "Bad Request",
-        "Online address is required",
-      );
-    }
-    if (storeDescription.length > 100) {
-      return sendErrorResponse(
-        res,
-        400,
-        "Bad Request",
-        "Store description should not exceed 100 characters",
-      );
-    }
+    const finalOnlineAddress = storeType === "physical" ? "" : (storeOnlineAddress || "Online");
+    const finalPhysicalAddress = storeType === "online" ? "" : storephysicalAddress;
+    console.log("Request body after validation:", req.body);
     // Validate file uploads
     const files = req.files as {
       storeLogo?: Express.Multer.File[];
@@ -185,6 +201,36 @@ const setupStore = async (req: Request, res: Response) => {
     ) {
       return sendErrorResponse(res, 400, "Bad Request", "Invalid image format");
     }
+    // Scan the uploaded images for viruses
+    for (const file of files.storeLogo ?? []) {
+      const { isInfected, viruses } = await scanFile(file.buffer);
+      if (isInfected) {
+        logger.warn(
+          `Store Logo is infected with viruses: ${viruses.join(", ")}`,
+        );
+        return sendErrorResponse(
+          res,
+          400,
+          "Bad Request",
+          `Store Logo is infected with viruses: ${viruses.join(", ")}`,
+        );
+      }
+    }
+    for (const file of files.storeBanner ?? []) {
+      const { isInfected, viruses } = await scanFile(file.buffer);
+      if (isInfected) {
+        logger.warn(
+          `Store Banner is infected with viruses: ${viruses.join(", ")}`,
+        );
+        return sendErrorResponse(
+          res,
+          400,
+          "Bad Request",
+          `Store Banner is infected with viruses: ${viruses.join(", ")}`,
+        );
+      }
+    }
+    // Upload images to Cloudinary
     const [storeLogoUpload, storeBannerUpload] = await Promise.all([
       uploadImage(files.storeLogo![0]!.buffer, "Egyzon/Seller/StoreLogo"),
       files.storeBanner
@@ -196,13 +242,16 @@ const setupStore = async (req: Request, res: Response) => {
     ]);
     // Setup store data
     const storeData = {
+      storeManagement: {
       storeDescription,
       storeType,
-      storephysicalAddress,
-      storeOnlineAddress,
-      storeLogo: storeLogoUpload.secure,
+      storephysicalAddress: finalPhysicalAddress,
+      storeOnlineAddress: finalOnlineAddress,
+      storeLogo: storeLogoUpload.secure_url,
       storeBanner: storeBannerUpload.secure_url,
+      },
     };
+    console.log('store data', storeData)
     await SellerServices.setupStore(storeData, userId);
     return sendSuccessResponse(res, 200, "Store setup successful");
   } catch (error) {
@@ -216,7 +265,3 @@ const setupStore = async (req: Request, res: Response) => {
   }
 };
 
-export default {
-  createRequestToJoin,
-  setupStore,
-};

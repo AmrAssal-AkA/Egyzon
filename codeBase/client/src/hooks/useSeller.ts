@@ -9,6 +9,10 @@ import {
   TopSellingProductsResponse,
   SellerOrdersResponse,
   TotalInventoryValueResponse,
+  WalletBalanceResponse,
+  SalesPerformanceResponse,
+  AvgOrderValueResponse,
+  SalesByCategoryResponse,
 } from "@/types/seller";
 
 export const useTotalProducts = () => {
@@ -19,6 +23,7 @@ export const useTotalProducts = () => {
       revalidateOnFocus: true,
     }
   );
+
 
   return {
     totalProducts: data?.data?.totalProductCounts ?? 0,
@@ -120,6 +125,76 @@ export const useTotalInventoryValue = () => {
     mutate,
   };
 };
+
+export const useWalletBalance = () => {
+  const { data, error, isLoading, mutate } = useSWR<WalletBalanceResponse>(
+    "/api/seller/walletPageApis/getWalletBalance",
+    () => sellerService.getWalletBalance(),
+    {
+      revalidateOnFocus: true,
+    }
+  );
+
+  return {
+    balance: data?.data?.balance ?? 0,
+    isLoading,
+    error,
+    mutate,
+  };
+};
+
+export const useSalesPerformanceIndicator = (timeframe: string = "7days") => {
+  const { data, error, isLoading, mutate } = useSWR<SalesPerformanceResponse>(
+    [`/api/seller/salesPerformanceIndecator`, timeframe],
+    () => sellerService.getSalesPerformanceIndicator(timeframe),
+    {
+      revalidateOnFocus: true,
+    }
+  );
+
+  return {
+    salesPerformance: data?.data,
+    isLoading,
+    error,
+    mutate,
+  };
+};
+
+export const useAverageOrderValue = () => {
+  const { data, error, isLoading, mutate } = useSWR<AvgOrderValueResponse>(
+    "/api/seller/AverageOrderValue",
+    () => sellerService.getAverageOrderValue(),
+    {
+      revalidateOnFocus: true,
+    }
+  );
+
+  return {
+    avgOrderValue: data?.data?.avgOrderValue ?? 0,
+    changePercent: data?.data?.changePercent ?? 0,
+    isLoading,
+    error,
+    mutate,
+  };
+};
+
+export const useSalesByCategory = () => {
+  const { data, error, isLoading, mutate } = useSWR<SalesByCategoryResponse>(
+    "/api/seller/getSalesByCategory",
+    () => sellerService.getSalesByCategory(),
+    {
+      revalidateOnFocus: true,
+    }
+  );
+
+  return {
+    salesByCategory: data?.data ?? {},
+    isLoading,
+    error,
+    mutate,
+  };
+};
+
 
 
 

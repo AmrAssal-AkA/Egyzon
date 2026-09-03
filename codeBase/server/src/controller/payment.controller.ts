@@ -6,6 +6,7 @@ import { AppError } from "../utils/AppError";
 import {sendErrorResponse, sendSuccessResponse} from "../utils/Responses"
 import { Payment } from "../models/payment.model";
 import {PaymentService} from "../services/payment.services";
+import logger from "../utils/logger";
 
 const paymobBaseUrl = process.env.PAYMOB_BASE_URL;
 const paymobApiKey = process.env.PAYMOB_API_KEY;
@@ -85,6 +86,7 @@ const createOrder = async (
       currency: "EGP",
       items,
     });
+    logger.info(`Order created in Paymob with ID: ${response.data.id}`);
     return response.data.id;
   } catch (error) {
     if (error instanceof AppError) throw error;
@@ -123,6 +125,7 @@ const getPaymentKey = async (
         integration_id: paymobIntegrationId,
       },
     );
+    logger.info(`Payment key generated in Paymob for order ID: ${orderId}`);
     return response.data.token;
   } catch (error) {
     if (error instanceof AppError) throw error;
@@ -149,6 +152,7 @@ const handlePaymobWebhook = async (req: Request, res: Response) => {
     }
     const result = await paymentServices.handlePaymobTransction(transaction);
     if(!result) return sendErrorResponse(res, 404, "Payment not found for the given Paymob order ID");
+    logger.info(`Payment processed successfully for Paymob order ID: ${transaction.order.id}`);
     return sendSuccessResponse(res, 200, "Payment processed successfully", result);
   }catch(error){
      if (error instanceof AppError) {

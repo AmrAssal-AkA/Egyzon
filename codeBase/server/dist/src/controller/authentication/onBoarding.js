@@ -10,7 +10,6 @@ const onBoarding = async (req, res) => {
     try {
         const userId = req.user?.userId || (process.env.NODE_ENV !== "production" && req.body?.userId);
         const { phoneNumber, address } = req.body;
-        console.log("Onboarding request received for user:", userId, { phoneNumber, address });
         if (!userId)
             return (0, Responses_1.sendErrorResponse)(res, 401, "Unauthorized", "Missing user id");
         const customer = await customerModel_1.default.findById(userId);
@@ -22,7 +21,6 @@ const onBoarding = async (req, res) => {
         customer.address = Array.isArray(address) ? address : [address];
         customer.completedOnboarding = true;
         await customer.save();
-        console.log("Onboarding completed for user:", customer._id);
         return (0, Responses_1.sendSuccessResponse)(res, 200, "Onboarding completed successfully", {
             customerId: customer._id,
             phoneNumber: customer.phoneNumber,

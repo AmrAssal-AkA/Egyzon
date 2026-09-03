@@ -35,28 +35,30 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Wallet = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const wallet_types_1 = require("../types/wallet.types");
 const walletSchema = new mongoose_1.Schema({
-    sellerId: {
+    seller: {
         type: mongoose_1.default.Schema.Types.ObjectId,
         ref: "Seller",
         required: true,
+        unique: true,
     },
-    Amount: {
+    balance: {
         type: Number,
         required: true,
         default: 0,
+        min: 0,
     },
     currency: {
         type: String,
         required: true,
+        default: "EGP",
     },
-    transactionType: {
-        type: String,
-        required: true,
-    },
-    transactionHistory: [{
-            transactionId: {
+    transactionHistory: [
+        {
+            transactionType: {
                 type: String,
+                enum: Object.values(wallet_types_1.TransactionType),
                 required: true,
             },
             amount: {
@@ -66,24 +68,26 @@ const walletSchema = new mongoose_1.Schema({
             currency: {
                 type: String,
                 required: true,
+                default: "EGP",
             },
-            transactionType: {
+            status: {
                 type: String,
+                enum: ["pending", "completed", "failed", "cancelled"],
                 required: true,
+            },
+            orderId: {
+                type: mongoose_1.default.Schema.Types.ObjectId,
+                ref: "Order",
+            },
+            withdrawalId: {
+                type: String,
             },
             date: {
                 type: Date,
-                required: true,
-            }
-        }],
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now,
-    }
+                default: Date.now,
+            },
+        },
+    ],
 }, { timestamps: true });
 exports.Wallet = mongoose_1.default.model("Wallet", walletSchema);
 //# sourceMappingURL=wallet.model.js.map

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -48,24 +49,30 @@ export default function SellerSideMenue({ storeName }: Props = {}) {
     },
     {
       id: 2,
+      name: "Storefront Setup",
+      path: "/settupStore",
+      icon: Store,
+    },
+    {
+      id: 3,
       name: "Inventory",
       path: "/sellerDashboard/Inventory",
       icon: Package,
     },
     {
-      id: 3,
+      id: 4,
       name: "Orders",
       path: "/sellerDashboard/orders",
       icon: Package,
     },
     {
-      id: 4,
+      id: 5,
       name: "Analytics",
       path: "/sellerDashboard/analytics",
       icon: BarChart3,
     },
     {
-      id: 5,
+      id: 6,
       name: "Wallet",
       path: "/sellerDashboard/wallet",
       icon: Wallet2,
@@ -90,8 +97,18 @@ export default function SellerSideMenue({ storeName }: Props = {}) {
       <aside className="w-full md:w-90 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-4 flex flex-col gap-6 shrink-0 md:max-h-full md:sticky top-4">
         {/* Store Header Info */}
         <div className="flex items-center gap-3 p-3 bg-slate-50/60 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700/50 shrink-0">
-          <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/60 flex items-center justify-center shrink-0">
-            <Store className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/60 flex items-center justify-center shrink-0 overflow-hidden">
+            {user?.storeManagement?.storeLogo ? (
+              <Image
+                src={user.storeManagement.storeLogo}
+                alt="Store Logo"
+                width={40}
+                height={40}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <Store className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            )}
           </div>
           <div className="flex flex-col min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
@@ -180,7 +197,9 @@ export default function SellerSideMenue({ storeName }: Props = {}) {
         <AddProductModel
           onClose={() => setIsAddModalOpen(false)}
           onSave={(data) => {
-            toast.success(`Product "${data?.name || "New Product"}" added successfully!`);
+            toast.success(
+              `Product "${data?.name || "New Product"}" added successfully!`,
+            );
             setIsAddModalOpen(false);
           }}
         />

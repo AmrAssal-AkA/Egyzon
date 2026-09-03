@@ -26,6 +26,10 @@ const socket_1 = require("./src/config/socket");
 const attachTo_1 = require("./src/middleware/attachTo");
 const order_route_1 = __importDefault(require("./src/routes/order.route"));
 const notifaication_routes_1 = __importDefault(require("./src/routes/notifaication.routes"));
+const payment_route_1 = __importDefault(require("./src/routes/payment.route"));
+const rateLimiter_1 = require("./src/middleware/rateLimiter");
+const requestLogger_1 = __importDefault(require("./src/middleware/requestLogger"));
+const logger_1 = __importDefault(require("./src/utils/logger"));
 const app = (0, express_1.default)();
 const httpServer = http_1.default.createServer(app);
 const io = (0, socket_1.initSocket)(httpServer);
@@ -44,17 +48,20 @@ app.use((0, cors_1.default)({
 app.use((0, helmet_1.default)());
 app.use((0, cookie_parser_1.default)());
 app.use((0, attachTo_1.attachTo)(io));
+app.use(requestLogger_1.default);
+app.set('trust proxy', 1);
 //routes
-app.use("/api/auth", auth_route_1.default);
-app.use("/api/product", product_route_1.default);
-app.use("/api/wishlist", wishlist_route_1.default);
-app.use("/api/seller", seller_route_1.default);
-app.use("/api/cart", cart_route_1.default);
-app.use("/api/category", category_routes_1.default);
-app.use("/api/customer", customer_route_1.default);
-app.use("/api/admin", admin_route_1.default);
-app.use('/api/order', order_route_1.default);
+app.use("/api/auth", rateLimiter_1.authLimiter, auth_route_1.default);
+app.use("/api/product", rateLimiter_1.generalLimiter, product_route_1.default);
+app.use("/api/wishlist", rateLimiter_1.generalLimiter, wishlist_route_1.default);
+app.use("/api/seller", rateLimiter_1.generalLimiter, seller_route_1.default);
+app.use("/api/cart", rateLimiter_1.generalLimiter, cart_route_1.default);
+app.use("/api/category", rateLimiter_1.generalLimiter, category_routes_1.default);
+app.use("/api/customer", rateLimiter_1.generalLimiter, customer_route_1.default);
+app.use("/api/admin", rateLimiter_1.generalLimiter, admin_route_1.default);
+app.use('/api/order', rateLimiter_1.generalLimiter, order_route_1.default);
 app.use('/api/notifications', notifaication_routes_1.default);
+app.use('/api/payment', payment_route_1.default);
 //swagger
 app.use("/api-docs", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_1.swaggerSpec));
 //default route
@@ -68,7 +75,7 @@ app.get("/api-docs.json", (req, res) => {
 });
 //start the server
 httpServer.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    logger_1.default.info(`Server is running on port ${PORT}`);
 });
 exports.default = app;
 //# sourceMappingURL=server.js.map

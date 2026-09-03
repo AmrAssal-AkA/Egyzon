@@ -33,23 +33,6 @@ const productSchema: Schema<IProduct> = new Schema(
       type: String,
       required: true,
       unique: true,
-      default: function (): string {
-        const categoryPart = this.category
-          ? this.category.toString().slice(0, 4).toUpperCase()
-          : "GEN";
-        const namePart = this.productName
-          ? this.productName.replace(/\s+/g, "").slice(0, 4).toUpperCase()
-          : "PROD";
-        const datePart = new Date()
-          .toISOString()
-          .slice(0, 10)
-          .replace(/-/g, "");
-        const randomPart = Math.random()
-          .toString(36)
-          .substring(2, 6)
-          .toUpperCase();
-        return `${categoryPart}-${namePart}-${datePart}-${randomPart}`;
-      },
     },
     status: {
       type: String,
@@ -70,27 +53,32 @@ const productSchema: Schema<IProduct> = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Category",
     },
+    lowStockNotify: {
+      type: Boolean,
+      default: false,
+    },
+    outOfStockNotify: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true },
 );
 
 productSchema.pre("validate", async function () {
   if (this.sku) return;
-  if (!this.category) return;
 
-  const categoryDoc = await Category.findById(this.category)
-    .select("categoryName")
-    .exec();
-  if (!categoryDoc) return;
-
-  const categoryPart = categoryDoc.categoryName.slice(0, 4).toUpperCase();
-  const namePart = this.productName
-    .replace(/\s+/g, "")
-    .slice(0, 4)
-    .toUpperCase();
-  const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+  let categoryPart = "GEN"
+  if(this.category) {
+     const category = await Category.findById(this.category).select("categoryName").exec();
+     if(category?.categoryName) {
+        categoryPart = category.categoryName.replace(/\s+/g, '').slice(0, 4).toUpperCase();
+     }
+  }
+  const namePart = (this.productName || 'PROD').replace(/\s+/g, '').slice(0, 4).toUpperCase();
+    const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, "");
   const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
-  this.sku = `${categoryPart}-${namePart}-${datePart}-${randomPart}`;
+  this.sku = `${categoryPart}-${namePart}-${datePart}-${randomPart}`; 
 });
 
 productSchema.pre(
@@ -126,5 +114,7 @@ productSchema.pre(
     ]);
   },
 );
+
+productSchema.index({ productName: "text", productDescription: "text", category: 1 });
 
 export default mongoose.model<IProduct>("Product", productSchema);

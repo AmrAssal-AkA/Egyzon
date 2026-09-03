@@ -17,6 +17,20 @@ exports.orderBaseSchema = zod_1.z.object({
             postalCode: typeTextRegex.min(5, { message: "Postal code must be at least 5 characters long" }),
             country: typeTextRegex.min(2, { message: "Country must be at least 2 characters long" })
         }),
+        billingData: zod_1.z.object({
+            firstName: zod_1.z.string().min(1, { message: "Billing first name is required" }),
+            lastName: zod_1.z.string().min(1, { message: "Billing last name is required" }),
+            email: zod_1.z.string().email({ message: "Invalid billing email" }),
+            phoneNumber: phoneNumberSchema,
+            apartment: zod_1.z.string().optional(),
+            floor: zod_1.z.string().optional(),
+            street: zod_1.z.string().optional(),
+            building: zod_1.z.string().optional(),
+            city: zod_1.z.string().optional(),
+            state: zod_1.z.string().optional(),
+            country: zod_1.z.string().optional(),
+            postalCode: zod_1.z.string().optional(),
+        }).optional(),
         phoneNumber: phoneNumberSchema.optional(),
     })
 });

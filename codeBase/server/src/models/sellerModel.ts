@@ -66,7 +66,7 @@ const SellerSchema = new Schema<ISeller>(
     products: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
+        ref: "Products",
       }
     ],
     createdAt: {

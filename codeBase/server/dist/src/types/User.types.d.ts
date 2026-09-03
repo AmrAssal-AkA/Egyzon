@@ -1,5 +1,5 @@
 import { HydratedDocument, Types } from "mongoose";
-export interface IUser {
+export interface IUser extends Document {
     id: string;
     FirstName: string;
     LastName: string;

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import AnalyticCard from '@/components/seller/dashboardComp/AnalyticCard'
+import AverageOrderValueCard from '@/components/seller/dashboardComp/AverageOrderValueCard'
 import TotalRevenueCard from '@/components/seller/dashboardComp/TotalRevenueCard'
 import TotalOrdersCard from '@/components/seller/dashboardComp/TotalOrdersCard'
 import TotalProductsCard from '@/components/seller/dashboardComp/TotalProductsCard'
@@ -15,7 +15,7 @@ function SellerDashboard() {
         <TotalRevenueCard change="+5.2%" description="Increase in revenue compared to last month" />
         <TotalOrdersCard change="+3.1%" description="Increase in orders compared to last month" />
         <TotalProductsCard change="-1.2%" description="Total products listed in store" />
-        <AnalyticCard title="Conversion Rate" value="890" change="+4.5%" description="Improvement in conversion rate" />
+        <AverageOrderValueCard description="Improvement in conversion rate" />
       </div>
 
       <AnalyticsGraph />

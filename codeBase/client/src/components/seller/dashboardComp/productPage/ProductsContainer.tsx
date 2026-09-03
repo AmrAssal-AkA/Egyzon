@@ -249,6 +249,10 @@ export default function ProductsContainer() {
           onEditProduct={handleOpenEditModal}
           onDeleteProduct={handleDeleteProduct}
           onApplyDiscount={handleOpenDiscountModal}
+          onUpdateStock={() => {
+            loadProducts();
+            mutateInventoryValue();
+          }}
         />
       )}
 

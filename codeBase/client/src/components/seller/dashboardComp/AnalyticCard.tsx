@@ -2,19 +2,23 @@ import React from "react";
 
 import {TrendingUp, TrendingDown} from "lucide-react"
 
+export interface AnalyticCardProps {
+  title: string;
+  value: string;
+  change?: string;
+  description: string;
+  isLoading?: boolean;
+}
+
 export default function AnalyticCard({
   title,
   value,
-  change,
+  change = "+0.0%",
   description,
   isLoading = false,
-}: {
-  title: string;
-  value: string;
-  change: string;
-  description: string;
-  isLoading?: boolean;
-}) {
+}: AnalyticCardProps) {
+  const isNegative = (change || "").startsWith("-");
+
   return (
     <div className="w-full h-40 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-4 flex flex-col gap-3">
       <div className="flex justify-between items-center">
@@ -23,12 +27,12 @@ export default function AnalyticCard({
         </h3>
         <p
           className={`text-sm font-medium ${
-            change.startsWith("-")
+            isNegative
               ? "text-red-500 dark:text-red-400"
               : "text-green-500 dark:text-green-400"
           }`}
         >
-          {change.startsWith("-") ? (
+          {isNegative ? (
             <TrendingDown className="inline-block w-4 h-4 mr-1" />
           ) : (
             <TrendingUp className="inline-block w-4 h-4 mr-1" />

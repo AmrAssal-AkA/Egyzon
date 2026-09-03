@@ -11,6 +11,7 @@ const orderModel_1 = __importDefault(require("../models/orderModel"));
 const admin_services_1 = require("./admin.services");
 const AppError_1 = require("../utils/AppError");
 const SellerApplyApplicant_1 = require("../templates/SellerApplyApplicant");
+const payment_type_1 = require("../types/payment.type");
 exports.SellerServices = {
     ApplyAsPartner: async (sellerData, userId) => {
         const userModel = sellerModel_1.default.db.model("User");
@@ -29,7 +30,6 @@ exports.SellerServices = {
                 applicantStatus: "pending",
             },
         }, { returnDocument: "after" });
-        console.log("SaveSellerData:", SaveSellerData);
         try {
             await (0, SellerApplyApplicant_1.SellerApplyApplicantTemplate)(user.email, user.FirstName, sellerData.storeName);
         }
@@ -67,6 +67,7 @@ exports.SellerServices = {
                 storeOnlineAddress,
             };
             await seller.save();
+            console.log("Store setup successful for seller:", seller._id);
             return seller;
         }
         catch (error) {
@@ -118,6 +119,7 @@ exports.SellerServices = {
             const getProducts = await productModel_1.default.find({ sellerId: seller.id });
             const productIds = getProducts.map((product) => product._id.toString());
             const orders = await orderModel_1.default.find({
+                paymentStatus: payment_type_1.PaymentStatus.paid,
                 "orderItems.product": { $in: productIds },
             });
             const subRevenue = orders.reduce((total, order) => {
@@ -191,10 +193,10 @@ exports.SellerServices = {
             if (!seller)
                 throw new AppError_1.AppError(404, "Seller not found");
             const getProducts = await productModel_1.default.find({ sellerId: seller.id }).lean();
-            const productIds = getProducts.map((product) => product._id.toString());
+            const productIds = getProducts.map((product) => product._id);
             const orders = await orderModel_1.default.find({
                 "orderItems.product": { $in: productIds },
-            });
+            }).populate("customer", "FirstName LastName email");
             return orders;
         }
         catch (error) {
@@ -226,11 +228,97 @@ exports.SellerServices = {
             const seller = await sellerModel_1.default.findById(sellerId);
             if (!seller)
                 throw new AppError_1.AppError(404, "Seller not found");
+            const order = await orderModel_1.default.findById(orderId);
+            if (!order)
+                throw new AppError_1.AppError(404, "Order not found");
+            const getProducts = await productModel_1.default.find({ sellerId: seller.id });
+            const productIds = getProducts.map((product) => product._id.toString());
+            const orderProductIds = order.orderItems.map((item) => item.product.toString());
+            const isSellerProductInOrder = orderProductIds.some((productId) => productIds.includes(productId));
+            if (!isSellerProductInOrder)
+                throw new AppError_1.AppError(403, "Forbidden, You are not authorized to change this order status");
+            if (newStatus === "delivered" || newStatus === "cancelled")
+                throw new AppError_1.AppError(403, "Forbidden, You are not authorized to change this order status");
+            order.orderStatus = newStatus;
+            await order.save();
+            return order;
         }
         catch (error) {
             if (error instanceof AppError_1.AppError)
                 throw new AppError_1.AppError(error.statusCode, error.message);
             throw new AppError_1.AppError(500, "Internal Server Error");
+        }
+    },
+    // seller should get average order value for all orders
+    getAvgOrderValue: async (sellerId) => {
+        try {
+            const seller = await sellerModel_1.default.findById(sellerId);
+            if (!seller)
+                throw new AppError_1.AppError(404, "seller not found");
+            const getProducts = await productModel_1.default.find({ sellerId: seller.id });
+            const productIds = getProducts.map((product) => product._id.toString());
+            const orders = await orderModel_1.default.find({
+                paymentStatus: payment_type_1.PaymentStatus.paid,
+                "orderItems.product": { $in: productIds },
+            });
+            const totalRevenue = orders.reduce((total, order) => {
+                const orderTotal = order.orderItems.reduce((orderSum, item) => {
+                    if (productIds.includes(item.product.toString())) {
+                        return orderSum + item.unitPrice * item.quantity;
+                    }
+                    return orderSum;
+                }, 0);
+                return total + orderTotal;
+            }, 0);
+            const avgOrderValue = orders.length > 0 ? totalRevenue / orders.length : 0;
+            const changePercent = 0;
+            const message = "Average Order Value calculated successfully";
+            const response = {
+                success: true,
+                data: {
+                    avgOrderValue,
+                    changePercent,
+                    message,
+                },
+            };
+            return response;
+        }
+        catch (error) {
+            if (error instanceof AppError_1.AppError)
+                throw new AppError_1.AppError(error.statusCode, error.message);
+            throw new AppError_1.AppError(500, "Internal Server Error");
+        }
+    },
+    getSalesByCategory: async (sellerId) => {
+        try {
+            const seller = await sellerModel_1.default.findById(sellerId);
+            if (!seller)
+                throw new AppError_1.AppError(404, "Seller not found");
+            const getProducts = await productModel_1.default.find({ sellerId: seller.id });
+            const productIds = getProducts.map((product) => product._id.toString());
+            const orders = await orderModel_1.default.find({
+                "orderItems.product": { $in: productIds },
+            });
+            const categorySalesMap = {};
+            orders.forEach((order) => {
+                order.orderItems.forEach((item) => {
+                    if (productIds.includes(item.product.toString())) {
+                        const product = getProducts.find((p) => p._id.toString() === item.product.toString());
+                        if (product && product.category) {
+                            const category = product.category.toString();
+                            const revenue = item.unitPrice * item.quantity;
+                            categorySalesMap[category] =
+                                (categorySalesMap[category] || 0) + revenue;
+                        }
+                    }
+                });
+            });
+            return categorySalesMap;
+        }
+        catch (error) {
+            if (error instanceof AppError_1.AppError)
+                throw new AppError_1.AppError(error.statusCode, error.message);
+            throw new AppError_1.AppError(500, "Invalid Server Error");
         }
     },
 };

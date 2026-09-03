@@ -1,8 +1,8 @@
 import React from "react";
 import { createPortal } from "react-dom";
 
-import AlertToast from "./AlertToast";
-import type { AlertItem } from "../types/alert";
+import AlertToast from "../AlertToast";
+import type { AlertItem } from "../../types/alert";
 
 interface AlertContainerProps {
   alerts: AlertItem[];
@@ -26,6 +26,6 @@ export default function AlertContainer({
         <AlertToast key={alert.id} alert={alert} onDismiss={onDismiss} />
       ))}
     </div>,
-    document.body
+    document.body,
   );
 }

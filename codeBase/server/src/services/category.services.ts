@@ -27,7 +27,7 @@ export const CategoryService = {
     },
     getAllCategories: async () => {
         try{
-            const categories = await Category.find({});
+            const categories = await Category.find();
             return categories;
         }catch(error){
             if (error instanceof AppError){

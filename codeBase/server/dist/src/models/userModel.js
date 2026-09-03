@@ -69,7 +69,6 @@ const UserSchema = new mongoose_1.Schema({
     },
     phoneNumber: {
         type: String,
-        unique: true,
         sparse: true,
     },
     isBlocked: {
@@ -81,11 +80,6 @@ const UserSchema = new mongoose_1.Schema({
         default: false,
     },
     googleId: {
-        type: String,
-        unique: true,
-        sparse: true,
-    },
-    facebookId: {
         type: String,
         unique: true,
         sparse: true,

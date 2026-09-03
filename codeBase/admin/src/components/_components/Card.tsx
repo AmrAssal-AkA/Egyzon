@@ -1,5 +1,5 @@
 import React from "react";
-import { CardProps, CardAction } from "../types/card";
+import { CardProps, CardAction } from "../../types/card";
 
 export type { CardProps, CardAction };
 
@@ -24,7 +24,8 @@ export const Card: React.FC<CardProps> = ({
   const variantStyles = {
     default: "bg-white border border-gray-200/80 shadow-sm rounded-xl p-5",
     compact: "bg-white border border-gray-200 shadow-xs rounded-lg p-3.5",
-    elevated: "bg-white border border-gray-100 shadow-md rounded-xl p-6 hover:shadow-lg",
+    elevated:
+      "bg-white border border-gray-100 shadow-md rounded-xl p-6 hover:shadow-lg",
   };
 
   const interactiveStyles = isInteractive
@@ -39,9 +40,17 @@ export const Card: React.FC<CardProps> = ({
   };
 
   const renderBadge = (badge: string, index: number) => {
-    const isPositive = badge.startsWith("+") || badge.toLowerCase().includes("active") || badge.toLowerCase().includes("success");
-    const isNegative = badge.startsWith("-") || badge.toLowerCase().includes("urgent") || badge.toLowerCase().includes("failed");
-    const isWarning = badge.toLowerCase().includes("pending") || badge.toLowerCase().includes("review");
+    const isPositive =
+      badge.startsWith("+") ||
+      badge.toLowerCase().includes("active") ||
+      badge.toLowerCase().includes("success");
+    const isNegative =
+      badge.startsWith("-") ||
+      badge.toLowerCase().includes("urgent") ||
+      badge.toLowerCase().includes("failed");
+    const isWarning =
+      badge.toLowerCase().includes("pending") ||
+      badge.toLowerCase().includes("review");
 
     let badgeColorClass = "bg-gray-100 text-gray-700 border-gray-200";
     if (isPositive) {
@@ -63,15 +72,18 @@ export const Card: React.FC<CardProps> = ({
   };
 
   const renderActionButton = (action: CardAction, isSecondary = false) => {
-    const actionVariant = action.variant || (isSecondary ? "outline" : "primary");
+    const actionVariant =
+      action.variant || (isSecondary ? "outline" : "primary");
 
     const baseClasses =
       "inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed";
 
     const variantClasses = {
       primary: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500",
-      secondary: "bg-gray-100 text-gray-800 hover:bg-gray-200 focus:ring-gray-400",
-      outline: "border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-blue-500",
+      secondary:
+        "bg-gray-100 text-gray-800 hover:bg-gray-200 focus:ring-gray-400",
+      outline:
+        "border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-blue-500",
       ghost: "text-gray-600 hover:bg-gray-100 focus:ring-gray-400",
       danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
     };
@@ -167,7 +179,9 @@ export const Card: React.FC<CardProps> = ({
         <div className="mt-4 w-full">
           <div className="flex items-center justify-between text-xs font-medium text-gray-500 mb-1.5">
             <span>Progress</span>
-            <span className="font-semibold text-gray-700">{Math.min(100, Math.max(0, progress))}%</span>
+            <span className="font-semibold text-gray-700">
+              {Math.min(100, Math.max(0, progress))}%
+            </span>
           </div>
           <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
             <div

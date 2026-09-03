@@ -9,15 +9,7 @@ import QuantitySelector from "./QuantitySelector";
 import AddToCartSection from "./AddToCartSection";
 import SellerCard from "./SellerCard";
 
-interface Seller {
-  name?: string;
-  storeName?: string;
-  FirstName?: string;
-  LastName?: string;
-  feedbackPercentage: number;
-  responseTime: string;
-  isVerified: boolean;
-}
+import { Seller } from "@/types/store";
 
 interface ProductInfoProps {
   id: string;

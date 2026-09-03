@@ -32,7 +32,7 @@ export interface TransactionTableProps {
 }
 
 export interface BalanceWalletProps {
-  balance: number;
+  balance?: number;
   pendingBalance?: number;
   lastPayoutAmount?: number;
   lastPayoutDate?: string;

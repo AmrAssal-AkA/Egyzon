@@ -47,7 +47,21 @@ export declare const AdminService: {
     approveSeller: (sellerId: string) => Promise<ISeller>;
     rejectSeller: (sellerId: string) => Promise<ISeller>;
     requestAdditionalDocuments: (sellerId: string, message: string) => Promise<ISeller>;
-    setPlatformFee: (feePercentage: number, adminId: string) => Promise<IPlatformConfig>;
+    setPlatformFee: (feePercentage: number, taxRate: number, adminId: string) => Promise<IPlatformConfig>;
     getPlatformFee: () => Promise<IPlatformConfig>;
+    getAllSellerActiveCounts: () => Promise<{
+        totalSellersActive: number;
+        growth: any;
+    }>;
+    getAllSellerPendingCounts: () => Promise<{
+        totalSellersPending: number;
+    }>;
+    getSellerProductsCategory: () => Promise<(import("mongoose").Document<unknown, {}, import("../types/product.types").ICategory, {}, import("mongoose").DefaultSchemaOptions> & import("../types/product.types").ICategory & {
+        _id: import("mongoose").Types.ObjectId;
+    } & {
+        __v: number;
+    } & {
+        id: string;
+    })[]>;
 };
 //# sourceMappingURL=admin.services.d.ts.map

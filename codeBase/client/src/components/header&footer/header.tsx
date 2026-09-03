@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { IoIosSearch } from "react-icons/io";
 import { FiUser, FiMenu, FiX, FiSearch } from "react-icons/fi";
 
 import Model from "./_components/Model";
@@ -99,23 +98,11 @@ export default function Header() {
         {/* Mobile Expandable Search Bar */}
         {isMobileSearchOpen && (
           <div className="md:hidden pb-3 pt-1 border-t border-border/50 animate-in fade-in slide-in-from-top-2 duration-200">
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              className="relative flex items-center"
-            >
-              <input
-                type="text"
-                placeholder="Search products..."
-                className="w-full pl-4 pr-12 py-2 rounded-xl border border-input bg-muted/40 text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/40"
-                autoFocus
-              />
-              <button
-                type="submit"
-                className="absolute right-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium"
-              >
-                <IoIosSearch className="w-4 h-4" />
-              </button>
-            </form>
+            <SearchBarComponent
+              isMobile
+              onClose={() => setIsMobileSearchOpen(false)}
+              autoFocus
+            />
           </div>
         )}
       </div>

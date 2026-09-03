@@ -4,6 +4,9 @@ import * as cookie from "cookie";
 
 import {verifyAccessToken, verifyRefreshToken} from "../utils/jwt.util";
 import { Notification } from "../types/notification.types";
+import {Analytical} from "../services/analytics.services";
+import {AnalyticalDateTimeframe} from "../types/analyticalData.types"
+
 
 
 export type AuthenticatedSocket = Socket & {
@@ -19,12 +22,13 @@ export function initSocket(server: HttpServer) {
             methods: ["GET", "POST"],
             credentials: true,
         },
+        transports: ["websocket", "polling"],
     });
     io.use((socket: AuthenticatedSocket, next) => {
         try {
             const rawCookie = socket.handshake.headers.cookie;
             if (!rawCookie) return next(new Error("Authentication error"));
-
+            
             const parsedCookie = cookie.parseCookie(rawCookie);
             const accessToken = parsedCookie.token;
             const refreshToken = parsedCookie.refreshToken;
@@ -38,6 +42,7 @@ export function initSocket(server: HttpServer) {
                 userId: accessTokenPayload.userId,
                 role: accessTokenPayload.role,
             };
+            console.log(`Socket authenticated for user ${socket.user.userId} with role ${socket.user.role}`);
             next();
         }catch(error){
             next(new Error("Authentication error"));
@@ -46,15 +51,36 @@ export function initSocket(server: HttpServer) {
 
     io.on("connection", (socket: AuthenticatedSocket) => {
         const userId = socket.user?.userId;
+        console.log(`Socket connected: ${socket.id} for user ${userId}`);
         if (userId) {
             if (!userSockets.has(userId)) {
                 userSockets.set(userId, new Set());
             }
             userSockets.get(userId)!.add(socket.id);
             socket.join(`user-${userId}`);
+            console.log(`User ${userId} connected with socket ID ${socket.id}`);
         }
+
+        socket.on("sales-indicator:subscribe",async (timeframe: AnalyticalDateTimeframe) => {
+            if (!userId || socket.user?.role !== "seller") return;
+
+            const validTimeframes = Object.values(AnalyticalDateTimeframe);
+            const safeTimeframe = validTimeframes.includes(timeframe) ? timeframe : AnalyticalDateTimeframe.SEVEN_DAYS;
+
+            const data = await Analytical.getSellerAnalytics(userId, safeTimeframe);
+            socket.emit("sales-Indicator:snapshot", data);
+        })
+        socket.on("platform-revenue:subscribe",async (timeframe: AnalyticalDateTimeframe) => {
+            if (!userId || socket.user?.role !== "seller") return;
+            
+            const validTimeframes = Object.values(AnalyticalDateTimeframe);
+            const safeTimeframe = validTimeframes.includes(timeframe) ? timeframe : AnalyticalDateTimeframe.SEVEN_DAYS;
+
+            const data = await Analytical.getSellerAnalytics(userId, safeTimeframe);
+            socket.emit("platform-revenue:snapshot", data);
+        })
+
         socket.on("disconnect", () => {
-            console.log(`User disconnected: ${userId}`);
             if(userId) {
                 const userSocketSet = userSockets.get(userId);
                 userSocketSet?.delete(socket.id);
@@ -80,3 +106,11 @@ export function emitNotificationToUser(userId: string, notification: Notificatio
     if (!ioInstance)  return;
     ioInstance.to(`user-${userId}`).emit("notification", notification);
 }
+
+export async function emitSalesIndicatorUpdate(sellerId: string, timeframe: AnalyticalDateTimeframe = AnalyticalDateTimeframe.SEVEN_DAYS): Promise<void> {
+    if (!isUserConnected(sellerId)) return;
+
+    const data = await Analytical.getSellerAnalytics(sellerId, timeframe);
+    getIo().to(`user-${sellerId}`).emit("sales-indicator:subscribe", data);
+}
+

@@ -1,6 +1,7 @@
 import { Server as HttpServer } from "http";
 import { Server, Socket } from "socket.io";
 import { Notification } from "../types/notification.types";
+import { AnalyticalDateTimeframe } from "../types/analyticalData.types";
 export type AuthenticatedSocket = Socket & {
     user?: {
         userId: string;
@@ -11,4 +12,5 @@ export declare function initSocket(server: HttpServer): Server<import("socket.io
 export declare function getIo(): Server;
 export declare function isUserConnected(userId: string): boolean;
 export declare function emitNotificationToUser(userId: string, notification: Notification): void;
+export declare function emitSalesIndicatorUpdate(sellerId: string, timeframe?: AnalyticalDateTimeframe): Promise<void>;
 //# sourceMappingURL=socket.d.ts.map

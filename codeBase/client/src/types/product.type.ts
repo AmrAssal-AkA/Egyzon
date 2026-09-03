@@ -100,3 +100,31 @@ export interface ProductFormData {
   status?: Product["status"];
   images?: File[];
 }
+
+export interface SearchProductsParams {
+  q: string;
+  category?: string;
+  sort?:
+    | "price:asc"
+    | "price:desc"
+    | "productName:asc"
+    | "productName:desc"
+    | "createdAt:asc"
+    | "createdAt:desc"
+    | string;
+  page?: number;
+  limit?: number;
+}
+
+export interface SearchProductsResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    products: Product[];
+    total?: number;
+    page?: number;
+    limit?: number;
+    totalPages?: number;
+  };
+  error?: string;
+}

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo, useRef } from 'react'
+import React, { useState, useMemo, useRef, useEffect } from 'react'
 import {
   TrendingUp,
   TrendingDown,
@@ -12,7 +12,9 @@ import {
   Award
 } from 'lucide-react'
 
-import { useTotalRevenue, useTotalOrders } from '@/hooks/useSeller'
+import { useTotalRevenue, useTotalOrders, useSalesPerformanceIndicator } from '@/hooks/useSeller'
+import { useNotificationStore } from '@/stores/useNotificationStore'
+import { SalesPerformanceData } from '@/types/seller'
 
 export interface SalesDataPoint {
   label: string
@@ -39,21 +41,79 @@ export default function AnalyticsGraph({
   data30d,
   data12m,
 }: AnalyticsGraphProps) {
-  const { totalRevenue: fetchedRevenue, isLoading: isRevLoading } = useTotalRevenue()
-  const { totalOrders: fetchedOrders, isLoading: isOrdLoading } = useTotalOrders()
-
   const [timeframe, setTimeframe] = useState<TimeFrame>('7D')
   const [activeMetric, setActiveMetric] = useState<MetricType>('revenue')
   const [hoverIndex, setHoverIndex] = useState<number | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+
+  const apiTimeframe = useMemo(() => {
+    switch (timeframe) {
+      case '30D':
+        return '30days'
+      case '12M':
+        return '12months'
+      case '7D':
+      default:
+        return '7days'
+    }
+  }, [timeframe])
+
+  const { salesPerformance, isLoading: isPerfLoading, mutate } = useSalesPerformanceIndicator(apiTimeframe)
+  const { totalRevenue: fetchedRevenue, isLoading: isRevLoading } = useTotalRevenue()
+  const { totalOrders: fetchedOrders, isLoading: isOrdLoading } = useTotalOrders()
+  const socket = useNotificationStore((state) => state.socket)
+
+  // Real-time Socket.IO subscription
+  useEffect(() => {
+    if (!socket) return
+
+    socket.emit('sales-indicator:subscribe', { timeframe: apiTimeframe })
+
+    const handleSalesUpdate = (data: SalesPerformanceData) => {
+      if (data && (!data.timeframe || data.timeframe === apiTimeframe)) {
+        mutate(
+          (prev) => ({
+            success: true,
+            message: 'Real-time update received',
+            data,
+          }),
+          false
+        )
+      }
+    }
+
+    socket.on('sales-indicator:update', handleSalesUpdate)
+    socket.on('sales-indicator', handleSalesUpdate)
+
+    return () => {
+      socket.off('sales-indicator:update', handleSalesUpdate)
+      socket.off('sales-indicator', handleSalesUpdate)
+    }
+  }, [socket, apiTimeframe, mutate])
 
   const activeData = useMemo<SalesDataPoint[]>(() => {
     if (timeframe === '30D' && data30d && data30d.length > 0) return data30d
     if (timeframe === '12M' && data12m && data12m.length > 0) return data12m
     if (timeframe === '7D' && data7d && data7d.length > 0) return data7d
 
-    const rev = fetchedRevenue || 0
-    const ord = fetchedOrders || 0
+    if (salesPerformance?.series && salesPerformance.series.length > 0) {
+      return salesPerformance.series.map((item) => {
+        const rev = item.revenue ?? 0
+        const ord = item.orders ?? 0
+        const conv =
+          item.conversionRate ??
+          (ord > 0 ? +((ord / Math.max(ord * 20, 1)) * 100).toFixed(1) : 0)
+        return {
+          label: item.label || item.date || '',
+          revenue: rev,
+          orders: ord,
+          conversionRate: conv || (rev > 0 ? +(rev / (ord || 1)).toFixed(1) : 0),
+        }
+      })
+    }
+
+    const rev = salesPerformance?.totalRevenue ?? fetchedRevenue ?? 0
+    const ord = salesPerformance?.totalOrders ?? fetchedOrders ?? 0
 
     if (timeframe === '30D') {
       const weights = [0.18, 0.22, 0.28, 0.32]
@@ -100,43 +160,60 @@ export default function AnalyticsGraph({
         conversionRate: conv || (rev > 0 ? 4.8 : 0)
       }
     })
-  }, [timeframe, data7d, data30d, data12m, fetchedRevenue, fetchedOrders])
+  }, [timeframe, data7d, data30d, data12m, salesPerformance, fetchedRevenue, fetchedOrders])
 
   // Calculated metrics
   const totalRevenue = useMemo(
-    () => fetchedRevenue ?? activeData.reduce((acc, item) => acc + item.revenue, 0),
-    [fetchedRevenue, activeData]
+    () => salesPerformance?.totalRevenue ?? fetchedRevenue ?? activeData.reduce((acc, item) => acc + item.revenue, 0),
+    [salesPerformance?.totalRevenue, fetchedRevenue, activeData]
   )
   const totalOrders = useMemo(
-    () => fetchedOrders ?? activeData.reduce((acc, item) => acc + item.orders, 0),
-    [fetchedOrders, activeData]
+    () => salesPerformance?.totalOrders ?? fetchedOrders ?? activeData.reduce((acc, item) => acc + item.orders, 0),
+    [salesPerformance?.totalOrders, fetchedOrders, activeData]
   )
-  const avgConversion = useMemo(() => {
-    if (!activeData.length) return 0
+  const avgOrderValue = useMemo(() => {
+    if (salesPerformance?.AverageOrderValue !== undefined) {
+      return Number(salesPerformance.AverageOrderValue).toFixed(1)
+    }
+    if (totalOrders > 0) {
+      return (totalRevenue / totalOrders).toFixed(1)
+    }
+    if (!activeData.length) return '0.0'
     const sum = activeData.reduce((acc, item) => acc + item.conversionRate, 0)
     return (sum / activeData.length).toFixed(1)
-  }, [activeData])
-
+  }, [salesPerformance?.AverageOrderValue, totalRevenue, totalOrders, activeData])
 
   const peakIndex = useMemo(() => {
+    if (salesPerformance?.peak?.label) {
+      const idx = activeData.findIndex(
+        (item) => item.label === salesPerformance.peak?.label || item.label === salesPerformance.peak?.date
+      )
+      if (idx !== -1) return idx
+    }
     let maxIdx = 0
     activeData.forEach((item, idx) => {
-      if (item[activeMetric] > activeData[maxIdx][activeMetric]) {
+      if (item[activeMetric] > (activeData[maxIdx]?.[activeMetric] ?? 0)) {
         maxIdx = idx
       }
     })
     return maxIdx
-  }, [activeData, activeMetric])
+  }, [activeData, activeMetric, salesPerformance?.peak])
 
   // Growth percentage vs previous baseline
   const growthRate = useMemo(() => {
+    if (salesPerformance?.revenueChangePercent !== undefined) {
+      const pct = Number(salesPerformance.revenueChangePercent)
+      return `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%`
+    }
     if (activeData.length < 2) return '+0.0%'
     const firstVal = activeData[0][activeMetric]
     const lastVal = activeData[activeData.length - 1][activeMetric]
     if (firstVal === 0) return '+100%'
     const pct = ((lastVal - firstVal) / firstVal) * 100
     return `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%`
-  }, [activeData, activeMetric])
+  }, [salesPerformance?.revenueChangePercent, activeData, activeMetric])
+
+  const isDataLoading = isPerfLoading || isRevLoading || isOrdLoading
 
   // Chart coordinate mapping
   const chartHeight = 240
@@ -290,7 +367,7 @@ export default function AnalyticsGraph({
             <span className="font-medium">Total Revenue</span>
             <DollarSign className="w-4 h-4 text-indigo-500" />
           </div>
-          {isRevLoading ? (
+          {isDataLoading ? (
             <div className="h-7 w-28 bg-slate-200 dark:bg-slate-800 animate-pulse rounded my-0.5" />
           ) : (
             <div className="text-xl font-bold text-slate-900 dark:text-slate-100">
@@ -311,7 +388,7 @@ export default function AnalyticsGraph({
             <span className="font-medium">Total Orders</span>
             <ShoppingBag className="w-4 h-4 text-blue-500" />
           </div>
-          {isOrdLoading ? (
+          {isDataLoading ? (
             <div className="h-7 w-20 bg-slate-200 dark:bg-slate-800 animate-pulse rounded my-0.5" />
           ) : (
             <div className="text-xl font-bold text-slate-900 dark:text-slate-100">
@@ -330,12 +407,16 @@ export default function AnalyticsGraph({
           }`}
         >
           <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
-            <span className="font-medium">Avg Conversion Rate</span>
+            <span className="font-medium">Avg Order Value</span>
             <ArrowUpRight className="w-4 h-4 text-emerald-500" />
           </div>
-          <div className="text-xl font-bold text-slate-900 dark:text-slate-100">
-            {avgConversion}%
-          </div>
+          {isDataLoading ? (
+            <div className="h-7 w-24 bg-slate-200 dark:bg-slate-800 animate-pulse rounded my-0.5" />
+          ) : (
+            <div className="text-xl font-bold text-slate-900 dark:text-slate-100">
+              {avgOrderValue} EGP
+            </div>
+          )}
         </button>
       </div>
 

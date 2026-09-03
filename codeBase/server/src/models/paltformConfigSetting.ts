@@ -1,11 +1,12 @@
 import { Schema, model } from "mongoose";
 import {IPlatformConfig }from "../types/platformConfig.types";
 
-const PlatformConfigSettingSchema = new Schema<IPlatformConfig>({
+const PlatformSchema = new Schema<IPlatformConfig>({
     PlatformFeePercentage: { type: Number, required: true },
     taxRate: { type: Number, required: true },
+    totalRevenue: { type: Number, default: 0 },
     updatedBy: { type: Schema.Types.ObjectId, ref: "Admin", required: true },
-    updateAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
 })
 
-export const PlatformConfigSetting = model<IPlatformConfig>("PlatformConfigSetting", PlatformConfigSettingSchema);
+export const Platform = model<IPlatformConfig>("Platform", PlatformSchema);

@@ -17,44 +17,6 @@ export type TopProductItem = {
   image: string
 }
 
-export const initialProducts: TopProductItem[] = [
-  {
-    id: 1,
-    name: "Aura Studio ANC Headphones",
-    category: "Electronics / Audio",
-    price: 3499,
-    sales: 245,
-    revenue: 857255,
-    image: "/images/tech_essentials.png",
-  },
-  {
-    id: 2,
-    name: "Kyoto Pour-Over Set",
-    category: "Home / Kitchen",
-    price: 1850,
-    sales: 182,
-    revenue: 336700,
-    image: "/images/curated_living.png",
-  },
-  {
-    id: 3,
-    name: "Heavyweight Essential Tee",
-    category: "Fashion / Apparel",
-    price: 799,
-    sales: 156,
-    revenue: 124644,
-    image: "/images/curated_living.png",
-  },
-  {
-    id: 4,
-    name: "Lumina Smart Desk Lamp",
-    category: "Electronics / Lighting",
-    price: 2200,
-    sales: 89,
-    revenue: 195800,
-    image: "/images/tech_essentials.png",
-  },
-]
 
 type TopProductProps = {
   topProducts?: (TopProductItem | TopSellingProductItem)[]

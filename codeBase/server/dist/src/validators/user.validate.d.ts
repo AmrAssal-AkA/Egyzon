@@ -1,21 +1,21 @@
 import { z } from "zod";
 export declare const userBaseSchema: z.ZodObject<{
-    FirstName: z.ZodString;
-    LastName: z.ZodString;
+    FirstName: z.ZodPipe<z.ZodString, z.ZodTransform<string, string>>;
+    LastName: z.ZodPipe<z.ZodString, z.ZodTransform<string, string>>;
     email: z.ZodString;
 }, z.core.$strip>;
 export declare const RegisterSchema: z.ZodObject<{
     body: z.ZodObject<{
-        FirstName: z.ZodString;
-        LastName: z.ZodString;
+        FirstName: z.ZodPipe<z.ZodString, z.ZodTransform<string, string>>;
+        LastName: z.ZodPipe<z.ZodString, z.ZodTransform<string, string>>;
         email: z.ZodString;
         password: z.ZodString;
     }, z.core.$strip>;
 }, z.core.$strip>;
 export declare const updateUserSchema: z.ZodObject<{
     body: z.ZodObject<{
-        FirstName: z.ZodOptional<z.ZodString>;
-        LastName: z.ZodOptional<z.ZodString>;
+        FirstName: z.ZodOptional<z.ZodPipe<z.ZodString, z.ZodTransform<string, string>>>;
+        LastName: z.ZodOptional<z.ZodPipe<z.ZodString, z.ZodTransform<string, string>>>;
         email: z.ZodOptional<z.ZodString>;
         address: z.ZodOptional<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>;
         phoneNumber: z.ZodOptional<z.ZodString>;
@@ -24,8 +24,8 @@ export declare const updateUserSchema: z.ZodObject<{
 }, z.core.$strip>;
 export declare const LoginSchema: z.ZodObject<{
     body: z.ZodObject<{
-        email: z.ZodString;
-        password: z.ZodString;
+        email: z.ZodPipe<z.ZodString, z.ZodTransform<string, string>>;
+        password: z.ZodPipe<z.ZodString, z.ZodTransform<string, string>>;
     }, z.core.$strip>;
 }, z.core.$strip>;
 export declare const userResposnseSchema: z.ZodObject<{
@@ -34,8 +34,8 @@ export declare const userResposnseSchema: z.ZodObject<{
         customer: "customer";
         seller: "seller";
     }>;
-    address: z.ZodArray<z.ZodString>;
-    phoneNumber: z.ZodArray<z.ZodString>;
+    address: z.ZodPipe<z.ZodArray<z.ZodString>, z.ZodTransform<string[], string[]>>;
+    phoneNumber: z.ZodPipe<z.ZodArray<z.ZodString>, z.ZodTransform<string[], string[]>>;
     isBlocked: z.ZodBoolean;
     createdAt: z.ZodDate;
 }, z.core.$strip>;

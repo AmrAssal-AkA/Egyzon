@@ -7,9 +7,11 @@ import { PaymentStatus } from '../types/payment.type';
 
 const orderItemSchema = new Schema<IOrderItem>({
     product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
+    seller: { type: Schema.Types.ObjectId, ref: 'Seller', required: true },
     quantity: { type: Number, required: true },
     unitPrice: { type: Number, required: true },
-    subtotal: { type: Number, required: true },
+    discount: { type: Number, default: 0 },
+    total: { type: Number, required: true },
 });
 
 const orderSchema = new Schema<IOrder>({
@@ -38,8 +40,12 @@ const orderSchema = new Schema<IOrder>({
     },
     notes: { type: String, default: '' },
     orderItems: { type: [orderItemSchema], default: [] },
+    platformFee: { type: Number, default: 0 },
 }, {
     timestamps: true,
 })
+
+orderSchema.index({"orderItems.seller":1, paymentStatus:1, orderDate:1});
+
 
 export default mongoose.model<IOrder>('Order', orderSchema);

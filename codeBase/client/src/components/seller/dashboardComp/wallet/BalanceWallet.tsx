@@ -18,19 +18,22 @@ import {
 import { FaMoneyBillWave, FaReceipt } from "react-icons/fa";
 import { toast } from "sonner";
 
+import { useWalletBalance } from "@/hooks/useSeller";
 import { cn } from "@/lib/utils";
-import { BalanceWalletProps } from "@/types/wallet"
+import { BalanceWalletProps } from "@/types/wallet";
 
 
 export default function BalanceWallet({
-  balance,
+  balance: propBalance,
   pendingBalance = 3500.00,
   lastPayoutAmount = 1200.00,
   lastPayoutDate = "2024-10-18T10:00:00.000Z",
   onWithdrawSubmit,
   onGenerateStatementSubmit,
 }: BalanceWalletProps) {
-  
+  const { balance: fetchedBalance, isLoading } = useWalletBalance();
+  const currentBalance = propBalance !== undefined ? propBalance : fetchedBalance;
+
   // --- Modals State ---
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const [isStatementOpen, setIsStatementOpen] = useState(false);
@@ -90,7 +93,7 @@ export default function BalanceWallet({
       return;
     }
 
-    if (amount > balance) {
+    if (amount > currentBalance) {
       setWithdrawError("Insufficient funds in available balance.");
       return;
     }
@@ -209,10 +212,14 @@ export default function BalanceWallet({
           </div>
 
           <div className="my-2">
-            <p className="text-4xl md:text-5xl font-mono font-bold text-white tracking-tight flex items-baseline gap-2">
-              {formatCurrency(balance)}
-              <span className="text-lg font-sans font-medium text-blue-300">EGP</span>
-            </p>
+            {isLoading && propBalance === undefined ? (
+              <div className="h-12 w-48 bg-white/20 animate-pulse rounded-xl" />
+            ) : (
+              <p className="text-4xl md:text-5xl font-mono font-bold text-white tracking-tight flex items-baseline gap-2">
+                {formatCurrency(currentBalance)}
+                <span className="text-lg font-sans font-medium text-blue-300">EGP</span>
+              </p>
+            )}
           </div>
 
           {/* Action Row */}
@@ -323,7 +330,7 @@ export default function BalanceWallet({
               {/* Available Bal Helper */}
               <div className="text-xs bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-lg flex justify-between font-medium">
                 <span className="text-slate-500">Available to Withdraw:</span>
-                <span className="text-slate-800 dark:text-slate-200">{formatCurrency(balance)} EGP</span>
+                <span className="text-slate-800 dark:text-slate-200">{formatCurrency(currentBalance)} EGP</span>
               </div>
 
               {/* Amount Input */}
@@ -335,7 +342,7 @@ export default function BalanceWallet({
                   type="number"
                   placeholder="Min 100 EGP"
                   min="100"
-                  max={balance}
+                  max={currentBalance}
                   step="0.01"
                   required
                   disabled={isWithdrawing}

@@ -23,6 +23,9 @@ import { attachTo } from "./src/middleware/attachTo";
 import orderRoute from "./src/routes/order.route";
 import NotificationRoute from "./src/routes/notifaication.routes";
 import PaymentRoute from "./src/routes/payment.route";
+import { generalLimiter} from "./src/middleware/rateLimiter"
+import morganMiddleware from "./src/middleware/requestLogger";
+import logger from "./src/utils/logger";
 
 
 const app = express();
@@ -48,18 +51,20 @@ app.use(
 app.use(helmet());
 app.use(cookieParser());
 app.use(attachTo(io));
+app.use(morganMiddleware);
+app.set('trust proxy', 1);
 
 
 //routes
 app.use("/api/auth", AuthentaicatingRoute);
-app.use("/api/product", productRoute);
-app.use("/api/wishlist", wishlistRoute);
-app.use("/api/seller", sellerRoute);
-app.use("/api/cart", cartRoute);
-app.use("/api/category", CategoryRoute);
-app.use("/api/customer", customerRoute);
-app.use("/api/admin", adminRoute);
-app.use('/api/order', orderRoute);
+app.use("/api/product", generalLimiter, productRoute);
+app.use("/api/wishlist", generalLimiter, wishlistRoute);
+app.use("/api/seller", generalLimiter, sellerRoute);
+app.use("/api/cart", generalLimiter, cartRoute);
+app.use("/api/category", generalLimiter, CategoryRoute);
+app.use("/api/customer", generalLimiter, customerRoute);
+app.use("/api/admin", generalLimiter, adminRoute);
+app.use('/api/order', generalLimiter, orderRoute);
 app.use('/api/notifications', NotificationRoute);
 app.use('/api/payment', PaymentRoute);
 //swagger
@@ -78,7 +83,7 @@ app.get("/api-docs.json", (req, res) => {
 
 //start the server
 httpServer.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  logger.info(`Server is running on port ${PORT}`);
 });
 
 export default app;

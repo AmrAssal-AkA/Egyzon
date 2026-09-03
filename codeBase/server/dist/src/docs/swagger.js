@@ -32,6 +32,10 @@ exports.swaggerSpec = {
         { name: "Categories", description: "Category management" },
         { name: "Customer", description: "Customer account settings" },
         { name: "Admin", description: "Admin login and seller application review" },
+        {
+            name: "Payment",
+            description: "Payment processing and Paymob integration webhooks",
+        },
     ],
     components: {
         securitySchemes: {
@@ -216,6 +220,53 @@ exports.swaggerSpec = {
                     },
                 },
             },
+            CustomerOrderHistoryOrder: {
+                type: "object",
+                properties: {
+                    _id: { type: "string" },
+                    orderNumber: { type: "string", example: "ORD-20260825-1234" },
+                    orderDate: { type: "string", format: "date-time" },
+                    totalAmount: { type: "number", example: 450 },
+                    status: {
+                        type: "string",
+                        enum: [
+                            "pending",
+                            "processing",
+                            "shipped",
+                            "delivered",
+                            "cancelled",
+                        ],
+                        example: "delivered",
+                    },
+                },
+            },
+            CustomerOrderHistoryData: {
+                type: "object",
+                properties: {
+                    _id: { type: "string" },
+                    FirstName: { type: "string", example: "Ahmed" },
+                    LastName: { type: "string", example: "Ali" },
+                    email: {
+                        type: "string",
+                        format: "email",
+                        example: "customer@example.com",
+                    },
+                    role: { type: "string", example: "customer" },
+                    phoneNumber: { type: "string", example: "+201001112223" },
+                    address: {
+                        type: "array",
+                        items: { type: "string" },
+                    },
+                    orders: {
+                        type: "array",
+                        items: { $ref: "#/components/schemas/CustomerOrderHistoryOrder" },
+                    },
+                    wishlist: {
+                        type: "array",
+                        items: { type: "string" },
+                    },
+                },
+            },
             ProductItem: {
                 type: "object",
                 properties: {
@@ -225,8 +276,17 @@ exports.swaggerSpec = {
                     price: { type: "number" },
                     discount: { type: "number" },
                     stock: { type: "number" },
+                    AvgRating: { type: "number" },
+                    sku: { type: "string" },
+                    status: { type: "string", enum: ["active", "inactive"] },
                     category: { type: "string" },
-                    imageUrl: { type: "string" },
+                    imageUrl: {
+                        type: "array",
+                        items: { type: "string" },
+                    },
+                    sellerId: { type: "string" },
+                    createdAt: { type: "string", format: "date-time" },
+                    updatedAt: { type: "string", format: "date-time" },
                 },
             },
             ProductCreateRequest: {
@@ -295,6 +355,18 @@ exports.swaggerSpec = {
                 type: "array",
                 items: { $ref: "#/components/schemas/ProductItem" },
             },
+            ProductSearchResponse: {
+                type: "object",
+                properties: {
+                    products: {
+                        type: "array",
+                        items: { $ref: "#/components/schemas/ProductItem" },
+                    },
+                    total: { type: "integer", example: 42 },
+                    totalPages: { type: "integer", example: 5 },
+                    currentPage: { type: "integer", example: 1 },
+                },
+            },
             CartItem: {
                 type: "object",
                 required: ["productId", "quantity", "price"],
@@ -330,9 +402,31 @@ exports.swaggerSpec = {
                     updatedAt: { type: "string", format: "date-time" },
                 },
             },
+            BillingData: {
+                type: "object",
+                required: ["firstName", "lastName", "email", "phoneNumber"],
+                properties: {
+                    firstName: { type: "string", example: "John" },
+                    lastName: { type: "string", example: "Doe" },
+                    email: {
+                        type: "string",
+                        format: "email",
+                        example: "john@example.com",
+                    },
+                    phoneNumber: { type: "string", example: "+201001112223" },
+                    apartment: { type: "string", example: "4B" },
+                    floor: { type: "string", example: "4" },
+                    street: { type: "string", example: "12 Nile St" },
+                    building: { type: "string", example: "10" },
+                    city: { type: "string", example: "Cairo" },
+                    state: { type: "string", example: "Cairo Governorate" },
+                    country: { type: "string", example: "Egypt" },
+                    postalCode: { type: "string", example: "11511" },
+                },
+            },
             OrderRequest: {
                 type: "object",
-                required: ["shippingAddress", "paymentMethod", "Address"],
+                required: ["shippingAddress", "paymentMethod", "address"],
                 properties: {
                     shippingAddress: {
                         type: "string",
@@ -347,7 +441,9 @@ exports.swaggerSpec = {
                         type: "string",
                         example: "Leave the package at the front desk.",
                     },
+                    address: { $ref: "#/components/schemas/OrderAddress" },
                     Address: { $ref: "#/components/schemas/OrderAddress" },
+                    billingData: { $ref: "#/components/schemas/BillingData" },
                     phoneNumber: {
                         type: "string",
                         example: "+201001112223",
@@ -389,6 +485,7 @@ exports.swaggerSpec = {
                         type: "string",
                         enum: ["pending", "paid", "failed", "refunded"],
                     },
+                    payment: { type: "string" },
                     paymentMethod: {
                         type: "object",
                         properties: {
@@ -399,6 +496,7 @@ exports.swaggerSpec = {
                             details: { type: "string" },
                         },
                     },
+                    address: { $ref: "#/components/schemas/OrderAddress" },
                     notes: { type: "string" },
                     orderItems: {
                         type: "array",
@@ -407,6 +505,20 @@ exports.swaggerSpec = {
                     createdAt: { type: "string", format: "date-time" },
                     updatedAt: { type: "string", format: "date-time" },
                 },
+            },
+            PlaceOrderResponseData: {
+                type: "object",
+                properties: {
+                    order: { $ref: "#/components/schemas/OrderResponse" },
+                    paymentUrl: {
+                        type: "string",
+                        example: "https://accept.paymob.com/acceptance/iframes/12345?payment_token=...",
+                    },
+                },
+            },
+            CustomerOrderListResponse: {
+                type: "array",
+                items: { $ref: "#/components/schemas/OrderResponse" },
             },
             WishlistRequest: {
                 type: "object",
@@ -517,13 +629,19 @@ exports.swaggerSpec = {
                 type: "object",
                 properties: {
                     totalRevenue: { type: "number", example: 12500 },
-                    revenueAfterPlatformFee: { type: "number", example: 11250 },
                 },
             },
             SellerTopSellingProductItem: {
                 type: "object",
                 properties: {
-                    productId: { type: "string" },
+                    productId: { type: "string", example: "66a1f2f3d4c5b6a7c8d9e0f1" },
+                    name: { type: "string", example: "Wireless Headphones" },
+                    image: {
+                        type: "string",
+                        nullable: true,
+                        example: "https://res.cloudinary.com/demo/image/upload/sample.jpg",
+                    },
+                    sales: { type: "number", example: 25 },
                     revenue: { type: "number", example: 2500 },
                 },
             },
@@ -544,19 +662,132 @@ exports.swaggerSpec = {
                     totalInventoryValue: { type: "number", example: 18500 },
                 },
             },
+            SellerChangeOrderStatusRequest: {
+                type: "object",
+                required: ["orderId", "newStatus"],
+                properties: {
+                    orderId: { type: "string", example: "66a1f2f3d4c5b6a7c8d9e0f1" },
+                    newStatus: {
+                        type: "string",
+                        enum: ["pending", "processing", "shipped"],
+                        example: "processing",
+                    },
+                },
+            },
+            SellerWalletBalanceResponse: {
+                type: "object",
+                properties: {
+                    balance: { type: "number", example: 12500 },
+                },
+            },
+            SellerAvgOrderValueResponse: {
+                type: "object",
+                properties: {
+                    success: { type: "boolean", example: true },
+                    data: {
+                        type: "object",
+                        properties: {
+                            avgOrderValue: { type: "number", example: 450.5 },
+                            changePercent: { type: "number", example: 0 },
+                            message: {
+                                type: "string",
+                                example: "Average Order Value calculated successfully",
+                            },
+                        },
+                    },
+                },
+            },
+            SellerSalesByCategoryResponse: {
+                type: "object",
+                additionalProperties: {
+                    type: "number",
+                },
+                example: {
+                    Electronics: 12500,
+                    Clothing: 4500,
+                },
+            },
+            AnalyticalDataPoint: {
+                type: "object",
+                properties: {
+                    label: { type: "string", example: "2026-08-25" },
+                    date: { type: "string", example: "2026-08-25" },
+                    revenue: { type: "number", example: 2100 },
+                    orders: { type: "integer", example: 5 },
+                },
+            },
+            SellerSalesPerformanceResponse: {
+                type: "object",
+                properties: {
+                    timeframe: {
+                        type: "string",
+                        enum: ["7days", "30days", "12months"],
+                        example: "7days",
+                    },
+                    totalRevenue: { type: "number", example: 15420.5 },
+                    totalOrders: { type: "integer", example: 35 },
+                    AverageOrderValue: { type: "number", example: 440.6 },
+                    revenueChangePercent: { type: "number", example: 12.5 },
+                    series: {
+                        type: "array",
+                        items: { $ref: "#/components/schemas/AnalyticalDataPoint" },
+                    },
+                    peak: {
+                        type: "object",
+                        properties: {
+                            label: { type: "string", example: "2026-08-25" },
+                            date: { type: "string", example: "2026-08-25" },
+                            revenue: { type: "number", example: 2100 },
+                        },
+                    },
+                },
+            },
+            PaymentItem: {
+                type: "object",
+                properties: {
+                    _id: { type: "string" },
+                    transactionId: { type: "string", example: "12345678" },
+                    paymobOrderId: { type: "number", example: 98765432 },
+                    amount: { type: "number", example: 500 },
+                    currency: { type: "string", example: "EGP" },
+                    paymentMethod: { type: "string", example: "card" },
+                    paymentStatus: {
+                        type: "string",
+                        enum: ["pending", "paid", "failed", "refunded"],
+                        example: "paid",
+                    },
+                    paymentDate: { type: "string", format: "date-time" },
+                    gateway: { type: "string", example: "paymob" },
+                    gatewayResponse: { type: "string" },
+                    refundAmount: { type: "number", example: 0 },
+                    cardLast4: { type: "string", example: "1234" },
+                    cardBrand: { type: "string", example: "MasterCard" },
+                    createdAt: { type: "string", format: "date-time" },
+                    updatedAt: { type: "string", format: "date-time" },
+                },
+            },
+            PaymobWebhookResponseData: {
+                type: "object",
+                properties: {
+                    payment: { $ref: "#/components/schemas/PaymentItem" },
+                    order: { $ref: "#/components/schemas/OrderResponse" },
+                },
+            },
             PlatformFeeResponse: {
                 type: "object",
                 properties: {
                     PlatformFeePercentage: { type: "number", example: 10 },
+                    taxRate: { type: "number", example: 14 },
                     updatedBy: { type: "string" },
                     updateAt: { type: "string", format: "date-time" },
                 },
             },
             SetPlatformFeeRequest: {
                 type: "object",
-                required: ["feePercentage"],
+                required: ["feePercentage", "taxRate"],
                 properties: {
                     feePercentage: { type: "number", example: 10 },
+                    taxRate: { type: "number", example: 14 },
                 },
             },
             AdminAdditionalDocumentsRequest: {
@@ -681,6 +912,34 @@ exports.swaggerSpec = {
             AdminUserListResponse: {
                 type: "array",
                 items: { $ref: "#/components/schemas/UserSummary" },
+            },
+            AdminActiveSellerCountsResponse: {
+                type: "object",
+                properties: {
+                    totalSellersActive: { type: "integer", example: 12 },
+                    growth: {
+                        type: "number",
+                        nullable: true,
+                        example: 15.5,
+                        description: "Percentage growth of active sellers over the last 30 days (null if no previous data)",
+                    },
+                },
+            },
+            AdminPendingSellerCountsResponse: {
+                type: "object",
+                properties: {
+                    totalSellersPending: { type: "integer", example: 4 },
+                },
+            },
+            AdminSellerProductsCategoryResponse: {
+                type: "array",
+                items: {
+                    type: "object",
+                    properties: {
+                        _id: { type: "string", example: "66a1f2f3d4c5b6a7c8d9e0f1" },
+                        categoryName: { type: "string", example: "Electronics" },
+                    },
+                },
             },
         },
     },
@@ -1508,6 +1767,101 @@ exports.swaggerSpec = {
                     },
                     404: {
                         description: "Product not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    500: {
+                        description: "Internal Server Error",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/product/search": {
+            get: {
+                tags: ["Products"],
+                summary: "Search products",
+                description: "Search products with text query, category filter, sorting, and pagination.",
+                parameters: [
+                    {
+                        name: "q",
+                        in: "query",
+                        required: true,
+                        schema: { type: "string" },
+                        description: "Search keyword query",
+                        example: "wireless headphones",
+                    },
+                    {
+                        name: "category",
+                        in: "query",
+                        required: false,
+                        schema: { type: "string" },
+                        description: "Filter by category ID or name",
+                        example: "electronics",
+                    },
+                    {
+                        name: "sort",
+                        in: "query",
+                        required: false,
+                        schema: {
+                            type: "string",
+                            enum: [
+                                "price:asc",
+                                "price:desc",
+                                "productName:asc",
+                                "productName:desc",
+                                "createdAt:asc",
+                                "createdAt:desc",
+                            ],
+                        },
+                        description: "Sort field and order formatted as field:order (e.g. price:asc, price:desc, productName:asc, createdAt:desc)",
+                        example: "price:asc",
+                    },
+                    {
+                        name: "page",
+                        in: "query",
+                        required: false,
+                        schema: { type: "integer", minimum: 1, default: 1 },
+                        example: 1,
+                    },
+                    {
+                        name: "limit",
+                        in: "query",
+                        required: false,
+                        schema: { type: "integer", minimum: 1, maximum: 100, default: 10 },
+                        example: 10,
+                    },
+                ],
+                responses: {
+                    200: {
+                        description: "Products retrieved successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: {
+                                                    $ref: "#/components/schemas/ProductSearchResponse",
+                                                },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    400: {
+                        description: "Query parameter is required and must be a string",
                         content: {
                             "application/json": {
                                 schema: { $ref: "#/components/schemas/ApiErrorResponse" },
@@ -2382,6 +2736,329 @@ exports.swaggerSpec = {
                 },
             },
         },
+        "/api/seller/change-order-status": {
+            patch: {
+                tags: ["Seller"],
+                summary: "Update the status of an order containing seller's products",
+                description: "Allows a seller to update an order status to pending, processing, or shipped.",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                requestBody: {
+                    required: true,
+                    content: {
+                        "application/json": {
+                            schema: {
+                                $ref: "#/components/schemas/SellerChangeOrderStatusRequest",
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: "Order status updated successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: { $ref: "#/components/schemas/OrderResponse" },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    400: {
+                        description: "Bad Request",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Forbidden",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    404: {
+                        description: "Order or seller not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    500: {
+                        description: "Internal Server Error",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/seller/balance": {
+            get: {
+                tags: ["Seller"],
+                summary: "Get the authenticated seller's wallet balance",
+                description: "Retrieves the available wallet balance for the authenticated seller.",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: "Wallet balance retrieved successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: {
+                                                    $ref: "#/components/schemas/SellerWalletBalanceResponse",
+                                                },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Forbidden - Unauthorized access or not a seller",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    404: {
+                        description: "Seller not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    500: {
+                        description: "Internal Server Error",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/seller/avg-order-value": {
+            get: {
+                tags: ["Seller"],
+                summary: "Get the authenticated seller's average order value / total revenue",
+                description: "Retrieves the revenue calculation and order metrics for the authenticated seller.",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: "Average order value fetched successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: {
+                                                    $ref: "#/components/schemas/SellerAvgOrderValueResponse",
+                                                },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Forbidden - You are not authorized to access this resource",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    404: {
+                        description: "Seller not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    500: {
+                        description: "Internal Server Error",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/seller/sales-performance-indicator": {
+            get: {
+                tags: ["Seller"],
+                summary: "Get the authenticated seller's sales performance indicator analytics",
+                description: "Retrieves revenue, order count, series trends, and peak metrics over a timeframe (7days, 30days, 12months). Emits real-time updates through Socket.IO.",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: "timeframe",
+                        in: "query",
+                        required: false,
+                        schema: {
+                            type: "string",
+                            enum: ["7days", "30days", "12months"],
+                            default: "7days",
+                        },
+                        example: "7days",
+                    },
+                ],
+                responses: {
+                    200: {
+                        description: "Sales performance indicator fetched successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: {
+                                                    $ref: "#/components/schemas/SellerSalesPerformanceResponse",
+                                                },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Forbidden - You are not authorized to access this resource",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    500: {
+                        description: "Internal Server Error",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/seller/get-salses-by-category": {
+            get: {
+                tags: ["Seller"],
+                summary: "Get the authenticated seller's sales grouped by category",
+                description: "Retrieves total sales revenue breakdown by category for the authenticated seller.",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: "Sales by category fetched successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: {
+                                                    $ref: "#/components/schemas/SellerSalesByCategoryResponse",
+                                                },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Forbidden - You are not authorized to access this resource",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    500: {
+                        description: "Internal Server Error",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
         "/api/category/addCategory": {
             post: {
                 tags: ["Categories"],
@@ -2736,6 +3413,59 @@ exports.swaggerSpec = {
                 },
             },
         },
+        "/api/customer/order-history": {
+            get: {
+                tags: ["Customer"],
+                summary: "Get customer order history",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: "Customer order history retrieved successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: {
+                                                    $ref: "#/components/schemas/CustomerOrderHistoryData",
+                                                },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    404: {
+                        description: "Customer not found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    500: {
+                        description: "Internal Server Error",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
         "/api/order/placeOrder": {
             post: {
                 tags: ["Orders"],
@@ -2760,7 +3490,9 @@ exports.swaggerSpec = {
                                         {
                                             type: "object",
                                             properties: {
-                                                data: { $ref: "#/components/schemas/OrderResponse" },
+                                                data: {
+                                                    $ref: "#/components/schemas/PlaceOrderResponseData",
+                                                },
                                             },
                                         },
                                     ],
@@ -2794,6 +3526,140 @@ exports.swaggerSpec = {
                     },
                     404: {
                         description: "Product not found while placing order",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/order/getUserOrders": {
+            get: {
+                tags: ["Orders"],
+                summary: "Get current customer's orders",
+                description: "Retrieves all orders placed by the authenticated customer, sorted newest first.",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: "Orders retrieved successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: {
+                                                    $ref: "#/components/schemas/CustomerOrderListResponse",
+                                                },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Forbidden - You are not authorized to view orders",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    500: {
+                        description: "Internal Server Error",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/payment/paymob/webhook": {
+            post: {
+                tags: ["Payment"],
+                summary: "Paymob transaction webhook callback",
+                description: "Processes transaction callbacks from Paymob. Verifies the HMAC SHA512 signature in the query parameter and updates payment and order status.",
+                parameters: [
+                    {
+                        name: "hmac",
+                        in: "query",
+                        required: true,
+                        schema: { type: "string" },
+                        description: "HMAC SHA512 signature from Paymob for request verification",
+                    },
+                ],
+                requestBody: {
+                    required: true,
+                    content: {
+                        "application/json": {
+                            schema: {
+                                type: "object",
+                                required: ["obj"],
+                                properties: {
+                                    obj: {
+                                        type: "object",
+                                        description: "Paymob transaction object",
+                                        additionalProperties: true,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: "Payment processed successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: {
+                                                    $ref: "#/components/schemas/PaymobWebhookResponseData",
+                                                },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    400: {
+                        description: "Invalid HMAC signature",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    404: {
+                        description: "Payment not found for the given Paymob order ID",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    500: {
+                        description: "Internal Server Error",
                         content: {
                             "application/json": {
                                 schema: { $ref: "#/components/schemas/ApiErrorResponse" },
@@ -3335,6 +4201,168 @@ exports.swaggerSpec = {
                     },
                     404: {
                         description: "User not found or no pending application found",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/admin/getAllSellerActiveCounts": {
+            get: {
+                tags: ["Admin"],
+                summary: "Get count of all active/approved sellers",
+                description: "Retrieves the total count of approved and active sellers on the platform.",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: "Seller counts retrieved successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: {
+                                                    $ref: "#/components/schemas/AdminActiveSellerCountsResponse",
+                                                },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Unauthorized access",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    500: {
+                        description: "Internal Server Error",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/admin/getAllSellerPendingCounts": {
+            get: {
+                tags: ["Admin"],
+                summary: "Get count of all pending seller applications",
+                description: "Retrieves the total count of pending seller applications awaiting review.",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: "Seller counts retrieved successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: {
+                                                    $ref: "#/components/schemas/AdminPendingSellerCountsResponse",
+                                                },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Unauthorized access",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    500: {
+                        description: "Internal Server Error",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "/api/admin/getSellerProductsCategory": {
+            get: {
+                tags: ["Admin"],
+                summary: "Get product categories for seller management",
+                description: "Retrieves list of product categories (ID and name) available in the system.",
+                security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: "Seller products category retrieved successfully",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    allOf: [
+                                        { $ref: "#/components/schemas/ApiSuccessResponse" },
+                                        {
+                                            type: "object",
+                                            properties: {
+                                                data: {
+                                                    $ref: "#/components/schemas/AdminSellerProductsCategoryResponse",
+                                                },
+                                            },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    401: {
+                        description: "Unauthorized",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    403: {
+                        description: "Unauthorized access",
+                        content: {
+                            "application/json": {
+                                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                            },
+                        },
+                    },
+                    500: {
+                        description: "Internal Server Error",
                         content: {
                             "application/json": {
                                 schema: { $ref: "#/components/schemas/ApiErrorResponse" },

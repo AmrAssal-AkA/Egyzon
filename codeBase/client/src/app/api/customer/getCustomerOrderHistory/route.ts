@@ -36,9 +36,20 @@ export async function GET(req: NextRequest) {
       headers.userId = userId;
     }
 
-    const res = await serverClient.get("/api/customer/order-history", {
-      headers,
-    });
+    let res;
+    try {
+      res = await serverClient.get("/api/customer/order-history", {
+        headers,
+      });
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 404) {
+        res = await serverClient.get("/api/customer/getCustomerOrderHistory", {
+          headers,
+        });
+      } else {
+        throw err;
+      }
+    }
 
     const responseData = res.data;
     return NextResponse.json(
@@ -77,4 +88,3 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-

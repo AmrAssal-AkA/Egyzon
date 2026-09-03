@@ -16,7 +16,7 @@ import Button from "@/components/ui/button";
 import ImageDropzone from "./ImageDropzone";
 import { SellerFormData, RegisterAsSellerModalProps } from "@/types/seller";
 import { sellerService } from "@/services/sellerService";
-import { toast } from "sonner";
+import { addToast, updateToast } from "@/stores/toast";
 
 export function RegisterAsSellerModal({
   isOpen,
@@ -106,22 +106,63 @@ export function RegisterAsSellerModal({
 
     if (!validateForm()) return;
 
-    setIsSubmitting(true);
+    const currentFormData = { ...formData };
+    const toastId = `apply-partner-${Date.now()}`;
 
-    const response = await sellerService.applyAsSeller(formData);
-    console.log("Seller application response:", response);
-    setIsSubmitting(false);
-    if (response.success) {
-      setIsSuccess(true);
-      if (onSubmitSuccess) {
-        onSubmitSuccess(formData);
+    // Reset & close modal immediately so user can continue browsing while processing
+    handleReset();
+
+    const executeApply = async () => {
+      addToast({
+        id: toastId,
+        message: `Submitting partner application for "${currentFormData.shopName}"...`,
+        progress: 10,
+        status: "loading",
+        onRetry: () => executeApply(),
+      });
+
+      try {
+        const response = await sellerService.applyAsSeller(
+          currentFormData,
+          (percent) => {
+            updateToast(toastId, {
+              progress: Math.min(95, percent),
+              status: "loading",
+              message: `Uploading verification documents... ${percent}%`,
+            });
+          },
+        );
+
+        if (response.success) {
+          updateToast(toastId, {
+            progress: 100,
+            status: "success",
+            message:
+              response.message ||
+              `Application for "${currentFormData.shopName}" submitted successfully!`,
+          });
+          if (onSubmitSuccess) {
+            onSubmitSuccess(currentFormData);
+          }
+        } else {
+          updateToast(toastId, {
+            status: "error",
+            message:
+              response.message ||
+              "Failed to submit partner application. Try again.",
+          });
+        }
+      } catch (error) {
+        console.error("Apply as partner error:", error);
+        updateToast(toastId, {
+          status: "error",
+          message:
+            "Failed to submit partner application. Please check your connection and retry.",
+        });
       }
-      toast.success(response.message || "Application submitted successfully!");
-      onClose();
-    } else {
-      console.error(response.message);
-      toast.error(response.message || "Failed to apply as seller");
-    }
+    };
+
+    executeApply();
   };
 
   const handleReset = () => {

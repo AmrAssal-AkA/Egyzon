@@ -158,4 +158,5 @@ export const CategorySalesChart: React.FC<CategorySalesChartProps> = ({
   );
 };
 
+
 export default CategorySalesChart;

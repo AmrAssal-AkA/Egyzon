@@ -1,56 +1,55 @@
 import mongoose, {Schema} from "mongoose"
-import {IWallet} from "../types/wallet.types"
+import {IWallet, TransactionType} from "../types/wallet.types"
 
 
 const walletSchema = new Schema<IWallet>({
-    sellerId: {
+    seller: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Seller",
         required: true,
+        unique: true,
     },
-    Amount: {
+    balance: {
         type: Number,
         required: true,
         default: 0,
+        min: 0,
     },
     currency: {
         type: String,
         required: true,
+        default: "EGP",
     },
-    transactionType: {
-        type: String,
-        required: true,
-    },
-    transactionHistory: [{
-        transactionId: {
-            type: String,
-            required: true,
+    transactionHistory: [
+        {
+            transactionType: {
+                type: String,
+                enum: Object.values(TransactionType),
+                required: true,
+            },
+            amount: {
+                type: Number,
+                required: true,
+            },
+            currency: {
+                type: String,
+                required: true,
+                default: "EGP", 
+            },
+            status: {
+                type: String,
+                enum: ["pending", "completed", "failed", "cancelled"],
+                required: true,
+            },
+            withdrawalId: {
+                type: String,
+            },
+            date: {
+                type: Date,
+                default: Date.now,
+            },
         },
-        amount: {
-            type: Number,
-            required: true,
-        },
-        currency: {
-            type: String,
-            required: true,
-        },
-        transactionType: {
-            type: String,
-            required: true,
-        },
-        date: {
-            type: Date,
-            required: true,
-        }
-    }],
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now,
-    }
+    ],
 }, {timestamps: true})
 
 

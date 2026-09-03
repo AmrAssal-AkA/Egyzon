@@ -7,7 +7,7 @@ import React, {
   useState,
 } from "react";
 
-import AlertContainer from "../components/AlertContainer";
+import AlertContainer from "../components/_components/AlertContainer";
 import {
   registerAlertHandlers,
   unregisterAlertHandlers,

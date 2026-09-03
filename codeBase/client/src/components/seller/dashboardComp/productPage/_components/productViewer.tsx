@@ -8,9 +8,17 @@ import {
   ChevronLeft,
   ChevronRight,
   Package,
-  BadgePercentIcon
+  BadgePercentIcon,
+  MoreHorizontal,
+  PackagePlus,
+  Loader2,
+  X,
+  Plus,
+  Minus,
 } from "lucide-react";
 import { Product } from "@/types/product.type";
+import { sellerService } from "@/services/sellerService";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,6 +29,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface ProductViewerProps {
   productsList?: Product[];
@@ -30,6 +45,7 @@ interface ProductViewerProps {
   onEditProduct?: (product: Product) => void;
   onDeleteProduct?: (id: string | number) => void | Promise<void>;
   onApplyDiscount?: (product: Product) => void;
+  onUpdateStock?: (product: Product, newStock: number) => void | Promise<void>;
 }
 
 export default function ProductViewer({
@@ -40,12 +56,16 @@ export default function ProductViewer({
   onEditProduct,
   onDeleteProduct,
   onApplyDiscount,
+  onUpdateStock,
 }: ProductViewerProps) {
   const [products, setProducts] = useState<Product[]>(productsList);
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [productToStock, setProductToStock] = useState<Product | null>(null);
+  const [stockInput, setStockInput] = useState<string>("");
+  const [isUpdatingStock, setIsUpdatingStock] = useState<boolean>(false);
   const itemsPerPage = 5;
 
   useEffect(() => {
@@ -135,6 +155,68 @@ export default function ProductViewer({
       setSelectedIds(selectedIds.filter((i) => i !== id));
     } else {
       setSelectedIds([...selectedIds, id]);
+    }
+  };
+  const handleStockItem = (product: Product) => {
+    setProductToStock(product);
+    setStockInput(String(product.stock ?? 0));
+  };
+
+  const handleSaveStock = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!productToStock) return;
+    const prodId = getProductId(productToStock);
+    const parsedStock = parseInt(stockInput, 10);
+
+    if (isNaN(parsedStock) || parsedStock < 0) {
+      toast.error("Please enter a valid non-negative stock quantity.");
+      return;
+    }
+
+    try {
+      setIsUpdatingStock(true);
+      const res = await sellerService.editStock(prodId, parsedStock);
+      if (res && res.success) {
+        toast.success(res.message || "Stock updated successfully");
+
+        let newStatus = productToStock.status;
+        const normStatus = (newStatus || "").toLowerCase();
+        if (normStatus !== "inactive") {
+          if (parsedStock === 0) {
+            newStatus = "Out of Stock";
+          } else if (parsedStock <= 5) {
+            newStatus = "Low Stock";
+          } else {
+            newStatus = "Active";
+          }
+        }
+
+        setProducts((prev) =>
+          prev.map((p) =>
+            getProductId(p) === prodId
+              ? {
+                  ...p,
+                  stock: parsedStock,
+                  status: newStatus,
+                  maxStock: Math.max(p.maxStock || 100, parsedStock),
+                }
+              : p,
+          ),
+        );
+
+        if (onUpdateStock) {
+          await onUpdateStock(productToStock, parsedStock);
+        }
+        setProductToStock(null);
+      } else {
+        toast.error(res?.message || "Failed to update stock");
+      }
+    } catch (err: unknown) {
+      console.error("Failed to update stock:", err);
+      const errorObj = err as { message?: string };
+      toast.error(errorObj?.message || "Failed to update stock");
+    } finally {
+      setIsUpdatingStock(false);
     }
   };
 
@@ -279,9 +361,13 @@ export default function ProductViewer({
                     product.sku ||
                     (prodId ? `SKU-${String(prodId).slice(-6)}` : "SKU-N/A");
                   const displayCategory =
-                    typeof product.category === "object" && product.category !== null
-                      ? (product.category as any).categoryName || (product.category as any).name || "General"
-                      : typeof product.category === "string" && product.category.trim() !== ""
+                    typeof product.category === "object" &&
+                    product.category !== null
+                      ? (product.category as any).categoryName ||
+                        (product.category as any).name ||
+                        "General"
+                      : typeof product.category === "string" &&
+                          product.category.trim() !== ""
                         ? product.category
                         : "General";
                   const imageSrc = Array.isArray(product.imageUrl)
@@ -385,28 +471,45 @@ export default function ProductViewer({
 
                       {/* Action Buttons */}
                       <td className="py-3.5 px-4 text-right">
-                        <div className="flex items-center justify-end gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
-                          <button 
-                            onClick={() => handleProductDiscount(product)}
-                            title="Apply discount"
-                            className="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-all cursor-pointer"
-                          >
-                            <BadgePercentIcon className="w-5 h-5" />
-                          </button>
-                          <button 
-                            onClick={() => onEditProduct?.(product)}
-                            title="Edit product"
-                            className="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-all cursor-pointer"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => setProductToDelete(product)}
-                            title="Delete product"
-                            className="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-all cursor-pointer"
-                          >
-                            <Trash2Icon className="w-4 h-4" />
-                          </button>
+                        <div className="flex items-center justify-end">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-400/20">
+                              <MoreHorizontal className="w-4 h-4" />
+                              <span className="sr-only">Open actions menu</span>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-44">
+                              <DropdownMenuItem
+                                onClick={() => onEditProduct?.(product)}
+                                className="cursor-pointer gap-2"
+                              >
+                                <Pencil className="w-4 h-4 text-slate-500" />
+                                <span>Edit</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleProductDiscount(product)}
+                                className="cursor-pointer gap-2"
+                              >
+                                <BadgePercentIcon className="w-4 h-4 text-amber-500" />
+                                <span>Apply Discount</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleStockItem(product)}
+                                className="cursor-pointer gap-2"
+                              >
+                                <PackagePlus className="w-4 h-4 text-emerald-500" />
+                                <span>Stock Item</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                variant="destructive"
+                                onClick={() => setProductToDelete(product)}
+                                className="cursor-pointer gap-2 text-rose-600 focus:text-rose-600 dark:text-rose-400 dark:focus:text-rose-400"
+                              >
+                                <Trash2Icon className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                                <span>Delete Product</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </td>
                     </tr>
@@ -502,7 +605,8 @@ export default function ProductViewer({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Product</AlertDialogTitle>
             <AlertDialogDescription>
-              Do you want to delete this product? Are you sure you want to remove{" "}
+              Do you want to delete this product? Are you sure you want to
+              remove{" "}
               <span className="font-semibold text-slate-900 dark:text-slate-100">
                 &ldquo;
                 {productToDelete?.name ||
@@ -530,7 +634,7 @@ export default function ProductViewer({
                   const prodId = getProductId(productToDelete);
                   await onDeleteProduct?.(prodId);
                   setProducts((prev) =>
-                    prev.filter((p) => getProductId(p) !== prodId)
+                    prev.filter((p) => getProductId(p) !== prodId),
                   );
                   setSelectedIds((prev) => prev.filter((i) => i !== prodId));
                   setProductToDelete(null);
@@ -545,6 +649,181 @@ export default function ProductViewer({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Stock Update Modal */}
+      {productToStock && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl w-full max-w-md my-8 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <PackagePlus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 dark:text-white text-base">
+                    Update Stock Level
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Adjust available inventory units
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                disabled={isUpdatingStock}
+                onClick={() => setProductToStock(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer disabled:opacity-50"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleSaveStock} className="p-5 flex flex-col gap-4">
+              {/* Product Info Preview */}
+              <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+                <div className="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-center overflow-hidden text-lg shrink-0">
+                  {(() => {
+                    const img = Array.isArray(productToStock.imageUrl)
+                      ? productToStock.imageUrl[0]
+                      : typeof productToStock.imageUrl === "string"
+                        ? productToStock.imageUrl
+                        : productToStock.image;
+                    return img &&
+                      (img.startsWith("http") ||
+                        img.startsWith("/") ||
+                        img.startsWith("blob:")) ? (
+                      <Image
+                        src={img}
+                        alt={productToStock.name || productToStock.productName || "Product"}
+                        width={48}
+                        height={48}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      img || "📦"
+                    );
+                  })()}
+                </div>
+                <div className="flex flex-col min-w-0 flex-1">
+                  <span className="font-semibold text-slate-900 dark:text-slate-100 text-sm truncate">
+                    {productToStock.name || productToStock.productName || "Untitled Product"}
+                  </span>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-[11px] text-slate-400 font-mono">
+                      Current Stock:{" "}
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">
+                        {productToStock.stock ?? 0} units
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Stock Input & Stepper */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  New Stock Quantity *
+                </label>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={isUpdatingStock}
+                    onClick={() => {
+                      const cur = parseInt(stockInput, 10) || 0;
+                      setStockInput(String(Math.max(0, cur - 1)));
+                    }}
+                    className="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all cursor-pointer shrink-0 disabled:opacity-50"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    required
+                    disabled={isUpdatingStock}
+                    placeholder="Enter stock quantity"
+                    value={stockInput}
+                    onChange={(e) => setStockInput(e.target.value)}
+                    className="w-full px-3 py-2.5 text-center font-semibold text-base bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-emerald-500 focus:outline-none disabled:opacity-60"
+                  />
+                  <button
+                    type="button"
+                    disabled={isUpdatingStock}
+                    onClick={() => {
+                      const cur = parseInt(stockInput, 10) || 0;
+                      setStockInput(String(cur + 1));
+                    }}
+                    className="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all cursor-pointer shrink-0 disabled:opacity-50"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Quick Preset Buttons */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[11px] text-slate-400 mr-1 font-medium">
+                  Quick Add:
+                </span>
+                {[5, 10, 25, 50, 100].map((delta) => (
+                  <button
+                    key={delta}
+                    type="button"
+                    disabled={isUpdatingStock}
+                    onClick={() => {
+                      const cur = parseInt(stockInput, 10) || 0;
+                      setStockInput(String(cur + delta));
+                    }}
+                    className="px-2.5 py-1 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 dark:hover:bg-emerald-950/30 dark:hover:text-emerald-400 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    +{delta}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  disabled={isUpdatingStock}
+                  onClick={() => setStockInput("0")}
+                  className="px-2.5 py-1 rounded-lg text-xs font-medium border border-rose-200 dark:border-rose-900/60 bg-rose-50/50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 hover:bg-rose-100 transition-all cursor-pointer disabled:opacity-50"
+                >
+                  Set 0
+                </button>
+              </div>
+
+              {/* Modal Actions */}
+              <div className="flex items-center justify-end gap-2.5 mt-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  disabled={isUpdatingStock}
+                  onClick={() => setProductToStock(null)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all cursor-pointer disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUpdatingStock}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {isUpdatingStock ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Updating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <PackagePlus className="w-4 h-4" />
+                      <span>Save Stock</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
