@@ -1,1 +1,0 @@
-{"version":3,"file":"platformConfig.types.d.ts","sourceRoot":"","sources":["../../../src/types/platformConfig.types.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,EAAE,MAAK,UAAU,CAAA;AAE/B,MAAM,WAAW,eAAe;IAC5B,qBAAqB,EAAE,MAAM,CAAC;IAC9B,OAAO,EAAE,MAAM,CAAC;IAChB,SAAS,EAAE,KAAK,CAAC,QAAQ,CAAC;IAC1B,QAAQ,EAAE,IAAI,CAAC;CAClB"}

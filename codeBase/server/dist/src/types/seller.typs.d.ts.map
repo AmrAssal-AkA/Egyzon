@@ -1,1 +1,0 @@
-{"version":3,"file":"seller.typs.d.ts","sourceRoot":"","sources":["../../../src/types/seller.typs.ts"],"names":[],"mappings":"AAEA,MAAM,WAAW,qBAAqB;IAClC,OAAO,EAAE,OAAO,CAAC;IACjB,IAAI,EAAE;QACF,aAAa,EAAE,MAAM,CAAC;QACtB,aAAa,EAAE,MAAM,CAAC;QACtB,OAAO,EAAE,MAAM,CAAC;KACnB,CAAC;CACL"}

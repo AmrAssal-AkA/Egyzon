@@ -1,1 +1,0 @@
-{"version":3,"file":"verifyEmailTemplate.js","sourceRoot":"","sources":["../../../src/templates/verifyEmailTemplate.ts"],"names":[],"mappings":";;;;;AAAA,oEAAoD;AAIpD,MAAM,mBAAmB,GAAG,KAAK,EAAE,EAAU,EAAE,KAAa,EAAE,eAAuB,EAAE,EAAE;IACrF,OAAO,MAAM,IAAA,mBAAiB,EAC1B,EAAE,EACF,mBAAmB,EACnB;;8NAEsN,eAAe;;;;;;;eAO9N,CACV,CAAA;AACL,CAAC,CAAA;kBAEc,mBAAmB"}

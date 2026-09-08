@@ -1,1 +1,0 @@
-{"version":3,"file":"onlineUsers.d.ts","sourceRoot":"","sources":["../../../src/socket/onlineUsers.ts"],"names":[],"mappings":"AAGA,iBAAS,aAAa,CAAC,MAAM,EAAE,MAAM,EAAE,QAAQ,EAAE,MAAM,QAGtD;AACD,iBAAS,gBAAgB,CAAC,MAAM,EAAE,MAAM,EAAE,QAAQ,EAAE,MAAM,QAKzD;AACD,iBAAS,UAAU,CAAC,MAAM,EAAE,MAAM,eAGjC;AAED,OAAO,EAAE,aAAa,EAAE,gBAAgB,EAAE,UAAU,EAAE,CAAC"}
