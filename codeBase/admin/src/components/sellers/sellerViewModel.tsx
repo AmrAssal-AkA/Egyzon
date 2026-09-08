@@ -18,10 +18,20 @@ import {
   Loader2,
   Eye,
   ExternalLink,
+  Landmark,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 
-import type { Seller, SellerStatus } from "../../types/seller";
+import {
+  approveSellerBankAccount,
+  rejectSellerBankAccount,
+} from "../../services/seller.services";
+import type { Seller } from "../../types/seller";
+import { BusinessAvatar } from "./_components/BusinessAvatar";
+import { StatusBadge } from "./_components/StatusBadge";
 
+/// *** Model Context ****///
 export interface SellerViewModelProps {
   seller: Seller | null;
   isOpen: boolean;
@@ -29,66 +39,11 @@ export interface SellerViewModelProps {
   onApprove?: (seller: Seller) => Promise<void>;
   onReject?: (seller: Seller) => Promise<void>;
   onRequestDocs?: (seller: Seller, message: string) => Promise<void>;
+  onApproveBankAccount?: (seller: Seller) => Promise<void>;
+  onRejectBankAccount?: (seller: Seller) => Promise<void>;
 }
 
-type ModalTab = "overview" | "store" | "request";
-
-const avatarColors = [
-  "bg-amber-100 text-amber-800 border-amber-200",
-  "bg-sky-100 text-sky-800 border-sky-200",
-  "bg-emerald-100 text-emerald-800 border-emerald-200",
-  "bg-violet-100 text-violet-800 border-violet-200",
-];
-
-function BusinessAvatar({ name }: { name: string }): React.ReactElement {
-  const initials = name
-    .split(" ")
-    .filter((part) => part.length > 0)
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-
-  const colorIndex =
-    name.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0) %
-    avatarColors.length;
-
-  return (
-    <div
-      className={`w-12 h-12 rounded-xl flex items-center justify-center text-sm font-bold border shrink-0 ${avatarColors[colorIndex]}`}
-      aria-hidden="true"
-    >
-      {initials || "SE"}
-    </div>
-  );
-}
-
-function StatusBadge({ status }: { status: SellerStatus }): React.ReactElement {
-  const badgeStyles: Record<SellerStatus, string> = {
-    pending: "bg-orange-50 text-orange-700 border-orange-200",
-    under_review: "bg-blue-50 text-blue-700 border-blue-200",
-    active: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    suspended: "bg-amber-50 text-amber-700 border-amber-200",
-    banned: "bg-red-50 text-red-700 border-red-200",
-  };
-
-  const labels: Record<SellerStatus, string> = {
-    pending: "Pending Application",
-    under_review: "Under Review",
-    active: "Active Seller",
-    suspended: "Suspended",
-    banned: "Application Rejected",
-  };
-
-  return (
-    <span
-      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${badgeStyles[status]}`}
-    >
-      {labels[status]}
-    </span>
-  );
-}
-
+type ModalTab = "overview" | "store" | "bank" | "request";
 
 export function SellerViewModel({
   seller,
@@ -97,15 +52,23 @@ export function SellerViewModel({
   onApprove,
   onReject,
   onRequestDocs,
+  onApproveBankAccount,
+  onRejectBankAccount,
 }: SellerViewModelProps): React.ReactElement | null {
   const [activeTab, setActiveTab] = useState<ModalTab>("overview");
   const [requestMessage, setRequestMessage] = useState<string>(
     "Please upload a clearer tax card image and add your business address."
   );
   const [submittingAction, setSubmittingAction] = useState<
-    "approve" | "reject" | "request" | null
+    "approve" | "reject" | "request" | "approve_bank" | "reject_bank" | null
   >(null);
   const [showRejectConfirm, setShowRejectConfirm] = useState(false);
+  const [showRejectBankConfirm, setShowRejectBankConfirm] = useState(false);
+  const [localBankStatus, setLocalBankStatus] = useState<string | null>(null);
+  const [bankActionMessage, setBankActionMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
   const [previewDocument, setPreviewDocument] = useState<{
     title: string;
     imageUrl: string;
@@ -115,8 +78,11 @@ export function SellerViewModel({
     if (!isOpen) {
       setActiveTab("overview");
       setShowRejectConfirm(false);
+      setShowRejectBankConfirm(false);
       setSubmittingAction(null);
       setPreviewDocument(null);
+      setLocalBankStatus(null);
+      setBankActionMessage(null);
     }
   }, [isOpen]);
 
@@ -193,6 +159,85 @@ export function SellerViewModel({
       imageUrl,
     });
   };
+
+  const handleApproveBankClick = async (): Promise<void> => {
+    if (!seller) return;
+    try {
+      setSubmittingAction("approve_bank");
+      setBankActionMessage(null);
+
+      if (onApproveBankAccount) {
+        await onApproveBankAccount(seller);
+      } else {
+        const response = await approveSellerBankAccount(seller.id);
+        if (!response.success) {
+          throw new Error(response.message || "Failed to approve bank account");
+        }
+      }
+
+      setLocalBankStatus("verified");
+      setBankActionMessage({
+        type: "success",
+        text: "Seller bank account verified and approved successfully.",
+      });
+    } catch (err: unknown) {
+      setBankActionMessage({
+        type: "error",
+        text:
+          err instanceof Error
+            ? err.message
+            : "Failed to approve seller bank account.",
+      });
+    } finally {
+      setSubmittingAction(null);
+    }
+  };
+
+  const handleRejectBankClick = async (): Promise<void> => {
+    if (!seller) return;
+    try {
+      setSubmittingAction("reject_bank");
+      setBankActionMessage(null);
+
+      if (onRejectBankAccount) {
+        await onRejectBankAccount(seller);
+      } else {
+        const response = await rejectSellerBankAccount(seller.id);
+        if (!response.success) {
+          throw new Error(response.message || "Failed to reject bank account");
+        }
+      }
+
+      setLocalBankStatus("rejected");
+      setShowRejectBankConfirm(false);
+      setBankActionMessage({
+        type: "success",
+        text: "Seller bank account has been rejected.",
+      });
+    } catch (err: unknown) {
+      setBankActionMessage({
+        type: "error",
+        text:
+          err instanceof Error
+            ? err.message
+            : "Failed to reject seller bank account.",
+      });
+    } finally {
+      setSubmittingAction(null);
+    }
+  };
+
+  const bankAccount = seller.bankAccount;
+  const currentBankStatus =
+    localBankStatus ||
+    bankAccount?.status ||
+    bankAccount?.verificationStatus ||
+    (bankAccount?.isVerified ? "verified" : "pending");
+  const isBankVerified =
+    currentBankStatus === "verified" ||
+    currentBankStatus === "active" ||
+    bankAccount?.isVerified === true;
+  const isBankRejected = currentBankStatus === "rejected";
 
   const storeManagement = seller.storeManagement;
 
@@ -280,6 +325,19 @@ export function SellerViewModel({
 
           <button
             type="button"
+            onClick={() => setActiveTab("bank")}
+            className={`py-3.5 px-4 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+              activeTab === "bank"
+                ? "border-blue-600 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-800"
+            }`}
+          >
+            <Landmark className="w-4 h-4" />
+            Bank Account
+          </button>
+
+          <button
+            type="button"
             onClick={() => setActiveTab("request")}
             className={`py-3.5 px-4 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
               activeTab === "request"
@@ -338,6 +396,52 @@ export function SellerViewModel({
                   >
                     <Eye className="w-3.5 h-3.5" /> View Tax Card Image
                   </button>
+                </div>
+
+                <div className="p-4 rounded-xl bg-gray-50 border border-gray-200/80 flex flex-col justify-between sm:col-span-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-2 text-xs font-semibold uppercase text-gray-400 mb-1">
+                        <Landmark className="w-4 h-4 text-indigo-500" />
+                        Linked Bank Account
+                      </div>
+                      <p className="text-base font-semibold text-gray-900">
+                        {bankAccount?.bankName || "Commercial International Bank (CIB)"}
+                      </p>
+                      <p className="text-xs font-mono text-gray-500 mt-0.5">
+                        {bankAccount?.iban
+                          ? `IBAN: ${bankAccount.iban}`
+                          : bankAccount?.accountNumber
+                          ? `Account: ${bankAccount.accountNumber}`
+                          : `Account Holder: ${bankAccount?.accountHolderName || seller.ownerName}`}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-3 self-start sm:self-center">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                          isBankVerified
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                            : isBankRejected
+                            ? "bg-red-50 text-red-700 border-red-200"
+                            : "bg-amber-50 text-amber-700 border-amber-200"
+                        }`}
+                      >
+                        {isBankVerified
+                          ? "Verified"
+                          : isBankRejected
+                          ? "Rejected"
+                          : "Verification Pending"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab("bank")}
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
+                      >
+                        Manage &rarr;
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -496,6 +600,207 @@ export function SellerViewModel({
                       View Image
                     </span>
                   </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "bank" && (
+            <div className="space-y-6">
+              {/* Bank Verification Status Banner */}
+              <div
+                className={`p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                  isBankVerified
+                    ? "bg-emerald-50/60 border-emerald-200 text-emerald-900"
+                    : isBankRejected
+                    ? "bg-red-50/60 border-red-200 text-red-900"
+                    : "bg-amber-50/60 border-amber-200 text-amber-900"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`p-2.5 rounded-xl border shrink-0 ${
+                      isBankVerified
+                        ? "bg-emerald-100 text-emerald-700 border-emerald-300"
+                        : isBankRejected
+                        ? "bg-red-100 text-red-700 border-red-300"
+                        : "bg-amber-100 text-amber-700 border-amber-300"
+                    }`}
+                  >
+                    <Landmark className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold">
+                      {isBankVerified
+                        ? "Verified Bank Account"
+                        : isBankRejected
+                        ? "Bank Account Rejected"
+                        : "Bank Account Verification Pending"}
+                    </h3>
+                    <p className="text-xs opacity-85 mt-0.5">
+                      {isBankVerified
+                        ? "This seller's bank account has been verified and approved for payout disbursements."
+                        : isBankRejected
+                        ? "This bank account was rejected. The seller must provide corrected banking credentials."
+                        : "Review linked banking details below and approve or reject this payout account."}
+                    </p>
+                  </div>
+                </div>
+
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border shrink-0 self-start sm:self-center ${
+                    isBankVerified
+                      ? "bg-emerald-100 text-emerald-800 border-emerald-300"
+                      : isBankRejected
+                      ? "bg-red-100 text-red-800 border-red-300"
+                      : "bg-amber-100 text-amber-800 border-amber-300"
+                  }`}
+                >
+                  {isBankVerified
+                    ? "Verified"
+                    : isBankRejected
+                    ? "Rejected"
+                    : "Pending Verification"}
+                </span>
+              </div>
+
+              {/* Bank Action Message Alert */}
+              {bankActionMessage && (
+                <div
+                  className={`p-3.5 rounded-xl border text-xs flex items-center gap-2 ${
+                    bankActionMessage.type === "success"
+                      ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                      : "bg-red-50 text-red-800 border-red-200"
+                  }`}
+                >
+                  {bankActionMessage.type === "success" ? (
+                    <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+                  ) : (
+                    <AlertTriangle className="w-4 h-4 shrink-0 text-red-600" />
+                  )}
+                  <span className="font-medium">{bankActionMessage.text}</span>
+                </div>
+              )}
+
+              {/* Bank Account Details Card */}
+              <div className="p-4 rounded-xl border border-gray-200 space-y-4 bg-white">
+                <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                  <Landmark className="w-4 h-4 text-gray-500" />
+                  Banking Credentials & Payout Information
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    <span className="text-xs text-gray-400 block font-medium">Bank Name</span>
+                    <span className="font-semibold text-gray-900 mt-0.5 block">
+                      {bankAccount?.bankName || "Commercial International Bank (CIB)"}
+                    </span>
+                  </div>
+
+                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    <span className="text-xs text-gray-400 block font-medium">Account Holder Name</span>
+                    <span className="font-semibold text-gray-900 mt-0.5 block">
+                      {bankAccount?.accountHolderName || seller.ownerName || "—"}
+                    </span>
+                  </div>
+
+                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    <span className="text-xs text-gray-400 block font-medium">Account Number</span>
+                    <span className="font-mono font-semibold text-gray-900 mt-0.5 block">
+                      {bankAccount?.accountNumber || "—"}
+                    </span>
+                  </div>
+
+                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    <span className="text-xs text-gray-400 block font-medium">IBAN</span>
+                    <span className="font-mono font-semibold text-gray-900 mt-0.5 block break-all">
+                      {bankAccount?.iban || "—"}
+                    </span>
+                  </div>
+
+                  {bankAccount?.swiftCode && (
+                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                      <span className="text-xs text-gray-400 block font-medium">SWIFT / BIC</span>
+                      <span className="font-mono font-semibold text-gray-900 mt-0.5 block">
+                        {bankAccount.swiftCode}
+                      </span>
+                    </div>
+                  )}
+
+                  {bankAccount?.routingNumber && (
+                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                      <span className="text-xs text-gray-400 block font-medium">Routing Number</span>
+                      <span className="font-mono font-semibold text-gray-900 mt-0.5 block">
+                        {bankAccount.routingNumber}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Bank Account Verification Actions Card */}
+              <div className="p-4 rounded-xl border border-gray-200 bg-gray-50/60 space-y-3">
+                <h3 className="text-xs font-semibold uppercase text-gray-500">
+                  Bank Account Decision Actions
+                </h3>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  Admins can verify or reject linked banking credentials for this seller. Approving allows platform payout disbursements to be processed to this account.
+                </p>
+
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  {!isBankVerified && (
+                    <button
+                      type="button"
+                      onClick={handleApproveBankClick}
+                      disabled={submittingAction !== null}
+                      className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 transition-colors shadow-sm"
+                    >
+                      {submittingAction === "approve_bank" ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <CheckCircle2 className="w-4 h-4" />
+                      )}
+                      Approve Bank Account
+                    </button>
+                  )}
+
+                  {showRejectBankConfirm ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-red-600 font-semibold">
+                        Reject this bank account?
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleRejectBankClick}
+                        disabled={submittingAction !== null}
+                        className="px-3.5 py-2 text-xs font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center gap-1.5"
+                      >
+                        {submittingAction === "reject_bank" && (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        )}
+                        Yes, Reject Account
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowRejectBankConfirm(false)}
+                        className="px-3.5 py-2 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    !isBankRejected && (
+                      <button
+                        type="button"
+                        onClick={() => setShowRejectBankConfirm(true)}
+                        disabled={submittingAction !== null}
+                        className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 disabled:opacity-50 transition-colors"
+                      >
+                        <XCircle className="w-4 h-4" />
+                        Reject Bank Account
+                      </button>
+                    )
+                  )}
                 </div>
               </div>
             </div>
@@ -676,3 +981,4 @@ export function SellerViewModel({
 }
 
 export default SellerViewModel;
+

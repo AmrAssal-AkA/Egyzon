@@ -7,6 +7,7 @@ import {
   getAllSellerActiveCounts,
   getAllSellerPendingCounts,
   getPlatformRevenueGrowth,
+  getSellerProductsCategory,
   getTotalRevenueInPlatform,
 } from "../services/analytics.services";
 import type {
@@ -14,6 +15,7 @@ import type {
   AnalyticalTimeframe,
   PendingSellersCountData,
   PlatformRevenueGrowthData,
+  SellerProductsCategoryData,
   TotalRevenueData,
 } from "../types/analytics";
 
@@ -21,6 +23,7 @@ const ACTIVE_SELLERS_COUNT_SWR_KEY = "getAllSellerActiveCounts";
 const PENDING_SELLERS_COUNT_SWR_KEY = "getAllSellerPendingCounts";
 const TOTAL_REVENUE_SWR_KEY = "getTotalRevenueInPlatform";
 const PLATFORM_REVENUE_GROWTH_SWR_KEY = "getPlatformRevenueGrowth";
+const SELLER_PRODUCTS_CATEGORY_SWR_KEY = "getSellerProductsCategory";
 
 export interface UseActiveSellersCountResult {
   data: ActiveSellersCountData | null;
@@ -161,6 +164,37 @@ export function usePlatformRevenueGrowth(
       socket.off("platform-revenue:snapshot", handleSnapshot);
     };
   }, [socket, timeframe, mutate]);
+
+  return {
+    data: data ?? null,
+    isLoading,
+    error: error instanceof Error ? error.message : null,
+    refresh: mutate,
+  };
+}
+
+export interface UseSellerProductsCategoryResult {
+  data: SellerProductsCategoryData | null;
+  isLoading: boolean;
+  error: string | null;
+  refresh: () => Promise<SellerProductsCategoryData | null | undefined>;
+}
+
+export function useSellerProductsCategory(): UseSellerProductsCategoryResult {
+  const { data, error, isLoading, mutate } = useSWR<SellerProductsCategoryData | null>(
+    SELLER_PRODUCTS_CATEGORY_SWR_KEY,
+    async () => {
+      const response = await getSellerProductsCategory();
+
+      if (!response.success || !response.data) {
+        throw new Error(
+          response.message || "Failed to fetch seller products category distribution"
+        );
+      }
+
+      return response.data;
+    }
+  );
 
   return {
     data: data ?? null,

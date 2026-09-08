@@ -10,6 +10,23 @@ export interface ApiSellerDocuments {
   taxCardUrl?: string;
 }
 
+export type BankAccountVerificationStatus = "pending" | "verified" | "rejected";
+export type BankAccountDecision = "verified" | "rejected";
+
+export interface SellerBankAccount {
+  bankName?: string;
+  accountHolderName?: string;
+  accountNumber?: string;
+  iban?: string;
+  swiftCode?: string;
+  routingNumber?: string;
+  status?: BankAccountVerificationStatus | string;
+  verificationStatus?: BankAccountVerificationStatus | string;
+  isVerified?: boolean;
+  documentUrl?: string;
+  statementUrl?: string;
+}
+
 export interface Seller {
   id: string;
   businessName: string;
@@ -27,6 +44,7 @@ export interface Seller {
   taxCardImage?: string;
   storeManagement?: ApiStoreManagement;
   notes?: string;
+  bankAccount?: SellerBankAccount;
 }
 
 export interface ApiSellerApplicationUser {
@@ -47,6 +65,7 @@ export interface ApiSellerApplication {
   applicantStatus: string;
   notes: string;
   user: ApiSellerApplicationUser;
+  bankAccount?: SellerBankAccount;
 }
 
 export interface ApiStoreManagement {
@@ -73,6 +92,7 @@ export interface ApiSeller {
   LastName?: string;
   email?: string;
   isBlocked?: boolean;
+  bankAccount?: SellerBankAccount;
   createdAt: string;
   updatedAt: string;
 }

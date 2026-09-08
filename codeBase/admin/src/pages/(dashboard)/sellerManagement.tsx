@@ -2,12 +2,14 @@ import React, { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import SellerTable, { SellerRowAction } from "../../components/sellers/SellerTable";
-import SellerViewModel from "../../components/sellers/sellerViewModel";
+import {SellerViewModel} from "../../components/sellers/sellerViewModel";
 import { useAlert } from "../../hooks/useAlert";
 import { useAllSellers } from "../../hooks/useAllSellers";
 import {
   approveSellerApplication,
+  approveSellerBankAccount,
   rejectSellerApplication,
+  rejectSellerBankAccount,
   requestAdditionalDocuments,
 } from "../../services/seller.services";
 import {
@@ -137,6 +139,43 @@ function SellerManagement(): React.ReactElement {
       showError("Something went wrong while requesting additional documents.");
     }
   };
+
+  const handleApproveBankAccount = async (seller: Seller): Promise<void> => {
+    try {
+      const response = await approveSellerBankAccount(seller.id);
+
+      if (!response.success) {
+        showError(response.message || "Failed to approve seller bank account.");
+        return;
+      }
+
+      await refresh();
+      showSuccess(
+        `${seller.businessName}'s bank account has been approved and verified.`
+      );
+    } catch {
+      showError("Something went wrong while approving the bank account.");
+    }
+  };
+
+  const handleRejectBankAccount = async (seller: Seller): Promise<void> => {
+    try {
+      const response = await rejectSellerBankAccount(seller.id);
+
+      if (!response.success) {
+        showError(response.message || "Failed to reject seller bank account.");
+        return;
+      }
+
+      await refresh();
+      showSuccess(
+        `${seller.businessName}'s bank account has been rejected.`
+      );
+    } catch {
+      showError("Something went wrong while rejecting the bank account.");
+    }
+  };
+
 
   const handleSellerAction = (
     action: SellerRowAction,
@@ -308,6 +347,8 @@ function SellerManagement(): React.ReactElement {
         onApprove={handleApproveSeller}
         onReject={handleRejectSeller}
         onRequestDocs={handleRequestAdditionalDocs}
+        onApproveBankAccount={handleApproveBankAccount}
+        onRejectBankAccount={handleRejectBankAccount}
       />
     </main>
   );

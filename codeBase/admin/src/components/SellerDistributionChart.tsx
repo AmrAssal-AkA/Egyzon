@@ -1,14 +1,19 @@
 import React, { useMemo } from "react";
 
+import { Loader2 } from "lucide-react";
 import {
-  PieChart,
-  Pie,
   Cell,
-  Tooltip,
+  Pie,
+  PieChart,
   ResponsiveContainer,
+  Tooltip,
 } from "recharts";
 
-import { SellerDistributionChartProps } from "../types/charts";
+import { useSellerProductsCategory } from "../hooks/useAnalytics";
+import type {
+  SellerDistributionChartProps,
+  SellerDistributionData,
+} from "../types/charts";
 
 const COLORS = [
   "#2563eb",
@@ -20,7 +25,7 @@ const COLORS = [
 ];
 
 export const SellerDistributionChart: React.FC<SellerDistributionChartProps> = ({
-  data,
+  data: propData,
   totalLabel = "Total Sellers",
   valueFormatter = (value) => value.toLocaleString(),
   title,
@@ -28,11 +33,35 @@ export const SellerDistributionChart: React.FC<SellerDistributionChartProps> = (
   height = 300,
   className = "",
   ariaLabel,
+  isLoading: propIsLoading,
 }): React.ReactElement => {
+  const isControlledData = Array.isArray(propData);
+
+  const {
+    data: liveData,
+    isLoading: isLiveLoading,
+    error: liveError,
+  } = useSellerProductsCategory();
+
+  const isLoading = propIsLoading ?? (!isControlledData && isLiveLoading);
+
+  const chartData: SellerDistributionData[] = useMemo(() => {
+    if (isControlledData) return propData ?? [];
+    if (!liveData?.categories) return [];
+
+    return liveData.categories.map((cat) => ({
+      category: cat.categoryName,
+      value: cat.sellerCount,
+      percentage: cat.percentage,
+    }));
+  }, [isControlledData, propData, liveData]);
+
   const totalSum = useMemo(() => {
-    if (!data) return 0;
-    return data.reduce((sum, item) => sum + item.value, 0);
-  }, [data]);
+    if (!isControlledData && liveData && typeof liveData.total === "number") {
+      return liveData.total;
+    }
+    return chartData.reduce((sum, item) => sum + item.value, 0);
+  }, [isControlledData, liveData, chartData]);
 
   const donutHeight = Math.max(140, Math.round(height * 0.55));
 
@@ -43,7 +72,7 @@ export const SellerDistributionChart: React.FC<SellerDistributionChartProps> = (
       aria-label={ariaLabel || title}
     >
       {/* Header */}
-      {(title || description || (data && data.length > 0)) && (
+      {(title || description || chartData.length > 0 || isLoading) && (
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <div>
             {title && (
@@ -55,7 +84,13 @@ export const SellerDistributionChart: React.FC<SellerDistributionChartProps> = (
               <p className="text-xs text-gray-400 mt-0.5">{description}</p>
             )}
             <div className="mt-2 text-2xl font-bold text-gray-900 tracking-tight">
-              {data && data.length > 0 ? valueFormatter(totalSum) : "No data"}
+              {isLoading && chartData.length === 0 ? (
+                <span className="text-gray-400 text-lg font-normal">Loading...</span>
+              ) : chartData.length > 0 ? (
+                valueFormatter(totalSum)
+              ) : (
+                "No data"
+              )}
             </div>
           </div>
 
@@ -69,7 +104,18 @@ export const SellerDistributionChart: React.FC<SellerDistributionChartProps> = (
 
       {/* Chart Container */}
       <div style={{ width: "100%", height }}>
-        {data && data.length > 0 ? (
+        {isLoading && chartData.length === 0 ? (
+          <div className="w-full h-full flex flex-col items-center justify-center border border-dashed border-gray-200 rounded-lg bg-gray-50/50 p-4">
+            <Loader2 className="w-6 h-6 text-blue-600 animate-spin mb-2" />
+            <span className="text-xs text-gray-400">Loading seller distribution...</span>
+          </div>
+        ) : liveError && !isControlledData && chartData.length === 0 ? (
+          <div className="w-full h-full flex flex-col items-center justify-center border border-dashed border-rose-200 rounded-lg bg-rose-50/30 p-4">
+            <span className="text-sm font-medium text-rose-600">
+              {liveError}
+            </span>
+          </div>
+        ) : chartData.length > 0 ? (
           <div className="w-full h-full flex flex-col justify-between">
             <div
               className="relative flex items-center justify-center w-full shrink-0"
@@ -105,7 +151,7 @@ export const SellerDistributionChart: React.FC<SellerDistributionChartProps> = (
                     }}
                   />
                   <Pie
-                    data={data}
+                    data={chartData}
                     cx="50%"
                     cy="50%"
                     innerRadius="65%"
@@ -114,7 +160,7 @@ export const SellerDistributionChart: React.FC<SellerDistributionChartProps> = (
                     dataKey="value"
                     nameKey="category"
                   >
-                    {data.map((_, index) => (
+                    {chartData.map((_, index) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={COLORS[index % COLORS.length]}
@@ -137,7 +183,7 @@ export const SellerDistributionChart: React.FC<SellerDistributionChartProps> = (
             </div>
 
             <div className="w-full flex flex-col gap-2 pt-3 border-t border-gray-100 overflow-y-auto max-h-[120px]">
-              {data.map((item, index) => {
+              {chartData.map((item, index) => {
                 const color = COLORS[index % COLORS.length];
                 return (
                   <div

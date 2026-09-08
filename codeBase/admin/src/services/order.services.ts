@@ -46,9 +46,8 @@ export function mapApiOrderToOrder(apiOrder: ApiOrder): Order {
   const productName =
     product?.productName ??
     (apiOrder.orderItems?.length > 0 ? "Order Items" : "—");
-  const imageUrl =
-    product?.imageUrl ??
-    "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f";
+  const rawImage = product?.imageUrl ?? product?.imageUrl ?? "";
+  const imageUrl = Array.isArray(rawImage) ? rawImage[0] : String(rawImage).split(',')[0].trim();
   const category = product?.category ?? "General";
 
   const firstName = apiOrder.customer?.firstName ?? "";
@@ -108,9 +107,7 @@ export async function getTotalOrdersInPlatform(
         data.data.totalOrders ??
         data.data.total ??
         orders.length;
-      const totalPages =
-        data.data.pagination?.totalPages ??
-        data.data.totalPages ??
+      const totalPages = data.data.totalPages ??
         Math.max(1, Math.ceil(total / limit));
 
       const pagination: OrdersPagination = data.data.pagination ?? {

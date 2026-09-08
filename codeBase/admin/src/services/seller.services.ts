@@ -6,6 +6,7 @@ import type {
   ApiAllSellersData,
   ApiSeller,
   ApiSellerApplication,
+  BankAccountDecision,
   Seller,
   SellerStatus,
   SellersPagination,
@@ -108,6 +109,7 @@ export function mapApiSellerToSeller(apiSeller: ApiSeller): Seller {
     taxCardImage,
     storeManagement: apiSeller.storeManagement,
     notes: apiSeller.notes,
+    bankAccount: apiSeller.bankAccount,
   };
 }
 
@@ -137,6 +139,7 @@ export function mapApiSellerApplicationToSeller(
     commercialRegisterImage,
     taxCardImage,
     notes: application.notes,
+    bankAccount: application.bankAccount,
   };
 }
 
@@ -269,3 +272,38 @@ export async function requestAdditionalDocuments(
     };
   }
 }
+
+export async function verifySellerBankAccount(
+  sellerId: string,
+  decision: BankAccountDecision
+): Promise<ApiResponse<ApiSeller>> {
+  try {
+    const { data } = await serverClient.patch<ApiResponse<ApiSeller>>(
+      `/verifySellerBankAccount/${sellerId}`,
+      { decision }
+    );
+
+    return data;
+  } catch (error: unknown) {
+    return {
+      success: false,
+      message: getErrorMessage(
+        error,
+        `Failed to ${decision === "verified" ? "verify" : "reject"} seller bank account`
+      ),
+    };
+  }
+}
+
+export async function approveSellerBankAccount(
+  sellerId: string
+): Promise<ApiResponse<ApiSeller>> {
+  return verifySellerBankAccount(sellerId, "verified");
+}
+
+export async function rejectSellerBankAccount(
+  sellerId: string
+): Promise<ApiResponse<ApiSeller>> {
+  return verifySellerBankAccount(sellerId, "rejected");
+}
+

@@ -34,7 +34,7 @@ export interface RevenueChartProps {
 }
 
 export interface SellerDistributionChartProps {
-  data: SellerDistributionData[];
+  data?: SellerDistributionData[];
   totalLabel?: string;
   valueFormatter?: (value: number) => string;
   title?: string;
@@ -42,6 +42,7 @@ export interface SellerDistributionChartProps {
   height?: number;
   className?: string;
   ariaLabel?: string;
+  isLoading?: boolean;
 }
 
 export interface CategorySalesChartProps {

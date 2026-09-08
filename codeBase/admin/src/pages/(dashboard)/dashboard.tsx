@@ -8,13 +8,6 @@ import TotalRevenue from "../../components/totalRevenue";
 import RevenueChart from "../../components/RevenueChart";
 import SellerDistributionChart from "../../components/SellerDistributionChart";
 import ContactCard from "../../components/contactCard";
-import type { SellerDistributionData } from "../../types/charts";
-
-const sellerDistributionData: SellerDistributionData[] = [
-  { category: "Electronics", value: 480, percentage: 40 },
-  { category: "Fashion", value: 360, percentage: 30 },
-  { category: "Home Goods", value: 360, percentage: 30 },
-];
 
 function DashBoardPage(): React.ReactElement {
   const [period, setPeriod] = useState<string>("7D");
@@ -88,7 +81,6 @@ function DashBoardPage(): React.ReactElement {
 
           {/* Seller Distribution Donut Chart */}
           <SellerDistributionChart
-            data={sellerDistributionData}
             title="Seller Distribution"
             description="Active sellers grouped by category."
             totalLabel="Total Sellers"

@@ -7,6 +7,7 @@ import type {
   AnalyticalTimeframe,
   PendingSellersCountData,
   PlatformRevenueGrowthData,
+  SellerProductsCategoryData,
   TotalRevenueData,
 } from "../types/analytics";
 
@@ -90,6 +91,26 @@ export async function getPlatformRevenueGrowth(
       message: getErrorMessage(
         error,
         "Failed to fetch platform revenue growth"
+      ),
+    };
+  }
+}
+
+export async function getSellerProductsCategory(): Promise<
+  ApiResponse<SellerProductsCategoryData>
+> {
+  try {
+    const { data } = await serverClient.get<
+      ApiResponse<SellerProductsCategoryData>
+    >("/getSellerProductsCategory");
+
+    return data;
+  } catch (error: unknown) {
+    return {
+      success: false,
+      message: getErrorMessage(
+        error,
+        "Failed to fetch seller products category distribution"
       ),
     };
   }

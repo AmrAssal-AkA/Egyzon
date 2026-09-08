@@ -12,6 +12,7 @@ import SellerManagement from './pages/(dashboard)/sellerManagement';
 import StoreSetting from './pages/(dashboard)/Setting';
 import { SocketProvider } from './context/socketContext';
 import OrdersPage from './pages/(dashboard)/orders';
+import FinancialPage from './pages/(dashboard)/financial';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
             <Route path="/users" element={<Users />} />
             <Route path="/sellerManagement" element={<SellerManagement />} />
             <Route path="/orders" element={<OrdersPage />} />
+            <Route path="/financial" element={<FinancialPage />} />
             <Route path="/storeSetting" element={<StoreSetting />} />
         </Route>
       </Route>

@@ -33,3 +33,15 @@ export interface PlatformRevenueGrowthData {
   series: RevenueSeriesPoint[];
   peak: RevenuePeakPoint;
 }
+
+export interface SellerCategoryItem {
+  categoryId: string;
+  categoryName: string;
+  sellerCount: number;
+  percentage: number;
+}
+
+export interface SellerProductsCategoryData {
+  total: number;
+  categories: SellerCategoryItem[];
+}
