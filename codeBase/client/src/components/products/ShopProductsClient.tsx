@@ -75,7 +75,11 @@ function ShopProductsClient({
           products
             .map((p) => {
               if (typeof p.category === "object" && p.category !== null) {
-                return (p.category as any).categoryName || (p.category as any).name || "";
+                return (
+                  (p.category as any).categoryName ||
+                  (p.category as any).name ||
+                  ""
+                );
               }
               return typeof p.category === "string" ? p.category : "";
             })
@@ -105,27 +109,41 @@ function ShopProductsClient({
         const matchesMinPrice = minPrice > 0 ? product.price >= minPrice : true;
         const matchesMaxPrice = maxPrice > 0 ? product.price <= maxPrice : true;
 
-        const matchesRating = rating ? (product.AvgRating ?? 0) >= rating : true;
+        const matchesRating = rating
+          ? (product.AvgRating ?? 0) >= rating
+          : true;
 
         const matchesAvailability =
           availability.length > 0
-            ? availability.some((value) =>
-                value === "inStock"
-                  ? product.status === "active" || product.stock > 0
-                  : product.status === "inactive" || product.stock <= 0,
-              )
+            ? availability.some((value) => {
+                const stock =
+                  typeof product.stock === "number" ? product.stock : 0;
+                const status =
+                  typeof product.status === "string"
+                    ? product.status.toLowerCase().trim()
+                    : "active";
+                const isProductInStock =
+                  stock > 0 &&
+                  status !== "out_of_stock" &&
+                  status !== "inactive";
+                return value === "inStock"
+                  ? isProductInStock
+                  : !isProductInStock;
+              })
             : true;
 
         const matchesDiscount =
           discount.length > 0
             ? discount.some((value) => {
                 if (value === "onSale") return (product.discount ?? 0) > 0;
-                if (value === "featured") return (product.AvgRating ?? 0) >= 4.5;
+                if (value === "featured")
+                  return (product.AvgRating ?? 0) >= 4.5;
                 // "newArrival" — products created in the last 30 days
                 if (value === "newArrival") {
-                  const createdAt = product.createdAt ? new Date(product.createdAt).getTime() : 0;
-                  const thirtyDaysAgo =
-                    Date.now() - 30 * 24 * 60 * 60 * 1000;
+                  const createdAt = product.createdAt
+                    ? new Date(product.createdAt).getTime()
+                    : 0;
+                  const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
                   return createdAt >= thirtyDaysAgo;
                 }
                 return false;
@@ -134,7 +152,9 @@ function ShopProductsClient({
 
         const prodCat =
           typeof product.category === "object" && product.category !== null
-            ? (product.category as any).categoryName || (product.category as any).name || ""
+            ? (product.category as any).categoryName ||
+              (product.category as any).name ||
+              ""
             : typeof product.category === "string"
               ? product.category
               : "";

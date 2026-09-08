@@ -6,7 +6,8 @@ import axios from "axios";
 export async function GET(req: NextRequest) {
     try {
         const searchParams = req.nextUrl.searchParams;
-        const token = searchParams.get('token');
+        const rawToken = searchParams.get('token');
+        const token = rawToken?.split('?')[0];
 
         if (!token) {
             return NextResponse.json({ success: false, message: "Token is missing" }, { status: 400 });
@@ -29,7 +30,8 @@ export async function GET(req: NextRequest) {
             }
         }
 
-        const { data } = await serverClient.get(`/api/auth/verify-email?token=${token}`, {
+        const { data } = await serverClient.get("/api/auth/verify-email", {
+            params: { token },
             headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
         });
 

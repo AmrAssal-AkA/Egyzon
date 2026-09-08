@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+
 import axios from "axios";
 
 import { serverClient } from "@/lib/serverClient";
@@ -22,33 +23,6 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    let notificationId: string | null = null;
-
-    try {
-      const body = await req.json();
-      notificationId = body?.id || body?._id || body?.notificationId || null;
-    } catch {
-      // Body might be empty or invalid JSON, will fallback to search params
-    }
-
-    if (!notificationId) {
-      const searchParams = req.nextUrl.searchParams;
-      notificationId =
-        searchParams.get("id") ||
-        searchParams.get("_id") ||
-        searchParams.get("notificationId");
-    }
-
-    if (!notificationId) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Notification ID is required",
-        },
-        { status: 400 }
-      );
-    }
-
     const headers: Record<string, string> = {
       Authorization: `Bearer ${token}`,
     };
@@ -61,7 +35,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const response = await serverClient.patch(
-      `/api/notifications/${notificationId}/markAsRead`,
+      "/api/notifications/markAllAsRead",
       {},
       { headers }
     );
@@ -70,20 +44,19 @@ export async function PATCH(req: NextRequest) {
       {
         success: response.data?.success ?? true,
         message:
-          response.data?.message || "Notification marked as read successfully",
+          response.data?.message || "All notifications marked as read successfully",
         data: response.data?.data ?? response.data,
       },
       { status: response.status || 200 }
     );
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-
       return NextResponse.json(
         {
           success: false,
           message:
             error.response.data?.message ||
-            "Failed to mark notification as read",
+            "Failed to mark all notifications as read",
           error: error.response.data?.error || error.response.data,
         },
         { status: error.response.status }

@@ -35,3 +35,9 @@ export interface MarkAsReadResponse {
   message: string;
   data?: Notification;
 }
+
+export interface MarkAllAsReadResponse {
+  success: boolean;
+  message: string;
+  data?: unknown;
+}

@@ -69,7 +69,7 @@ export const customerService = {
         },
       };
     }
-  },
+  }
 };
 
 export const getCustomerOrderHistory = customerService.getCustomerOrderHistory;

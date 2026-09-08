@@ -1,7 +1,10 @@
 import { create } from "zustand";
 import { io, Socket } from "socket.io-client";
 import { Notification } from "@/types/notification.types";
-import { markNotificationAsRead } from "@/services/notificationService";
+import {
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
+} from "@/services/notificationService";
 
 interface NotificationState {
    socket: Socket | null;
@@ -76,19 +79,16 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     },
 
     markAllAsRead: async () => {
-        const unreadIds = get()
-            .notifications.filter((n) => !n.isRead)
-            .map((n) => n.id || n._id || "")
-            .filter(Boolean);
-
         set((state) => ({
             notifications: state.notifications.map((n) => ({ ...n, isRead: true })),
         }));
 
         get().socket?.emit("notification:markAllAsRead");
 
-        if (unreadIds.length > 0) {
-            await Promise.allSettled(unreadIds.map((id) => markNotificationAsRead(id)));
+        try {
+            await markAllNotificationsAsRead();
+        } catch (error) {
+            console.error("Failed to mark all notifications as read via API:", error);
         }
     },
 

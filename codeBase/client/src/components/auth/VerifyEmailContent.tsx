@@ -9,7 +9,8 @@ import Link from "next/link";
 
 export default function VerifyEmailContent() {
   const searchParams = useSearchParams();
-  const token = searchParams.get("token");
+  const rawToken = searchParams.get("token");
+  const token = rawToken?.split("?")[0] ?? null;
   const { verifyEmail } = useAuth();
   const router = useRouter()
   

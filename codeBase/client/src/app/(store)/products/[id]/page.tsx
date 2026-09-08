@@ -56,7 +56,11 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   if (rawSeller && typeof rawSeller === "object") {
     const sellerObject = rawSeller as SellerLike;
-    sellerId = (sellerObject as any)._id || (sellerObject as any).id;
+    sellerId =
+      sellerObject.storeName ||
+      sellerObject.shopName ||
+      sellerObject.username ||
+      undefined;
     sellerStoreName = sellerObject.storeName || sellerObject.shopName || "";
     const fullName = [sellerObject.FirstName, sellerObject.LastName]
       .filter(Boolean)
@@ -93,13 +97,24 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const rawCategory = product.category;
   let categoryDisplayName = "General";
   if (typeof rawCategory === "object" && rawCategory !== null) {
-    categoryDisplayName =
-      (rawCategory as any).categoryName ||
-      (rawCategory as any).name ||
-      "General";
+    categoryDisplayName = rawCategory.categoryName || "General";
   } else if (typeof rawCategory === "string" && rawCategory.trim() !== "") {
     categoryDisplayName = rawCategory;
   }
+
+  const stockNumber =
+    typeof product.stock === "number"
+      ? product.stock
+      : Number(product.stock) || 0;
+  const rawStatus =
+    typeof product.status === "string"
+      ? product.status.toLowerCase().trim()
+      : "active";
+  const isProductInStock =
+    stockNumber > 0 &&
+    rawStatus !== "inactive" &&
+    rawStatus !== "out_of_stock" &&
+    rawStatus !== "out of stock";
 
   const specifications = [
     {
@@ -110,7 +125,11 @@ export default async function ProductDetailPage({ params }: PageProps) {
     { key: "Category", value: categoryDisplayName },
     {
       key: "Status",
-      value: typeof product.status === "string" ? product.status : "active",
+      value: !isProductInStock
+        ? "Out of Stock"
+        : typeof product.status === "string"
+          ? product.status
+          : "active",
     },
     {
       key: "Discount",
@@ -169,8 +188,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   reviewCount={10}
                   price={product.price}
                   discount={product.discount ?? product.discountPercentage ?? 0}
-                  inStock={product.status === "active" || product.stock > 0}
-                  stock={product.stock}
+                  inStock={isProductInStock}
+                  stock={stockNumber}
                   seller={seller}
                   thumbnail={productThumbnail}
                 />

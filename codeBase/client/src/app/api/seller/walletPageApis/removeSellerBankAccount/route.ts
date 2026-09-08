@@ -5,7 +5,7 @@ import axios from "axios";
 
 import { serverClient } from "@/lib/serverClient";
 
-export async function GET(req: NextRequest) {
+export async function DELETE(req: NextRequest) {
   try {
     const cookieStore = await cookies();
     const token =
@@ -19,42 +19,52 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const { data, status } = await serverClient.get("/api/wallet/balance", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    // Call backend endpoint: DELETE /api/seller/remove-bank-account
+    const { data, status } = await serverClient.delete(
+      "/api/seller/remove-bank-account",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     return NextResponse.json(
       {
         success: data?.success ?? true,
-        message: data?.message || "Wallet balance fetched successfully",
-        data: data?.data ?? data,
+        message: data?.message || "Bank account removed successfully",
+        data: data?.data ?? null,
       },
       { status: status || 200 }
     );
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       console.error(
-        "[getWalletBalance] Backend error response:",
-        error.response.status,
-        error.response.data
+        "[removeSellerBankAccount] Backend error status:",
+        error.response.status
       );
 
       return NextResponse.json(
         {
           success: false,
-          message: error.response.data?.message || "Failed to fetch wallet balance",
-          details: error.response.data,
+          message:
+            error.response.data?.message ||
+            error.response.data?.error ||
+            "Failed to remove bank account",
+          error: error.response.data?.error,
         },
         { status: error.response.status }
       );
     }
 
-    console.error("[getWalletBalance] API route error:", error);
+    console.error("[removeSellerBankAccount] Server error occurred:", error);
     return NextResponse.json(
       { success: false, message: "Internal Server Error" },
       { status: 500 }
     );
   }
+}
+
+export async function POST(req: NextRequest) {
+  return DELETE(req);
 }

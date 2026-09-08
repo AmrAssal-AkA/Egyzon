@@ -246,6 +246,94 @@ export interface SellerOrdersResponse {
   data: SellerOrder[];
 }
 
+export interface SellerBankAccountData {
+  issuer?: string;
+  fullName: string;
+  last4: string;
+  BankCode: string;
+  status: "verified" | "pending_verification" | "rejected" | string;
+}
+
+export interface SellerBankAccountResponse {
+  success: boolean;
+  message: string;
+  data: SellerBankAccountData | null;
+}
+
+export interface AddSellerBankAccountPayload {
+  issuer?: string;
+  fullName: string;
+  bankCardNumber: string;
+  bankCode: string;
+}
+
+export interface AddSellerBankAccountResponse {
+  success: boolean;
+  message: string;
+  data?: unknown;
+  error?: string;
+}
+
+export interface RemoveSellerBankAccountResponse {
+  success: boolean;
+  message: string;
+  data?: unknown;
+  error?: string;
+}
+
+export interface SellerTransactionItem {
+  TransactionId?: string;
+  id?: string;
+  _id?: string;
+  transactionType?: string;
+  type?: string;
+  amount: number;
+  currency: string;
+  status: string;
+  withdrawalId?: string;
+  date: string;
+}
+
+export interface SellerTransactionHistoryData {
+  transactions: SellerTransactionItem[];
+  totalTransactions: number;
+  currentPage: number;
+  totalPages: number;
+}
+
+export interface SellerTransactionsResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    transactionHistory: SellerTransactionHistoryData;
+  } | SellerTransactionHistoryData;
+}
+
+export interface WithdrawBalancePayload {
+  amount: number;
+}
+
+export interface WithdrawBalanceResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    updatedWallet?: {
+      wallet?: {
+        _id?: string;
+        seller?: string;
+        balance?: number;
+        currency?: string;
+        transactionHistory?: SellerTransactionItem[];
+      };
+      bankAccount?: unknown;
+    };
+  };
+  error?: string;
+}
+
+
+
+
 export type {
   StoreType,
   AddressSuggestion,
@@ -256,3 +344,4 @@ export type {
   BackendStoreDetails,
   StoreDetailsResponse,
 } from "@/types/store";
+

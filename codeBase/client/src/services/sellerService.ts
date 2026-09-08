@@ -9,11 +9,17 @@ import {
   SellerOrdersResponse,
   TotalInventoryValueResponse,
   WalletBalanceResponse,
+  SellerBankAccountResponse,
+  AddSellerBankAccountPayload,
+  AddSellerBankAccountResponse,
+  RemoveSellerBankAccountResponse,
   SalesPerformanceResponse,
   AvgOrderValueResponse,
   AvgOrderValueData,
   SalesByCategoryResponse,
   StoreDetailsResponse,
+  SellerTransactionsResponse,
+  WithdrawBalanceResponse,
 } from "@/types/seller";
 import { CreateStoreResponse, StorefrontFormData } from "@/types/store";
 import { ApiResponse } from "@/types/auth";
@@ -591,6 +597,149 @@ export const sellerService = {
       return { success: false, message, data: { balance: 0 } };
     }
   },
+  getSellerBankAccount: async (): Promise<SellerBankAccountResponse> => {
+    try {
+      const response = await apiClient.get<SellerBankAccountResponse>(
+        "/api/seller/walletPageApis/getSellerBankAccount",
+        {
+          withCredentials: true,
+        },
+      );
+
+      const data = response.data;
+      if (!data?.success) {
+        return {
+          success: false,
+          message: data?.message || "Failed to fetch seller bank account",
+          data: null,
+        };
+      }
+
+      console.log(
+        "[getSellerBankAccount] API response:",
+        data,
+        "Status:",
+        response.status,
+      );
+      return {
+        success: true,
+        message: data.message || "Seller bank account retrieved successfully",
+        data: data.data || null,
+      };
+    } catch (error: unknown) {
+      console.error("Get seller bank account error:", error);
+      const axiosError = error as {
+        response?: {
+          data?: {
+            message?: string;
+            error?: string;
+          };
+        };
+        message?: string;
+      };
+      const message =
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
+        axiosError?.message ||
+        "Failed to get seller bank account";
+      return { success: false, message, data: null };
+    }
+  },
+  addSellerBankAccount: async (
+    payload: AddSellerBankAccountPayload
+  ): Promise<AddSellerBankAccountResponse> => {
+    try {
+      const response = await apiClient.post<AddSellerBankAccountResponse>(
+        "/api/seller/walletPageApis/addSellerBankAccount",
+        payload,
+        {
+          withCredentials: true,
+        }
+      );
+
+      const data = response.data;
+      if (!data?.success) {
+        return {
+          success: false,
+          message: data?.message || "Failed to link bank account",
+          error: data?.error,
+        };
+      }
+
+      return {
+        success: true,
+        message: data.message || "Bank account added successfully",
+        data: data.data,
+      };
+    } catch (error: unknown) {
+      console.error("Add seller bank account error");
+      const axiosError = error as {
+        response?: {
+          data?: {
+            message?: string;
+            error?: string;
+          };
+        };
+        message?: string;
+      };
+      const message =
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
+        axiosError?.message ||
+        "Failed to link bank account";
+      return {
+        success: false,
+        message,
+        error: axiosError?.response?.data?.error,
+      };
+    }
+  },
+  removeSellerBankAccount: async (): Promise<RemoveSellerBankAccountResponse> => {
+    try {
+      const response = await apiClient.delete<RemoveSellerBankAccountResponse>(
+        "/api/seller/walletPageApis/removeSellerBankAccount",
+        {
+          withCredentials: true,
+        }
+      );
+
+      const data = response.data;
+      if (!data?.success) {
+        return {
+          success: false,
+          message: data?.message || "Failed to remove bank account",
+          error: data?.error,
+        };
+      }
+
+      return {
+        success: true,
+        message: data.message || "Bank account removed successfully",
+        data: data.data,
+      };
+    } catch (error: unknown) {
+      console.error("Remove seller bank account error:", error);
+      const axiosError = error as {
+        response?: {
+          data?: {
+            message?: string;
+            error?: string;
+          };
+        };
+        message?: string;
+      };
+      const message =
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
+        axiosError?.message ||
+        "Failed to remove bank account";
+      return {
+        success: false,
+        message,
+        error: axiosError?.response?.data?.error,
+      };
+    }
+  },
   createStore: async (
     data: StorefrontFormData | FormData,
   ): Promise<CreateStoreResponse> => {
@@ -883,6 +1032,119 @@ export const sellerService = {
       return { success: false, message, data: null };
     }
   },
+  getSellerTransactions: async (
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<SellerTransactionsResponse> => {
+    try {
+      const response = await apiClient.get<SellerTransactionsResponse>(
+        "/api/seller/walletPageApis/getSellerTranscations",
+        {
+          params: { page, limit },
+          withCredentials: true,
+        },
+      );
+
+      const data = response.data;
+      if (!data?.success) {
+        return {
+          success: false,
+          message: data?.message || "Failed to fetch seller transactions",
+          data: {
+            transactionHistory: {
+              transactions: [],
+              totalTransactions: 0,
+              currentPage: page,
+              totalPages: 1,
+            },
+          },
+        };
+      }
+
+      return {
+        success: true,
+        message: data.message || "Seller transactions retrieved successfully",
+        data: data.data,
+      };
+    } catch (error: unknown) {
+      console.error("Get seller transactions error:", error);
+      const axiosError = error as {
+        response?: {
+          data?: {
+            message?: string;
+            error?: string;
+          };
+        };
+        message?: string;
+      };
+      const message =
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
+        axiosError?.message ||
+        "Failed to get seller transactions";
+      return {
+        success: false,
+        message,
+        data: {
+          transactionHistory: {
+            transactions: [],
+            totalTransactions: 0,
+            currentPage: page,
+            totalPages: 1,
+          },
+        },
+      };
+    }
+  },
+  withdrawBalance: async (
+    amount: number,
+  ): Promise<WithdrawBalanceResponse> => {
+    try {
+      const response = await apiClient.post<WithdrawBalanceResponse>(
+        "/api/seller/walletPageApis/withdrawBalance",
+        { amount },
+        {
+          withCredentials: true,
+        },
+      );
+
+      const data = response.data;
+      if (!data?.success) {
+        return {
+          success: false,
+          message: data?.message || "Failed to submit withdrawal request",
+          error: data?.error,
+        };
+      }
+
+      return {
+        success: true,
+        message: data.message || "Withdrawal request submitted successfully",
+        data: data.data,
+      };
+    } catch (error: unknown) {
+      console.error("Withdraw balance error:", error);
+      const axiosError = error as {
+        response?: {
+          data?: {
+            message?: string;
+            error?: string;
+          };
+        };
+        message?: string;
+      };
+      const message =
+        axiosError?.response?.data?.message ||
+        axiosError?.response?.data?.error ||
+        axiosError?.message ||
+        "Failed to submit withdrawal request";
+      return {
+        success: false,
+        message,
+        error: axiosError?.response?.data?.error,
+      };
+    }
+  },
 };
 
 export const fetchSellerProducts = sellerService.getSellerProducts;
@@ -907,4 +1169,10 @@ export const fetchSalesByCategory = sellerService.getSalesByCategory;
 export const fetchStoreDetails = sellerService.getStoreDetails;
 export const getStoreDetails = sellerService.getStoreDetails;
 export const fetchStorefrontDetails = sellerService.getStoreDetails;
+export const fetchSellerTransactions = sellerService.getSellerTransactions;
+export const getSellerTransactions = sellerService.getSellerTransactions;
+export const withdrawBalance = sellerService.withdrawBalance;
+export const submitWithdrawBalance = sellerService.withdrawBalance;
+
+
 

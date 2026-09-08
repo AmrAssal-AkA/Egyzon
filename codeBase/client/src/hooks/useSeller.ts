@@ -10,10 +10,18 @@ import {
   SellerOrdersResponse,
   TotalInventoryValueResponse,
   WalletBalanceResponse,
+  SellerBankAccountResponse,
   SalesPerformanceResponse,
   AvgOrderValueResponse,
   SalesByCategoryResponse,
+  SellerTransactionsResponse,
+  SellerTransactionHistoryData,
 } from "@/types/seller";
+import type {
+  Transaction,
+  TransactionType,
+  TransactionStatus,
+} from "@/types/wallet";
 
 export const useTotalProducts = () => {
   const { data, error, isLoading, mutate } = useSWR<TotalProductsResponse>(
@@ -143,6 +151,23 @@ export const useWalletBalance = () => {
   };
 };
 
+export const useSellerBankAccount = () => {
+  const { data, error, isLoading, mutate } = useSWR<SellerBankAccountResponse>(
+    "/api/seller/walletPageApis/getSellerBankAccount",
+    () => sellerService.getSellerBankAccount(),
+    {
+      revalidateOnFocus: true,
+    }
+  );
+
+  return {
+    bankAccount: data?.data ?? null,
+    isLoading,
+    error,
+    mutate,
+  };
+};
+
 export const useSalesPerformanceIndicator = (timeframe: string = "7days") => {
   const { data, error, isLoading, mutate } = useSWR<SalesPerformanceResponse>(
     [`/api/seller/salesPerformanceIndecator`, timeframe],
@@ -194,6 +219,41 @@ export const useSalesByCategory = () => {
     mutate,
   };
 };
+
+export const useSellerTransactions = (page: number = 1, limit: number = 10) => {
+  const { data, error, isLoading, mutate } = useSWR<SellerTransactionsResponse>(
+    [`/api/seller/walletPageApis/getSellerTranscations`, page, limit],
+    () => sellerService.getSellerTransactions(page, limit),
+    {
+      revalidateOnFocus: true,
+    }
+  );
+
+  const rawHistory: SellerTransactionHistoryData | undefined =
+    data?.data && "transactionHistory" in data.data
+      ? data.data.transactionHistory
+      : (data?.data as SellerTransactionHistoryData | undefined);
+
+  const transactions: Transaction[] = (rawHistory?.transactions || []).map((t) => ({
+    id: t.TransactionId || t.id || t._id || "N/A",
+    date: t.date || new Date().toISOString(),
+    type: (t.transactionType || t.type || "sale") as TransactionType,
+    amount: Number(t.amount || 0),
+    currency: t.currency || "EGP",
+    status: (t.status || "completed") as TransactionStatus,
+  }));
+
+  return {
+    transactions,
+    totalTransactions: rawHistory?.totalTransactions ?? 0,
+    currentPage: rawHistory?.currentPage ?? page,
+    totalPages: rawHistory?.totalPages ?? 1,
+    isLoading,
+    error,
+    mutate,
+  };
+};
+
 
 
 

@@ -4,6 +4,7 @@ import { apiClient } from "@/lib/apiClient";
 import type {
   GetNotificationsResponse,
   MarkAsReadResponse,
+  MarkAllAsReadResponse,
 } from "@/types/notification.types";
 
 export const getNotifications = async (): Promise<GetNotificationsResponse> => {
@@ -40,4 +41,21 @@ export const markNotificationAsRead = async (
     throw new Error("Failed to mark notification as read");
   }
 };
+
+export const markAllNotificationsAsRead = async (): Promise<MarkAllAsReadResponse> => {
+  try {
+    const response = await apiClient.patch<MarkAllAsReadResponse>(
+      "/api/notifications/markAllAsRead"
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(
+        error.response.data?.message || "Failed to mark all notifications as read"
+      );
+    }
+    throw new Error("Failed to mark all notifications as read");
+  }
+};
+
 

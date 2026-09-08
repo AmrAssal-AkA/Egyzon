@@ -107,6 +107,7 @@ export default function SearchBarComponent({
           ref={inputRef}
           type="text"
           value={query}
+          autoComplete="on"
           onChange={(e) => {
             setQuery(e.target.value);
             if (!isOpen) setIsOpen(true);

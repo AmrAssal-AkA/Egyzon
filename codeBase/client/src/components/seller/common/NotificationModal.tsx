@@ -145,18 +145,33 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
           ) : (
             notifications.map((item: Notification) => {
               const notifId = item.id || item._id || "";
+              const isUnread = !item.isRead;
               return (
                 <div
                   key={notifId || item.createdAt}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={
+                    isUnread
+                      ? `Mark "${item.title || "Notification"}" as read`
+                      : item.title || "Notification"
+                  }
+                  title={isUnread ? "Click to mark as read" : undefined}
                   onClick={() => {
-                    if (!item.isRead && notifId) {
+                    if (isUnread && notifId) {
                       markAsRead(notifId);
                     }
                   }}
-                  className={`p-4 flex items-start gap-3.5 transition-colors cursor-pointer ${
-                    !item.isRead
-                      ? "bg-blue-50/40 dark:bg-blue-950/20 hover:bg-blue-50/70 dark:hover:bg-blue-950/30"
-                      : "hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                  onKeyDown={(e) => {
+                    if ((e.key === "Enter" || e.key === " ") && isUnread && notifId) {
+                      e.preventDefault();
+                      markAsRead(notifId);
+                    }
+                  }}
+                  className={`p-4 flex items-start gap-3.5 transition-colors ${
+                    isUnread
+                      ? "bg-blue-50/40 dark:bg-blue-950/20 hover:bg-blue-50/70 dark:hover:bg-blue-950/30 cursor-pointer"
+                      : "hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-default"
                   }`}
                 >
                   <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 shrink-0 mt-0.5">
@@ -165,7 +180,13 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2 mb-1">
-                      <h3 className={`text-xs font-semibold truncate ${!item.isRead ? "text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"}`}>
+                      <h3
+                        className={`text-xs font-semibold truncate ${
+                          isUnread
+                            ? "text-slate-900 dark:text-white"
+                            : "text-slate-700 dark:text-slate-300"
+                        }`}
+                      >
                         {item.title}
                       </h3>
                       <span className="text-[10px] text-slate-400 shrink-0 whitespace-nowrap">
@@ -177,7 +198,7 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
                     </p>
                   </div>
 
-                  {!item.isRead && (
+                  {isUnread && (
                     <span
                       className="w-2 h-2 rounded-full bg-blue-600 shrink-0 mt-2"
                       title="Unread notification - Click to mark as read"

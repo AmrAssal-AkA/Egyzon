@@ -26,12 +26,16 @@ export default function AddToCartSection({
   productThumbnail,
   onAddToCart,
   onAddToWishlist,
-  isAvailable = true,
+  isAvailable,
 }: AddToCartSectionProps) {
   const { user, isSeller } = useAuth();
   const { addItem, removeItem, items } = useWishlistStore();
 
-  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
 
   const isWishlisted = mounted && items.some((item) => item.id === productId);
 
@@ -65,6 +69,7 @@ export default function AddToCartSection({
       <button
         type="button"
         onClick={() => {
+          if (!isAvailable) return;
           if (!user) {
             toast.error("Please login to add items to your cart");
             return;

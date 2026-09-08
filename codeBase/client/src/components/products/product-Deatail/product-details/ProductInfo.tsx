@@ -39,10 +39,17 @@ export default function ProductInfo({
   const [quantity, setQuantity] = useState(1);
 
   const numPrice = typeof price === "number" ? price : Number(price) || 0;
-  const numDiscount = typeof discount === "number" ? discount : Number(discount) || 0;
+  const numDiscount =
+    typeof discount === "number" ? discount : Number(discount) || 0;
   const hasDiscount = numDiscount > 0 && numDiscount < 100;
-  const discountedPrice = hasDiscount ? numPrice * (1 - numDiscount / 100) : numPrice;
+  const discountedPrice = hasDiscount
+    ? numPrice * (1 - numDiscount / 100)
+    : numPrice;
   const finalPrice = hasDiscount ? discountedPrice : numPrice;
+
+  const isAvailable = Boolean(
+    inStock && (typeof stock === "number" ? stock > 0 : true),
+  );
 
   const handleAddToCart = () => {
     toast.success(`Added ${quantity} x "${title}" to your cart!`);
@@ -55,12 +62,18 @@ export default function ProductInfo({
   return (
     <div className="flex flex-col gap-6 w-full">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1.5 text-xs text-muted-foreground flex-wrap" aria-label="Breadcrumb">
+      <nav
+        className="flex items-center gap-1.5 text-xs text-muted-foreground flex-wrap"
+        aria-label="Breadcrumb"
+      >
         <Link href="/" className="hover:text-foreground transition-colors">
           Home
         </Link>
         <ChevronRight className="w-3.5 h-3.5 shrink-0" />
-        <Link href="/products" className="hover:text-foreground transition-colors">
+        <Link
+          href="/products"
+          className="hover:text-foreground transition-colors"
+        >
           Products
         </Link>
         <ChevronRight className="w-3.5 h-3.5 shrink-0" />
@@ -83,10 +96,17 @@ export default function ProductInfo({
           </div>
           <span className="text-muted-foreground">({reviewCount} reviews)</span>
           <span className="w-1.5 h-1.5 rounded-full bg-border shrink-0" />
-          {inStock ? (
-            <span className="inline-flex items-center text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full">
-              In Stock
-            </span>
+          {isAvailable ? (
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full">
+                In Stock
+              </span>
+              {typeof stock === "number" && stock > 0 && stock <= 5 && (
+                <span className="inline-flex items-center text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full">
+                  Only {stock} left!
+                </span>
+              )}
+            </div>
           ) : (
             <span className="inline-flex items-center text-xs font-semibold uppercase tracking-wider text-red-600 dark:text-red-450 bg-red-500/10 px-2.5 py-0.5 rounded-full">
               Out of Stock
@@ -121,9 +141,10 @@ export default function ProductInfo({
       {/* Selector & Actions */}
       <div className="flex flex-col gap-6 border-t border-border pt-6">
         <QuantitySelector
-          quantity={quantity}
+          quantity={isAvailable ? quantity : 0}
           onChange={setQuantity}
           stock={stock}
+          disabled={!isAvailable}
         />
         <AddToCartSection
           onAddToCart={handleAddToCart}
@@ -132,7 +153,7 @@ export default function ProductInfo({
           productPrice={finalPrice}
           productThumbnail={thumbnail}
           onAddToWishlist={handleAddToWishlist}
-          isAvailable={inStock}
+          isAvailable={isAvailable}
         />
       </div>
 

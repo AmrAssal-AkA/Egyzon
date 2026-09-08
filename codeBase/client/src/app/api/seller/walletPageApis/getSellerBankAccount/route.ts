@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-
 import axios from "axios";
 
 import { serverClient } from "@/lib/serverClient";
 
-export async function GET(req: NextRequest) {
+export async function GET(request: Request | NextRequest) {
   try {
     const cookieStore = await cookies();
     const token =
       cookieStore.get("token")?.value ||
-      req.headers.get("authorization")?.replace("Bearer ", "");
+      request.headers.get("authorization")?.replace("Bearer ", "");
 
     if (!token) {
       return NextResponse.json(
@@ -19,7 +18,8 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const { data, status } = await serverClient.get("/api/wallet/balance", {
+    // Call backend endpoint: GET /api/seller/get-bank-account
+    const { data, status } = await serverClient.get("/api/seller/get-bank-account", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -28,15 +28,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         success: data?.success ?? true,
-        message: data?.message || "Wallet balance fetched successfully",
-        data: data?.data ?? data,
+        message: data?.message || "Bank account fetched successfully",
+        data: data?.data ?? null,
       },
       { status: status || 200 }
     );
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       console.error(
-        "[getWalletBalance] Backend error response:",
+        "[getSellerBankAccount] Backend error response:",
         error.response.status,
         error.response.data
       );
@@ -44,14 +44,15 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: error.response.data?.message || "Failed to fetch wallet balance",
+          message:
+            error.response.data?.message || "Failed to fetch seller bank account",
           details: error.response.data,
         },
         { status: error.response.status }
       );
     }
 
-    console.error("[getWalletBalance] API route error:", error);
+    console.error("[getSellerBankAccount] API route error:", error);
     return NextResponse.json(
       { success: false, message: "Internal Server Error" },
       { status: 500 }

@@ -1,139 +1,34 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+
 import Link from "next/link";
+
 import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
-  Filter,
   Download,
   ChevronLeft,
   ChevronRight,
-  Check,
   Search,
   AlertCircle,
 } from "lucide-react";
+
+import { useSellerTransactions } from "@/hooks/useSeller";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+
 import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import {
-  Transaction,
   TransactionQueryState,
   TransactionTableProps,
   TransactionType,
   TransactionStatus,
 } from "@/types/wallet";
 
-const DEFAULT_MOCK_TRANSACTIONS: Transaction[] = [
-  {
-    id: "TRX-8924-A",
-    date: "2024-10-26T10:00:00.000Z",
-    type: "sale",
-    amount: 245.0,
-    currency: "USD",
-    status: "completed",
-  },
-  {
-    id: "TRX-8923-B",
-    date: "2024-10-25T14:15:00.000Z",
-    type: "fee",
-    amount: -12.25,
-    currency: "USD",
-    status: "completed",
-  },
-  {
-    id: "PO-1102-X",
-    date: "2024-10-24T09:30:00.000Z",
-    type: "payout",
-    amount: -3500.0,
-    currency: "USD",
-    status: "pending",
-  },
-  {
-    id: "TRX-8910-C",
-    date: "2024-10-23T16:45:00.000Z",
-    type: "sale",
-    amount: 890.5,
-    currency: "USD",
-    status: "completed",
-  },
-  {
-    id: "REF-0012-D",
-    date: "2024-10-22T11:20:00.000Z",
-    type: "refund",
-    amount: -145.0,
-    currency: "USD",
-    status: "completed",
-  },
-  {
-    id: "TRX-8901-E",
-    date: "2024-10-21T08:10:00.000Z",
-    type: "sale",
-    amount: 120.0,
-    currency: "EGP",
-    status: "completed",
-  },
-  {
-    id: "TRX-8902-F",
-    date: "2024-10-20T17:50:00.000Z",
-    type: "fee",
-    amount: -6.0,
-    currency: "EGP",
-    status: "completed",
-  },
-  {
-    id: "REF-0013-G",
-    date: "2024-10-19T13:40:00.000Z",
-    type: "refund",
-    amount: -50.0,
-    currency: "EGP",
-    status: "completed",
-  },
-  {
-    id: "PO-1103-Y",
-    date: "2024-10-18T10:00:00.000Z",
-    type: "payout",
-    amount: -1200.0,
-    currency: "EGP",
-    status: "completed",
-  },
-  {
-    id: "TRX-8903-H",
-    date: "2024-10-17T15:25:00.000Z",
-    type: "sale",
-    amount: 450.0,
-    currency: "EGP",
-    status: "pending",
-  },
-  {
-    id: "TRX-8904-I",
-    date: "2024-10-16T12:05:00.000Z",
-    type: "sale",
-    amount: 310.0,
-    currency: "USD",
-    status: "failed",
-  },
-  {
-    id: "TRX-8905-J",
-    date: "2024-10-15T09:12:00.000Z",
-    type: "fee",
-    amount: -15.5,
-    currency: "USD",
-    status: "completed",
-  },
-];
-
 export default function TransactionTable({
   transactions: controlledTransactions,
-  isLoading = false,
+  isLoading: controlledLoading = false,
   totalCount: controlledTotalCount,
   queryState: controlledQueryState,
   onQueryChange,
@@ -143,7 +38,7 @@ export default function TransactionTable({
   // --- Uncontrolled State (Fallback) ---
   const [internalQuery, setInternalQuery] = useState<TransactionQueryState>({
     page: 1,
-    limit: 5,
+    limit: 10,
     status: "all",
     type: "all",
     sortBy: "date",
@@ -158,13 +53,25 @@ export default function TransactionTable({
       ? { ...internalQuery, ...controlledQueryState }
       : internalQuery;
 
+  // Fetch real transactions via SWR when in uncontrolled mode
+  const {
+    transactions: swrTransactions,
+    totalTransactions: swrTotalTransactions,
+    isLoading: swrLoading,
+  } = useSellerTransactions(
+    isControlled ? 1 : currentQuery.page,
+    isControlled ? 10 : currentQuery.limit,
+  );
+
+  const isLoading = controlledLoading || (!isControlled && swrLoading);
+
   const updateQuery = (updates: Partial<TransactionQueryState>) => {
     if (onQueryChange) {
       onQueryChange(updates);
     } else {
       setInternalQuery((prev) => {
         const next = { ...prev, ...updates };
-        // Reset page if filters/search change to avoid empty pages
+
         if (
           updates.status ||
           updates.type ||
@@ -177,11 +84,13 @@ export default function TransactionTable({
     }
   };
 
-  // --- Filtering & Sorting Logic (For Mock Mode only) ---
-  const localTransactions = useMemo(() => {
-    if (isControlled) return [];
+  const rawTransactions = isControlled
+    ? controlledTransactions!
+    : swrTransactions;
 
-    let result = [...DEFAULT_MOCK_TRANSACTIONS];
+  // --- Filtering & Sorting Logic ---
+  const filteredTransactions = useMemo(() => {
+    let result = [...rawTransactions];
 
     // Filter by type
     if (currentQuery.type !== "all") {
@@ -215,24 +124,30 @@ export default function TransactionTable({
     });
 
     return result;
-  }, [isControlled, currentQuery]);
+  }, [rawTransactions, currentQuery]);
 
-  // Derived Values
-  const transactions = isControlled
-    ? controlledTransactions!
-    : localTransactions;
+  const hasLocalFilters =
+    currentQuery.type !== "all" ||
+    currentQuery.status !== "all" ||
+    Boolean(currentQuery.searchTerm);
+
   const totalItems = isControlled
-    ? (controlledTotalCount ?? transactions.length)
-    : localTransactions.length;
+    ? (controlledTotalCount ?? rawTransactions.length)
+    : hasLocalFilters
+      ? filteredTransactions.length
+      : swrTotalTransactions;
 
   const totalPages = Math.max(1, Math.ceil(totalItems / currentQuery.limit));
 
-  // Slice data for pagination in mock mode
+  // In uncontrolled mode, transactions are already server-paginated; in controlled mode without totalCount, slice locally
   const paginatedTransactions = useMemo(() => {
-    if (isControlled) return transactions;
-    const startIndex = (currentQuery.page - 1) * currentQuery.limit;
-    return transactions.slice(startIndex, startIndex + currentQuery.limit);
-  }, [isControlled, transactions, currentQuery.page, currentQuery.limit]);
+    if (isControlled && controlledTotalCount === undefined) {
+      const startIndex = (currentQuery.page - 1) * currentQuery.limit;
+      return filteredTransactions.slice(startIndex, startIndex + currentQuery.limit);
+    }
+    return filteredTransactions;
+  }, [isControlled, controlledTotalCount, filteredTransactions, currentQuery.page, currentQuery.limit]);
+
 
   // --- Formatter Helpers ---
 
@@ -283,7 +198,7 @@ export default function TransactionTable({
     }
 
     // Default Client-side CSV Exporter
-    const dataToExport = isControlled ? transactions : localTransactions;
+    const dataToExport = filteredTransactions;
     if (dataToExport.length === 0) return;
 
     const headers = [
@@ -427,71 +342,6 @@ export default function TransactionTable({
             />
           </div>
 
-          {/* Filter Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 h-9 px-3 gap-2 cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/20">
-              <Filter className="h-4 w-4" />
-              Filter
-              {(currentQuery.status !== "all" ||
-                currentQuery.type !== "all") && (
-                <span className="h-2 w-2 rounded-full bg-blue-500"></span>
-              )}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 align-end" align="end">
-              <DropdownMenuLabel>Filter Transactions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-
-              {/* Type Filters */}
-              <div className="px-2 py-1.5 text-xs font-semibold text-slate-400 uppercase">
-                Type
-              </div>
-              {(["all", "sale", "fee", "payout", "refund"] as const).map(
-                (type) => (
-                  <DropdownMenuItem
-                    key={type}
-                    onClick={() => updateQuery({ type })}
-                    className="flex items-center justify-between cursor-pointer capitalize text-slate-700 dark:text-slate-200"
-                  >
-                    <span className="flex items-center gap-2">
-                      {type !== "all" && (
-                        <span
-                          className={cn(
-                            "h-2 w-2 rounded-full",
-                            getTypeDotColor(type),
-                          )}
-                        />
-                      )}
-                      {type === "all" ? "All Types" : type}
-                    </span>
-                    {currentQuery.type === type && (
-                      <Check className="h-4 w-4 text-blue-500" />
-                    )}
-                  </DropdownMenuItem>
-                ),
-              )}
-
-              <DropdownMenuSeparator />
-
-              {/* Status Filters */}
-              <div className="px-2 py-1.5 text-xs font-semibold text-slate-400 uppercase">
-                Status
-              </div>
-              {(["all", "completed", "pending", "failed"] as const).map(
-                (status) => (
-                  <DropdownMenuItem
-                    key={status}
-                    onClick={() => updateQuery({ status })}
-                    className="flex items-center justify-between cursor-pointer capitalize text-slate-700 dark:text-slate-200"
-                  >
-                    <span>{status === "all" ? "All Statuses" : status}</span>
-                    {currentQuery.status === status && (
-                      <Check className="h-4 w-4 text-blue-500" />
-                    )}
-                  </DropdownMenuItem>
-                ),
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
 
           {/* Export Button */}
           <Button
@@ -512,16 +362,16 @@ export default function TransactionTable({
           <thead>
             <tr className="bg-slate-50/50 dark:bg-slate-900/50">
               <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wider text-left">
-                <SortableHeader field="date" label="Date" />
+                Date
               </th>
               <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wider text-left">
-                <SortableHeader field="id" label="Transaction ID" />
+                Transaction ID
               </th>
               <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wider text-left">
                 Type
               </th>
               <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wider text-left">
-                <SortableHeader field="amount" label="Amount" />
+                Amount
               </th>
               <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wider text-left">
                 Status

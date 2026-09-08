@@ -7,20 +7,21 @@ import {
   Loader2,
   X,
   Landmark,
-  Smartphone,
-  Send,
   Calendar,
   AlertCircle,
   HelpCircle,
   Clock,
-  ArrowUpRight
+  ArrowUpRight,
+  CheckCircle2,
 } from "lucide-react";
 import { FaMoneyBillWave, FaReceipt } from "react-icons/fa";
+import { mutate } from "swr";
 import { toast } from "sonner";
 
-import { useWalletBalance } from "@/hooks/useSeller";
+import { useWalletBalance, useSellerBankAccount } from "@/hooks/useSeller";
+import { sellerService } from "@/services/sellerService";
 import { cn } from "@/lib/utils";
-import { BalanceWalletProps } from "@/types/wallet";
+import type { BalanceWalletProps } from "@/types/wallet";
 
 
 export default function BalanceWallet({
@@ -31,7 +32,12 @@ export default function BalanceWallet({
   onWithdrawSubmit,
   onGenerateStatementSubmit,
 }: BalanceWalletProps) {
-  const { balance: fetchedBalance, isLoading } = useWalletBalance();
+  const {
+    balance: fetchedBalance,
+    isLoading,
+    mutate: mutateBalance,
+  } = useWalletBalance();
+  const { bankAccount, isLoading: isBankLoading } = useSellerBankAccount();
   const currentBalance = propBalance !== undefined ? propBalance : fetchedBalance;
 
   // --- Modals State ---
@@ -40,12 +46,6 @@ export default function BalanceWallet({
 
   // --- Withdraw Form State ---
   const [withdrawAmount, setWithdrawAmount] = useState("");
-  const [withdrawMethod, setWithdrawMethod] = useState<"bank" | "vodafone" | "instapay">("bank");
-  const [bankName, setBankName] = useState("");
-  const [bankAccount, setBankAccount] = useState("");
-  const [accountHolder, setAccountHolder] = useState("");
-  const [vodafoneNumber, setVodafoneNumber] = useState("");
-  const [instapayAddress, setInstapayAddress] = useState("");
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [withdrawError, setWithdrawError] = useState("");
 
@@ -98,52 +98,68 @@ export default function BalanceWallet({
       return;
     }
 
-    // Prepare details based on method
-    const details: Record<string, string> = {};
-    if (withdrawMethod === "bank") {
-      if (!bankName.trim() || !bankAccount.trim() || !accountHolder.trim()) {
-        setWithdrawError("Please fill out all bank account fields.");
-        return;
-      }
-      details.bankName = bankName;
-      details.bankAccount = bankAccount;
-      details.accountHolder = accountHolder;
-    } else if (withdrawMethod === "vodafone") {
-      const isMobileValid = /^(010|011|012|015)[0-9]{8}$/.test(vodafoneNumber);
-      if (!isMobileValid) {
-        setWithdrawError("Please enter a valid 11-digit mobile wallet number starting with 010/011/012/015.");
-        return;
-      }
-      details.vodafoneNumber = vodafoneNumber;
-    } else if (withdrawMethod === "instapay") {
-      if (!instapayAddress.includes("@")) {
-        setWithdrawError("Please enter a valid Instapay IPA address (e.g. name@instapay).");
-        return;
-      }
-      details.instapayAddress = instapayAddress;
+    if (!bankAccount && !isBankLoading) {
+      setWithdrawError("Please link and verify a bank account before requesting a withdrawal.");
+      return;
     }
 
     setIsWithdrawing(true);
 
     try {
       if (onWithdrawSubmit) {
-        const success = await onWithdrawSubmit(amount, withdrawMethod, details);
+        const success = await onWithdrawSubmit(amount, "bank", {
+          bankCode: bankAccount?.BankCode || "",
+          last4: bankAccount?.last4 || "",
+          fullName: bankAccount?.fullName || "",
+        });
         if (success) {
           toast.success(`Successfully requested withdrawal of ${formatCurrency(amount)} EGP!`);
           setIsWithdrawOpen(false);
-          resetWithdrawForm();
+          setWithdrawAmount("");
+          setWithdrawError("");
+          mutateBalance();
+          mutate(
+            (key) =>
+              typeof key === "string" &&
+              key.includes("/api/seller/walletPageApis/"),
+            undefined,
+            { revalidate: true }
+          );
         } else {
           setWithdrawError("Failed to submit withdrawal. Please try again.");
         }
       } else {
-        // Simulated local fallback success
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        toast.success(`Successfully requested withdrawal of ${formatCurrency(amount)} EGP!`);
-        setIsWithdrawOpen(false);
-        resetWithdrawForm();
+        const res = await sellerService.withdrawBalance(amount);
+        if (res.success) {
+          toast.success(
+            res.message ||
+              `Successfully requested withdrawal of ${formatCurrency(amount)} EGP!`
+          );
+          setIsWithdrawOpen(false);
+          setWithdrawAmount("");
+          setWithdrawError("");
+          mutateBalance();
+          mutate(
+            (key) =>
+              typeof key === "string" &&
+              key.includes("/api/seller/walletPageApis/"),
+            undefined,
+            { revalidate: true }
+          );
+        } else {
+          setWithdrawError(
+            res.message ||
+              res.error ||
+              "Failed to submit withdrawal. Please try again."
+          );
+        }
       }
-    } catch {
-      setWithdrawError("An unexpected error occurred. Please try again.");
+    } catch (err: unknown) {
+      const errorMsg =
+        err instanceof Error
+          ? err.message
+          : "An unexpected error occurred. Please try again.";
+      setWithdrawError(errorMsg);
     } finally {
       setIsWithdrawing(false);
     }
@@ -151,13 +167,9 @@ export default function BalanceWallet({
 
   const resetWithdrawForm = () => {
     setWithdrawAmount("");
-    setBankName("");
-    setBankAccount("");
-    setAccountHolder("");
-    setVodafoneNumber("");
-    setInstapayAddress("");
     setWithdrawError("");
   };
+
 
   // --- Statement Submit Handler ---
   const handleStatementSubmit = async (e: React.FormEvent) => {
@@ -352,113 +364,57 @@ export default function BalanceWallet({
                 />
               </div>
 
-              {/* Method Selector tabs */}
+              {/* Payout Channel: Bank Account Only */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold text-slate-500 uppercase">
                   Payout Channel
                 </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {(["bank", "vodafone", "instapay"] as const).map((m) => (
-                    <button
-                      key={m}
-                      type="button"
-                      disabled={isWithdrawing}
-                      onClick={() => {
-                        setWithdrawMethod(m);
-                        setWithdrawError("");
-                      }}
-                      className={cn(
-                        "py-2 px-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center justify-center gap-1.5 transition duration-200 cursor-pointer capitalize",
-                        withdrawMethod === m
-                          ? "bg-indigo-50 border-indigo-200 text-indigo-600 dark:bg-indigo-950/40 dark:border-indigo-800 dark:text-indigo-400"
-                          : "border-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800 text-slate-500"
-                      )}
-                    >
-                      {m === "bank" && <Landmark className="h-4 w-4" />}
-                      {m === "vodafone" && <Smartphone className="h-4 w-4" />}
-                      {m === "instapay" && <Send className="h-4 w-4" />}
-                      {m === "vodafone" ? "Vodafone Cash" : m}
-                    </button>
-                  ))}
-                </div>
+
+                {isBankLoading ? (
+                  <div className="p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/80 rounded-xl animate-pulse flex flex-col gap-2">
+                    <div className="h-4 w-32 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                    <div className="h-3 w-48 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                  </div>
+                ) : bankAccount ? (
+                  <div className="flex flex-col gap-2 p-3 bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80 rounded-xl">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400">
+                          <Landmark className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-slate-900 dark:text-white">
+                            {bankAccount.BankCode || bankAccount.issuer || "Bank Account"}
+                          </p>
+                          <p className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                            •••• •••• •••• {bankAccount.last4}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full">
+                        <CheckCircle2 className="h-3 w-3" />
+                        Verified
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60 flex justify-between">
+                      <span>Beneficiary:</span>
+                      <span className="font-medium text-slate-700 dark:text-slate-300">
+                        {bankAccount.fullName}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-xl flex items-start gap-2.5 text-xs text-amber-800 dark:text-amber-300">
+                    <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+                    <div>
+                      <p className="font-semibold">No verified bank account linked</p>
+                      <p className="mt-0.5 text-amber-700 dark:text-amber-400 text-[11px]">
+                        Please link a bank account from your wallet cards before requesting a withdrawal.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
-
-              {/* Dynamic input sections based on method selection */}
-              {withdrawMethod === "bank" && (
-                <div className="flex flex-col gap-3 p-3 bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 rounded-xl animate-in fade-in slide-in-from-top-1 duration-150">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase">Bank Name</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. CIB, QNB, NBE"
-                      required
-                      disabled={isWithdrawing}
-                      value={bankName}
-                      onChange={(e) => setBankName(e.target.value)}
-                      className="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase">IBAN / Account Number</label>
-                    <input
-                      type="text"
-                      placeholder="EG00 0000 ..."
-                      required
-                      disabled={isWithdrawing}
-                      value={bankAccount}
-                      onChange={(e) => setBankAccount(e.target.value)}
-                      className="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500 font-mono"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase">Account Holder Full Name</label>
-                    <input
-                      type="text"
-                      placeholder="As registered in your bank"
-                      required
-                      disabled={isWithdrawing}
-                      value={accountHolder}
-                      onChange={(e) => setAccountHolder(e.target.value)}
-                      className="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {withdrawMethod === "vodafone" && (
-                <div className="flex flex-col gap-2 p-3 bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 rounded-xl animate-in fade-in slide-in-from-top-1 duration-150">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase">Mobile Wallet Number</label>
-                    <input
-                      type="tel"
-                      placeholder="e.g. 01012345678"
-                      maxLength={11}
-                      required
-                      disabled={isWithdrawing}
-                      value={vodafoneNumber}
-                      onChange={(e) => setVodafoneNumber(e.target.value)}
-                      className="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500 font-mono"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {withdrawMethod === "instapay" && (
-                <div className="flex flex-col gap-2 p-3 bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 rounded-xl animate-in fade-in slide-in-from-top-1 duration-150">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase">Instapay Handle (IPA)</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. name@instapay"
-                      required
-                      disabled={isWithdrawing}
-                      value={instapayAddress}
-                      onChange={(e) => setInstapayAddress(e.target.value)}
-                      className="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500 font-mono"
-                    />
-                  </div>
-                </div>
-              )}
 
               {/* Submit Buttons */}
               <div className="flex gap-3 justify-end border-t border-slate-100 dark:border-slate-800 pt-3.5 mt-2">
@@ -472,7 +428,7 @@ export default function BalanceWallet({
                 </button>
                 <button
                   type="submit"
-                  disabled={isWithdrawing}
+                  disabled={isWithdrawing || (!bankAccount && !isBankLoading) || currentBalance < 100}
                   className="px-5 py-2 text-xs font-semibold bg-emerald-500 text-slate-950 rounded-xl hover:bg-emerald-400 active:bg-emerald-600 cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
                 >
                   {isWithdrawing && <Loader2 className="h-3 w-3 animate-spin" />}
