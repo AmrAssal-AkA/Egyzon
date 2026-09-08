@@ -1,5 +1,6 @@
 import mongoose, {Schema} from "mongoose"
 import {IWallet, TransactionType} from "../types/wallet.types"
+import {v4 as uuidv4} from "uuid"
 
 
 const walletSchema = new Schema<IWallet>({
@@ -7,7 +8,6 @@ const walletSchema = new Schema<IWallet>({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Seller",
         required: true,
-        unique: true,
     },
     balance: {
         type: Number,
@@ -22,6 +22,13 @@ const walletSchema = new Schema<IWallet>({
     },
     transactionHistory: [
         {
+            TransactionId: {
+                type: String,
+                unique: true,
+                default: () => {
+                    `TXN-${uuidv4()}`;
+                }
+            },
             transactionType: {
                 type: String,
                 enum: Object.values(TransactionType),

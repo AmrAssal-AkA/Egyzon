@@ -107,7 +107,7 @@ router.post("/logout", isAuthenticated, async (req: Request, res: Response) => {
   }
 });
 // Email verification route
-router.get("/verify-email", isAuthenticated, verifyEmail);
+router.get("/verify-email",  verifyEmail);
 
 router.get(
   "/continue-with-google",

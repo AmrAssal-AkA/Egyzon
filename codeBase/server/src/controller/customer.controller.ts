@@ -4,9 +4,11 @@ import { Request, Response } from "express";
 import { AppError } from "../utils/AppError";
 import User from "../models/userModel";
 import Customer from "../models/customerModel";
-import { hashPassword, comparePasswords } from "../utils/password.ustils";
+import Order from "../models/orderModel";
+import { hashPassword } from "../utils/password.ustils";
 import changePasswordTemplate from "../templates/changePasswordTemp";
 import { sendSuccessResponse, sendErrorResponse } from "../utils/Responses";
+
 
 export const CustomerController = {
   changePassword: async (req: Request, res: Response) => {
@@ -70,5 +72,20 @@ export const CustomerController = {
       return sendErrorResponse(res, 500, "Internal Server Error");
     }
   },
-
+  getTotalSpent: async (req: Request, res: Response) => {
+    try{
+    const isUser = req.user?.userId;
+    const isCustomer = req.user?.role;
+    if(!isUser || isCustomer !== "customer") return;
+    const totalSpent = await Order.aggregate([
+      { $match: { customer: isUser } },
+      { $group: { _id: null, totalSpent: { $sum: "$totalAmount" } } }
+    ]);
+    const totalSpentAmount = totalSpent[0]?.totalSpent || 0;
+    return sendSuccessResponse(res, 200, "Total spent retrieved successfully", { totalSpentAmount });
+    }catch(error){
+      if(error instanceof AppError) return sendErrorResponse(res,error.statusCode,error.status ,error.message);
+      return sendErrorResponse(res, 500, "Internal Server Error");
+    }
+  }
 };

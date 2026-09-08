@@ -1,13 +1,13 @@
 import express from "express";
 
 import {createRequestToJoin, setupStore} from "../controller/seller/StoreCreation.controller";
-import { getWalletBalance } from "../controller/wallet.controller";
+
 import {upload} from "../middleware/upload.middleware";
 import {isAuthenticated} from "../middleware/Auth.middleware";
 import { Authorize } from "../middleware/Authorization";
 import { userRole } from "../types/auth.types";
 import { validate } from "../middleware/validate";
-import { sellerBaseSchema, sellerSetupStoreSchema,  } from "../validators/seller.validate";
+import { sellerBaseSchema, sellerSetupStoreSchema, addBankAccountRequestSchema } from "../validators/seller.validate";
 import { SellerController } from "../controller/seller.controller";
 import { uploadLimiter } from "../middleware/rateLimiter";
 
@@ -22,10 +22,12 @@ router.get("/total-selling-product", isAuthenticated, Authorize(userRole.Seller)
 router.get("/getAllOrders", isAuthenticated, Authorize(userRole.Seller), SellerController.getAllOrders);
 router.get("/totalInventoryValue", isAuthenticated, Authorize(userRole.Seller), SellerController.totalInventoryValue);
 router.patch("/change-order-status", isAuthenticated, Authorize(userRole.Seller), SellerController.changeOrderStatus);
-router.get("/balance",isAuthenticated, Authorize(userRole.Seller), getWalletBalance);
 router.get("/avg-order-value", isAuthenticated, Authorize(userRole.Seller), SellerController.getAvgOrderValue);
 router.get("/sales-performance-indicator", isAuthenticated, Authorize(userRole.Seller), SellerController.salesPerformanceIndicator);
 router.get("/get-salses-by-category", isAuthenticated, Authorize(userRole.Seller), SellerController.getSalesByCategory);
 router.get("/getStoreDetails/:sellerId",  SellerController.getStoreDetails);
+router.post("/add-bank-account", isAuthenticated, Authorize(userRole.Seller), validate(addBankAccountRequestSchema), SellerController.AddBankAccount);
+router.get("/get-bank-account", isAuthenticated, Authorize(userRole.Seller), SellerController.getBankAccount);
+router.delete("/remove-bank-account", isAuthenticated, Authorize(userRole.Seller), SellerController.removeBankAccount);
 
 export default router;

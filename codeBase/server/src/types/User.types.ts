@@ -1,4 +1,5 @@
 import {HydratedDocument, Types} from "mongoose";
+import { IBankAccount } from "./wallet.types";
 
 export interface IUser extends Document{
     id: string;
@@ -56,6 +57,7 @@ export interface ISeller  extends IUser {
     applicantStatus: 'pending' | 'under-review' | 'additional_docs_requested' | 'approved' | 'rejected';
     products: Types.ObjectId[];
     notes: string;
+    bankAccount?: IBankAccount;
     createdAt: Date;
 }
 

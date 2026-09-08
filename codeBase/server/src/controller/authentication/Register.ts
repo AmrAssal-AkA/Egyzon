@@ -40,15 +40,15 @@ const RegisterUser = async (userData: any, res: Response, req: Request) => {
     const emailToken = generateToken();
     const {
       token: emailTokenValue,
-      haashedToken,
+      hashedToken,
       expiration,
     } = JSON.parse(emailToken);
-    newUser.emailVerificationToken = haashedToken;
+    newUser.emailVerificationToken = hashedToken;
     newUser.emailVerificationTokenExpiration = expiration;
   
     await newUser.save();
     const verificationUrl = `${process.env.FRONTEND_URL}/verifyEmail?token=${emailTokenValue}`;
-    await verifyEmailTemplate(email, emailTokenValue, verificationUrl);
+    await verifyEmailTemplate(email, verificationUrl);
 
     res.cookie("token", token, {
       httpOnly: true,

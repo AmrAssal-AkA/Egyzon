@@ -1,11 +1,8 @@
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 import { swaggerSpec } from "../docs/swagger";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const serverRoot = path.resolve(__dirname, "../..");
+const serverRoot = process.cwd();
 
 interface RouteEntry {
   method: string;
@@ -41,8 +38,10 @@ for (const { prefix, file } of routeFiles) {
   let match: RegExpExecArray | null;
 
   while ((match = regex.exec(content)) !== null) {
-    const method = match[1].toUpperCase();
+    const method = match[1]?.toUpperCase();
     const subPath = match[2];
+    if (!method || !subPath) continue;
+
     const normalizedSubPath =
       subPath === "/" ? "" : subPath.startsWith("/") ? subPath : `/${subPath}`;
     const fullPath = `${prefix}${normalizedSubPath}`.replace(
@@ -55,8 +54,14 @@ for (const { prefix, file } of routeFiles) {
   }
 }
 
-// Add root route from server.ts
-foundRoutes.push({ method: "GET", path: "/", file: "server.ts", line: 74 });
+// Add root routes from server.ts
+foundRoutes.push({ method: "GET", path: "/", file: "server.ts", line: 76 });
+foundRoutes.push({
+  method: "GET",
+  path: "/api-docs.json",
+  file: "server.ts",
+  line: 80,
+});
 
 console.log(
   `\n🔍 Verifying Swagger coverage against ${foundRoutes.length} Express endpoints...\n`,
@@ -101,18 +106,6 @@ if (missingInSwagger.length > 0) {
     console.error(
       `  • [${m.method}] ${m.path} (${m.file}:${m.line}) -> ${m.reason}`,
     );
-  }
-
-  console.log("\n📋 Starter OpenAPI template for missing routes:\n");
-  for (const m of missingInSwagger) {
-    console.log(`    "${m.path}": {`);
-    console.log(`      ${m.method.toLowerCase()}: {`);
-    console.log(`        summary: "Description for ${m.path}",`);
-    console.log(`        responses: {`);
-    console.log(`          200: { description: "Success" }`);
-    console.log(`        }`);
-    console.log(`      }`);
-    console.log(`    },`);
   }
 }
 

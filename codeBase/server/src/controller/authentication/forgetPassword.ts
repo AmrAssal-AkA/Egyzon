@@ -17,8 +17,8 @@ const RequestForgetPassword = async (req: Request, res: Response) => {
     const user = await User.findOne({ email: emailAddress });
     if (!user) return sendErrorResponse(res, 404, "the user notFound");
 
-    const { token, haashedToken, expiration } = JSON.parse(generateToken());
-    user.forgetPasswordToken = haashedToken;
+    const { token, hashedToken, expiration } = JSON.parse(generateToken());
+    user.forgetPasswordToken = hashedToken;
     user.forgetPasswordTokenExpiration = expiration;
     await user.save();
 

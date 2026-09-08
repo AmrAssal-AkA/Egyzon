@@ -1,22 +1,58 @@
-import sendnoReplayEmail from "../config/sendEmail";
+import { sendEmail } from "../services/email";
+import {
+  renderEmailLayout,
+  renderButton,
+  renderInfoBox,
+  renderUrlFallback,
+} from "./emailLayout";
 
+const verifyEmailTemplate = async (
+  to: string,
+  verificationUrl: string,
+) => {
 
+  const content = `
+    <div style="text-align: left;">
+      <h1 style="margin: 0 0 16px 0; font-size: 22px; font-weight: 700; color: #0f172a; line-height: 1.3;">
+        Welcome to Egyzon!
+      </h1>
+      
+      <p style="margin: 0 0 16px 0; color: #475569; font-size: 15px; line-height: 1.6;">
+        Thank you for joining Egyzon. We're excited to have you on board! To finish setting up your account and get full access to the marketplace, please confirm your email address:
+      </p>
 
-const verifyEmailTemplate = async (to: string, token: string, verificationUrl: string) => {
-    return await sendnoReplayEmail(
-        to,
-        "Verify your email",
-        `<div style="font-family: Arial, sans-serif; font-size: 16px; color: #333; text-align: center; padding: 20px;">
-        <p>Thank you for registering. Please verify your email by clicking the link below:</p>
-        <a style="background-color:black; color: white; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 4px;" href="${verificationUrl}">Verify Email</a>
-        <p>If you did not register, please ignore this email.</p>
-        <p>Best regards,</p>
-        <p>The Team</p>
-        <p>Note: Please do not reply to this email. This is an automated message.</p>
-        <p>If you have any questions or need assistance, please contact our support team.</p>
-        <p>This link will expire in 1 hour.</p>
-        </div>`
-    )
-}
+      ${renderButton({
+        text: "Verify Email Address",
+        url: verificationUrl,
+        bgColor: "#2563eb",
+      })}
+
+      ${renderInfoBox({
+        title: "Security Notice",
+        content:
+          "This verification link is valid for 24 hours. If you did not create an account on Egyzon, you can safely ignore this email &mdash; no account will be activated without verification.",
+        bgColor: "#f8fafc",
+        borderColor: "#e2e8f0",
+      })}
+
+      ${renderUrlFallback(verificationUrl)}
+    </div>
+  `;
+
+  await sendEmail({
+    to,
+    subject: "Verify Your Email Address - Egyzon",
+    html: renderEmailLayout({
+      title: "Verify Your Email Address - Egyzon",
+      previewText: "Verify your email to activate your Egyzon account",
+      badge: {
+        text: "Account Verification",
+        bgColor: "#eff6ff",
+        textColor: "#1d4ed8",
+      },
+      content,
+    }),
+  });
+};
 
 export default verifyEmailTemplate;

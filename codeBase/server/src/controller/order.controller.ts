@@ -7,6 +7,7 @@ import {AppError} from "../utils/AppError";
 import { sendErrorResponse, sendSuccessResponse } from "../utils/Responses";
 import { NotificationServices } from "../services/notification.services";
 import { paymentServices } from "../controller/payment.controller";
+import { sendOrderReceivedConfirmationEmail } from "../templates/orderReceivedConfirmationTem";
 
 export const placeOrder = async (req: Request, res: Response) => {
   try {
@@ -73,12 +74,15 @@ export const placeOrder = async (req: Request, res: Response) => {
       address,
       billingData,
     });
-    await NotificationServices.createNotification({
-      user: customerId,
-      title: "Order Placed",
-      message: `Your order with ID ${order.order._id} has been placed successfully.`,
-      type: "info",
-    });
+    await sendOrderReceivedConfirmationEmail(order.order);
+    const sellerId = order.order.orderItems[0]?.seller?._id?.toString();
+    if (sellerId) {
+      await NotificationServices.notifySellerAdminForNewOrder({
+        orderId: order.order._id.toString(),
+        sellerId,
+        buyerName: `${billingData.firstName} ${billingData.lastName}`,
+      });
+    }
     return sendSuccessResponse(res, 201, "Order placed successfully", order);
   } catch (error: any) {
     return sendErrorResponse(

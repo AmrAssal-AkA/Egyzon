@@ -11,6 +11,8 @@ import logger from "../utils/logger";
 import Order from "../models/orderModel";
 import Product from "../models/productModel";
 import { Platform } from "../models/paltformConfigSetting";
+import { BankAccountStatus, TransactionStatus } from "../types/wallet.types";
+import { Wallet } from "../models/wallet.model";
 
 export const AdminService = {
   AdminLoggingin: async (email: string, password: string) => {
@@ -410,7 +412,7 @@ export const AdminService = {
           $project: {
             _id: 0,
             categoryId: "$categoryInfo._id",
-            categoryName: "$categoryInfo.name",
+            categoryName: "$categoryInfo.categoryName",
             sellerCount: 1,
           },
         },
@@ -435,7 +437,16 @@ export const AdminService = {
   },
   getTotalRevenueInPlatform: async () => {
     try {
-      
+      const totalRevenue = await Order.aggregate([
+        {
+          $group: {
+            _id: null,
+            totalRevenue: { $sum: "$totalAmount" },
+          },
+        },
+      ]);
+      const revenue = totalRevenue.length > 0 ? totalRevenue[0].totalRevenue : 0;
+      return { totalRevenue: revenue };
     } catch (error) {
       if (error instanceof AppError)
         throw new AppError(error.statusCode, error.message);
@@ -476,9 +487,9 @@ export const AdminService = {
         orders,
         pagination: {
           page: currentPage,
-          limit: currentPage,
+          limit: currentLimit,
           total,
-          totalPage: Math.ceil(total / currentLimit),
+          totalPages: Math.ceil(total / currentLimit),
         },
       };
     } catch (error) {
@@ -487,4 +498,118 @@ export const AdminService = {
       throw new AppError(500, "Invalid Server Error");
     }
   },
+  verifySellerBankAccount: async (sellerId: string, decision: 'verified' | 'rejected') => {
+    try {
+      const seller = await Seller.findById(sellerId).select("bankAccount");
+      if (!seller) throw new AppError(404, "Seller not found");
+      if (!seller.bankAccount || !seller.bankAccount.last4) {
+        throw new AppError(400, "Seller does not have a bank account linked");
+      }
+      seller.bankAccount.status = decision === 'verified' ? BankAccountStatus.VERIFIED : BankAccountStatus.REJECTED;
+      await seller.save();
+      return seller;
+    }catch(error){
+      if (error instanceof AppError) throw error;
+      throw new AppError(500, "Internal server error")
+    }
+  },
+  getAllSellerWithdrawlRequests: async (page: number, limit: number, status: 'pending' | 'completed' | 'failed' | 'rejected' | "all") => {
+    try {
+      const currentPage = Math.max(1, parseInt(String(page), 10) || 1);
+      const currentLimit = Math.min(
+        Math.max(1, parseInt(String(limit), 10) || 10),
+        100,
+      );
+      const statusMatch =
+        status && status !== "all"
+          ? { "transactionHistory.status": status }
+          : {};
+      const pipeline = [
+        { $unwind: "$transactionHistory" },
+        { $match: statusMatch },
+        { $sort: { "transactionHistory.date": -1 as const } },
+        {
+          $facet: {
+            data: [
+              { $skip: (currentPage - 1) * currentLimit },
+              { $limit: currentLimit },
+            ],
+            totalCounts: [{ $count: "count" }],
+          },
+        },
+      ];
+
+      const result = await Wallet.aggregate(pipeline);
+      const withdrawalRequests = result[0]?.data || [];
+      const total = result[0]?.totalCounts?.[0]?.count || 0;
+
+    await Wallet.populate(withdrawalRequests, {
+      path: "seller",
+      select: "FirstName LastName email storeName bankAccount",
+    });
+
+      return {
+        withdrawalRequests,
+        pagination: {
+          page: currentPage,
+          limit: currentLimit,
+          total,
+          totalPages: Math.ceil(total / currentLimit),
+        },
+      };
+    }catch(error){
+      if (error instanceof AppError) throw error;
+      throw new AppError(500, "Internal server error")
+    }
+  },
+  approveSellerWithdrawalRequest: async (sellerId: string, transactionId: string, decision: 'approved' | 'rejected') => {
+    try {
+      const wallet = await Wallet.findOne({ seller: sellerId });
+      if (!wallet) return;
+      const transaction = wallet.transactionHistory.find(t => t.id === transactionId);
+      if (!transaction) throw new AppError(404, "Transaction not found");
+      transaction.status = decision === 'approved' ? TransactionStatus.completed : TransactionStatus.failed;
+
+      await wallet.save();
+      return wallet;
+    }catch(error){
+      if (error instanceof AppError) throw error;
+      throw new AppError(500, "Invalid Server Error");
+    }
+  },
+  getTotalSales: async () => {
+    try {
+      const totalSales = await Order.aggregate([
+        {
+          $group: {
+            _id: null,
+            totalSales: { $sum: "$totalAmount" },
+          },
+        },
+      ]);
+      const sales = totalSales.length > 0 ? totalSales[0].totalSales : 0;
+      return { totalSales: sales };
+    }catch(error){
+      if (error instanceof AppError) throw error;
+      throw new AppError(500, "Invalid Server Error");
+    }
+  },
+  getWithdrawalCompletedCount: async () => {
+    try {
+      const completedCount = await Wallet.find({ "transactionHistory.status": TransactionStatus.completed }).countDocuments();
+      return { completedCount };
+    }catch (error){
+        if (error instanceof AppError) throw error;
+        throw new AppError(500, "Invalid Server Error");
+    }
+  },
+  getPendingWithdrawalCount: async () => {
+    try {
+      const pendingCount = await Wallet.find({ "transactionHistory.status": TransactionStatus.pending }).countDocuments();
+      return { pendingCount };
+    }catch (error){
+      if (error instanceof AppError) throw error;
+      throw new AppError(500, "Invalid Server Error");
+    }
+  }
 };

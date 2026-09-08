@@ -6,6 +6,7 @@ import {AppError} from "../utils/AppError";
 import {Analytical} from "../services/analytics.services";
 import {getIo, isUserConnected} from "../config/socket";
 import {AnalyticalDateTimeframe} from "../types/analyticalData.types"
+import { addBankAccountInput, addBankAccountSchema } from "../validators/seller.validate";
 
 
 export const SellerController = {
@@ -136,6 +137,45 @@ export const SellerController = {
       if(!sellerId) return sendErrorResponse(res, 400, "Bad Request", "Seller ID is required");
       const storeDetails = await SellerServices.getStoreFront(sellerId);
       sendSuccessResponse(res, 200, "Store details fetched successfully", storeDetails);
+    }catch(error){
+      if (error instanceof AppError) return sendErrorResponse(res, error.statusCode, error.status, error.message);
+      return sendErrorResponse(res, 500, "Internal Server Error");
+    }
+  },
+  AddBankAccount: async (req: Request, res: Response) => {
+    try {
+      const sellerId = req.user?.userId || (process.env.NODE_ENV !== "production" ? req.body.sellerId as string : undefined);
+      const isSeller = req.user?.role || (process.env.NODE_ENV !== "production" ? req.body.role as string : undefined);
+      if(!sellerId || isSeller !== "seller") return sendErrorResponse(res, 403, "Forbidden", "You are not authorized to access this resource");
+      const input = req.body as addBankAccountInput;
+      if(!input.bankCardNumber || !input.bankCode) return sendErrorResponse(res, 400, "Bad Request", "Bank card number and bank code are required");
+      const saveBankAccount = await SellerServices.AddBankAccount(sellerId, input);
+      sendSuccessResponse(res, 200, "Bank account added successfully", saveBankAccount);
+    }catch (error){
+      if (error instanceof AppError) return sendErrorResponse(res, error.statusCode, error.status, error.message);
+      return sendErrorResponse(res, 500, "Internal Server Error");
+    }
+  },
+  getBankAccount: async (req: Request, res: Response) => {
+    try {
+      const isUser = req.user?.userId || (process.env.NODE_ENV !== "production" ? req.body.sellerId as string : undefined);
+      const isSeller = req.user?.role || (process.env.NODE_ENV !== "production" ? req.body.role as string : undefined);
+      if(!isUser || isSeller !== "seller") return sendErrorResponse(res, 403, "Forbidden", "You are not authorized to access this resource");
+      const bankAccount = await SellerServices.getBankAccoount(isUser);
+      if(!bankAccount) return sendErrorResponse(res, 404, "Not Found", "Bank account not found");
+      sendSuccessResponse(res, 200, "Bank account fetched successfully", bankAccount);
+    }catch(error){
+      if(error instanceof AppError) return sendErrorResponse(res, error.statusCode, error.status, error.message);
+      return sendErrorResponse(res, 500, "Internal Server Error");
+    }
+  },
+  removeBankAccount: async (req: Request, res: Response) => {
+    try{
+      const isUser = req.user?.userId || (process.env.NODE_ENV !== "production" ? req.body.sellerId as string : undefined);
+      const isSeller = req.user?.role || (process.env.NODE_ENV !== "production" ? req.body.role as string : undefined);
+      if(!isUser || isSeller !== "seller") return sendErrorResponse(res, 403, "Forbidden", "You are not authorized to access this resource");
+      const removedBankAccount = await SellerServices.removeBankAccount(isUser);
+      sendSuccessResponse(res, 200, "Bank account removed successfully", removedBankAccount);
     }catch(error){
       if (error instanceof AppError) return sendErrorResponse(res, error.statusCode, error.status, error.message);
       return sendErrorResponse(res, 500, "Internal Server Error");

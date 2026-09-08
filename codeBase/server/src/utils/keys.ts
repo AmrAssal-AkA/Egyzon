@@ -8,3 +8,4 @@ export const cartkeyUserById = (userId: string) => getkeyName('cart', 'user', us
 export const wishlistCacheKey = (userId: string) => getkeyName('wishlist', userId);
 export const productCacheKey = (productId: string) => getkeyName('product', productId);
 export const RateLimitKey = (ip: string | undefined) => getkeyName('rate-limit', ip || 'unknown');
+export const categoryCacheKey = (categoryId: string) => getkeyName('category', categoryId);

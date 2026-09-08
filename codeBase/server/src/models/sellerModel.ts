@@ -1,6 +1,34 @@
 import mongoose, { Schema } from "mongoose";
 import { ISeller } from "../types/User.types";
 import User from "./userModel";
+import { paymobIssuar, paymobBankCode } from "../types/wallet.types";
+
+const bankAccountSchema = new Schema({
+    issuer: {
+      type: String,
+      enum: Object.values(paymobIssuar),
+      default: paymobIssuar.BANK_CARD
+    },
+    fullName: {
+      type: String
+    },
+    bankCardNumber: {
+      type: String,
+      select: false
+    },
+    last4: {
+      type: String
+    },
+    BankCode: {
+      type: String,
+      enum: Object.values(paymobBankCode)
+    },
+    status: {
+      type: String,
+              enum: ["pending_verification", "verified", "rejected"],
+        default: "pending_verification",
+    }
+}, {_id: false, timestamp: true})
 
 const SellerSchema = new Schema<ISeller>(
   {
@@ -69,6 +97,10 @@ const SellerSchema = new Schema<ISeller>(
         ref: "Products",
       }
     ],
+    bankAccount: {
+      type: bankAccountSchema,
+      default: () => {}
+    },
     createdAt: {
       type: Date,
     }

@@ -79,12 +79,82 @@ router.get(
   Authorize(userRole.Admin),
   AdminController.getPlatformFee,
 );
-router.get('/getAllSellerActiveCounts', isAuthenticated, Authorize(userRole.Admin), AdminController.getAllSellerActiveCounts);
-router.get('/getAllSellerPendingCounts', isAuthenticated, Authorize(userRole.Admin), AdminController.getAllSellerPendingCounts);
-router.get('/getSellerProductsCategory',isAuthenticated, Authorize(userRole.Admin), AdminController.getSellerProductsCategory);
-router.get('/getTotalRevenueInPlatform', isAuthenticated, Authorize(userRole.Admin), AdminController.getTotalRevenueInPlatform);
-router.get('/getTotalOrdersInPlatform', isAuthenticated, Authorize(userRole.Admin), AdminController.getAllOrderOnPlatform);
-router.get('/getPlatformRevenueGrowth', isAuthenticated, Authorize(userRole.Admin), AdminController.getPlatformRevenueGrowth);
-
+router.get(
+  "/getAllSellerActiveCounts",
+  isAuthenticated,
+  Authorize(userRole.Admin),
+  AdminController.getAllSellerActiveCounts,
+);
+router.get(
+  "/getAllSellerPendingCounts",
+  isAuthenticated,
+  Authorize(userRole.Admin),
+  AdminController.getAllSellerPendingCounts,
+);
+router.get(
+  "/getSellerProductsCategory",
+  isAuthenticated,
+  Authorize(userRole.Admin),
+  AdminController.getSellerProductsCategory,
+);
+router.get(
+  "/getTotalRevenueInPlatform",
+  isAuthenticated,
+  Authorize(userRole.Admin),
+  AdminController.getTotalRevenueInPlatform,
+);
+router.get(
+  "/getTotalOrdersInPlatform",
+  isAuthenticated,
+  Authorize(userRole.Admin),
+  AdminController.getAllOrderOnPlatform,
+);
+router.get(
+  "/getPlatformRevenueGrowth",
+  isAuthenticated,
+  Authorize(userRole.Admin),
+  AdminController.getPlatformRevenueGrowth,
+);
+router.patch(
+  "/verifySellerBankAccount/:sellerId",
+  isAuthenticated,
+  Authorize(userRole.Admin),
+  AdminController.verifySellerBankAccount,
+);
+router.get("/getAllSellerWithdrawlRequests",
+  isAuthenticated,
+  Authorize(userRole.Admin),
+  AdminController.getAllSellerWithdrawlRequests,
+);
+router.patch(
+  "/approveSellerWithdrawalRequest/:sellerId/:transactionId",
+  isAuthenticated,
+  Authorize(userRole.Admin),
+  AdminController.approveSellerWithdrawalRequest,
+);
+router.get(
+  "/getTotalSales",
+  isAuthenticated,
+  Authorize(userRole.Admin),
+  AdminController.getTotalsales,
+);
+router.get(
+  "/getWithdrawalCompletedCount",
+  isAuthenticated,
+  Authorize(userRole.Admin),
+  AdminController.getWithdrawalCompletedCount,
+);
+router.get(
+  "/getWithdrawalPendingCount",
+  isAuthenticated,
+  Authorize(userRole.Admin),
+  AdminController.getPendingWithdrawalCount,
+);
+router.get(
+  "/get-salesOverview-last30days",
+  isAuthenticated,
+  Authorize(userRole.Admin),
+  AdminController.getSalesOverviewLast30Days,
+)
 
 export default router;

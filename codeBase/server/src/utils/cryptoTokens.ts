@@ -12,10 +12,10 @@ const hashToken = (token: string): string => {
 
 const generateToken = (): string => {
     const token = crypto.randomBytes(tokenBytes).toString("hex");
-    const haashedToken = hashToken(token);
+    const hashedToken = hashToken(token);
     const expiration = new Date(Date.now() + tokenExpiration);
     
-    return JSON.stringify({ token, haashedToken, expiration });
+    return JSON.stringify({ token, hashedToken, expiration });
 }
 
 

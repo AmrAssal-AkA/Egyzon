@@ -8,7 +8,9 @@ import type { OrderStatus } from "../types/order.type";
 import { SellerApplyApplicantTemplate } from "../templates/SellerApplyApplicant";
 import type {AvgOrderValueResponse} from "../types/seller.typs";
 import { PaymentStatus } from "../types/payment.type";
-import { Platform } from "../models/paltformConfigSetting";
+import { encrypt , dycrypt} from "../utils/encryption";
+import {addBankAccountInput, addBankAccountSchema} from "../validators/seller.validate"
+import { BankAccountStatus } from "../types/wallet.types";
 
 
 export const SellerServices = {
@@ -351,6 +353,67 @@ export const SellerServices = {
     }catch(error){
       if (error instanceof AppError) throw new AppError(error.statusCode, error.message)
       throw new AppError(500, "Internal Server Error")
+    }
+  },
+  AddBankAccount: async (sellerId: string, rawInput: unknown) => {
+    try {
+      const seller = await Seller.findById(sellerId);
+      if (!seller) return;
+      const input: addBankAccountInput = addBankAccountSchema.parse(rawInput);
+      const last4 = input.bankCardNumber.slice(-4);
+      const encryptedCardNumber = encrypt(input.bankCardNumber);
+
+      const saveBankAccount = await Seller.findByIdAndUpdate(
+        seller,
+        {
+          bankAccount: {
+            issuer: input.issuer,
+            fullName: input.fullName,
+            bankCardNumber: encryptedCardNumber,
+            last4,
+            BankCode: input.bankCode,
+            status: BankAccountStatus.PENDING_VERIFICATION
+          }
+        },
+        {new: true, runValidators: true}
+      ).select("-bankAccount.bankCardNumber")
+
+      return saveBankAccount
+    }catch(error){
+      if (error instanceof AppError) throw error
+      throw new AppError (500, "Internal Server Error")
+    }
+  },
+  getBankAccoount: async (sellerId: string) => {
+    try{
+      const seller = await Seller.findById(sellerId).select("-bankAccount.bankCardNumber");
+      if(!seller) return;
+      if(!seller.bankAccount || !seller.bankAccount.last4) return null;
+      return seller.bankAccount
+    }catch(error){
+      if (error instanceof AppError) throw error
+      console.error(error)
+      throw new AppError(500, "internal Server Error")
+    }
+  },
+  removeBankAccount: async (sellerId: string) => {
+    try {
+      const seller = await Seller.findById(sellerId).select('+bankAccount.bankCardNumber ');
+      if (!seller) return;
+     if (!seller.bankAccount || !seller.bankAccount.last4) return null;
+      
+     const removeBankAccount = await Seller.findByIdAndUpdate(
+        seller,
+        {
+          $unset: { bankAccount: "" }
+        },
+        { new: true }
+      );
+
+      return removeBankAccount;
+    }catch(error){
+      if (error instanceof AppError) throw error;
+      throw new AppError(500, "internal Server Error");
     }
   }
 };

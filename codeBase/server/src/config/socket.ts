@@ -51,7 +51,6 @@ export function initSocket(server: HttpServer) {
 
     io.on("connection", (socket: AuthenticatedSocket) => {
         const userId = socket.user?.userId;
-        console.log(`Socket connected: ${socket.id} for user ${userId}`);
         if (userId) {
             if (!userSockets.has(userId)) {
                 userSockets.set(userId, new Set());

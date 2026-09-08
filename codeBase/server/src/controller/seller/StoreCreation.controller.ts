@@ -6,6 +6,7 @@ import uploadImage from "../../config/cloudainry.config";
 import { AppError } from "../../utils/AppError";
 import { scanFile } from "../../utils/virusScan";
 import logger from "../../utils/logger";
+import { NotificationServices } from "../../services/notification.services";
 
 export const createRequestToJoin = async (req: Request, res: Response) => {
   let uploadedCommercialRegister: { public_id: string } | undefined;
@@ -112,6 +113,12 @@ export const createRequestToJoin = async (req: Request, res: Response) => {
       },
     };
     await SellerServices.ApplyAsPartner(sellerData, userId);
+    await NotificationServices.notifyPartenerApplicantsToAdmin({
+      applicantId: userId,
+      applicationId: new Date().toISOString(),
+      applicantName: storeName,
+      shopName: storeName,
+    })
 
     return sendSuccessResponse(res, 200, "Request sent successfully");
   } catch (error) {
@@ -124,7 +131,6 @@ export const createRequestToJoin = async (req: Request, res: Response) => {
       );
     }
 
-    console.log(error);
     return sendErrorResponse(
       res,
       500,

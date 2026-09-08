@@ -1,5 +1,6 @@
 import {z} from "zod";
 import { sentizeRichText, sentizePlainText } from "../utils/senitize";
+import { paymobBankCode, paymobIssuar } from "../types/wallet.types";
 
 const typeTextRegex = z.string().regex(/^[a-zA-Z0-9\s-. , ']+$/, { message: "Only alphanumeric characters, spaces, hyphens, periods, commas, and apostrophes are allowed" });
 const multerFileSchema = z.object({
@@ -33,3 +34,21 @@ export const sellerSetupStoreSchema = z.object({
         storeBanner: z.array(multerFileSchema, { message: "Store banner is required" }).min(1, {message: "Store banner is required"}),
     })
 })
+
+export const addBankAccountRequestSchema = z.object({
+    body: z.object({
+    issuer: z.nativeEnum(paymobIssuar).default(paymobIssuar.BANK_CARD),
+    fullName: z.string().trim().min(3, "Full name must match the bank account holder"),
+    bankCardNumber: z.string().trim().regex(/^\d{10,34}$/, "Bank card/account number must be numeric, 10-34 digits"),
+    bankCode: z.nativeEnum(paymobBankCode)
+    })
+})
+export const addBankAccountSchema = z.object({
+    issuer: z.nativeEnum(paymobIssuar).default(paymobIssuar.BANK_CARD),
+    fullName: z.string().trim().min(3, "Full name must match the bank account holder"),
+    bankCardNumber: z.string().trim().regex(/^\d{10,34}$/, "Bank card/account number must be numeric, 10-34 digits"),
+    bankCode: z.nativeEnum(paymobBankCode)
+})
+
+
+export type addBankAccountInput = z.infer<typeof addBankAccountSchema>;

@@ -16,3 +16,10 @@ export interface Notification {
     isRead: boolean;
     createdAt: Date;
 }
+
+export interface PartnerApplicant {
+    applicantId: string;
+    applicationId: string;
+    applicantName: string;
+    shopName: string;
+}

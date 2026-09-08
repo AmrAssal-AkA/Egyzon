@@ -34,6 +34,10 @@ export const swaggerSpec = {
       name: "Payment",
       description: "Payment processing and Paymob integration webhooks",
     },
+    {
+      name: "Wallet",
+      description: "Seller wallet balance and fund withdrawals",
+    },
   ],
   components: {
     securitySchemes: {
@@ -1041,10 +1045,16 @@ export const swaggerSpec = {
                   type: "object",
                   nullable: true,
                   properties: {
-                    _id: { type: "string", example: "64b1f2c3d4e5f6a7b8c9d0e2" },
+                    _id: {
+                      type: "string",
+                      example: "64b1f2c3d4e5f6a7b8c9d0e2",
+                    },
                     FirstName: { type: "string", example: "Ahmed" },
                     LastName: { type: "string", example: "Hassan" },
-                    email: { type: "string", example: "ahmed.hassan@example.com" },
+                    email: {
+                      type: "string",
+                      example: "ahmed.hassan@example.com",
+                    },
                   },
                 },
                 orderDate: { type: "string", format: "date-time" },
@@ -1151,6 +1161,266 @@ export const swaggerSpec = {
               total: { type: "integer", example: 45 },
               totalPage: { type: "integer", example: 5 },
             },
+          },
+        },
+      },
+      AddBankAccountRequest: {
+        type: "object",
+        required: ["fullName", "bankCardNumber", "bankCode"],
+        properties: {
+          issuer: {
+            type: "string",
+            enum: ["bank_card", "instant_bank"],
+            default: "bank_card",
+            example: "bank_card",
+            description: "Payment issuer type",
+          },
+          fullName: {
+            type: "string",
+            example: "Ahmed Hassan",
+            description:
+              "Full name matching the bank account holder (min 3 characters)",
+          },
+          bankCardNumber: {
+            type: "string",
+            example: "1234567890123456",
+            description: "Bank card or account number (numeric, 10-34 digits)",
+          },
+          bankCode: {
+            type: "string",
+            enum: ["CIB", "MISR", "NBE", "QNB", "AAIB"],
+            example: "CIB",
+            description: "Supported Egyptian bank code",
+          },
+        },
+      },
+      BankAccountData: {
+        type: "object",
+        properties: {
+          issuer: {
+            type: "string",
+            enum: ["bank_card", "instant_bank"],
+            example: "bank_card",
+          },
+          fullName: { type: "string", example: "Ahmed Hassan" },
+          last4: { type: "string", example: "3456" },
+          BankCode: {
+            type: "string",
+            enum: ["CIB", "MISR", "NBE", "QNB", "AAIB"],
+            example: "CIB",
+          },
+          status: {
+            type: "string",
+            enum: ["pending_verification", "verified", "rejected"],
+            example: "pending_verification",
+          },
+        },
+      },
+      WalletWithdrawRequest: {
+        type: "object",
+        required: ["amount"],
+        properties: {
+          amount: {
+            type: "number",
+            minimum: 1,
+            example: 500,
+            description: "Amount to withdraw from seller wallet in EGP",
+          },
+        },
+      },
+      WalletWithdrawResponseData: {
+        type: "object",
+        properties: {
+          updatedWallet: {
+            type: "object",
+            properties: {
+              wallet: {
+                type: "object",
+                properties: {
+                  _id: { type: "string", example: "66d1f2e3a4b5c6d7e8f9a0b1" },
+                  seller: {
+                    type: "string",
+                    example: "66d1f2e3a4b5c6d7e8f9a0b2",
+                  },
+                  balance: { type: "number", example: 2500 },
+                  currency: { type: "string", example: "EGP" },
+                  transactionHistory: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        TransactionId: {
+                          type: "string",
+                          example: "TXN-b1c2d3e4-f5a6",
+                        },
+                        transactionType: {
+                          type: "string",
+                          example: "withdrawal",
+                        },
+                        amount: { type: "number", example: 500 },
+                        currency: { type: "string", example: "EGP" },
+                        status: { type: "string", example: "pending" },
+                        withdrawalId: {
+                          type: "string",
+                          example: "66d1f2e3a4b5c6d7e8f9a0b3",
+                        },
+                        date: { type: "string", format: "date-time" },
+                      },
+                    },
+                  },
+                },
+              },
+              bankAccount: {
+                type: "object",
+                properties: {
+                  issuer: { type: "string", example: "bank_card" },
+                  fullName: { type: "string", example: "Ahmed Hassan" },
+                  last4: { type: "string", example: "3456" },
+                  bankCode: { type: "string", example: "CIB" },
+                },
+              },
+            },
+          },
+        },
+      },
+      AdminVerifyBankAccountRequest: {
+        type: "object",
+        required: ["decision"],
+        properties: {
+          decision: {
+            type: "string",
+            enum: ["verified", "rejected"],
+            example: "verified",
+            description:
+              "Decision to approve or reject the seller bank account",
+          },
+        },
+      },
+      WalletTransactionItem: {
+        type: "object",
+        properties: {
+          TransactionId: { type: "string", example: "TXN-b1c2d3e4-f5a6" },
+          transactionType: {
+            type: "string",
+            enum: ["sale", "refund", "withdrawal", "deposit"],
+            example: "withdrawal",
+          },
+          amount: { type: "number", example: 500 },
+          currency: { type: "string", example: "EGP" },
+          status: {
+            type: "string",
+            enum: ["pending", "completed", "failed", "cancelled"],
+            example: "completed",
+          },
+          withdrawalId: {
+            type: "string",
+            nullable: true,
+            example: "66d1f2e3a4b5c6d7e8f9a0b3",
+          },
+          date: { type: "string", format: "date-time" },
+        },
+      },
+      WalletTransactionHistoryResponseData: {
+        type: "object",
+        properties: {
+          transactionHistory: {
+            type: "object",
+            properties: {
+              transactions: {
+                type: "array",
+                items: { $ref: "#/components/schemas/WalletTransactionItem" },
+              },
+              totalTransactions: { type: "integer", example: 15 },
+              currentPage: { type: "integer", example: 1 },
+              totalPages: { type: "integer", example: 2 },
+            },
+          },
+        },
+      },
+      AdminApproveWithdrawalRequest: {
+        type: "object",
+        required: ["decision"],
+        properties: {
+          decision: {
+            type: "string",
+            enum: ["approved", "rejected"],
+            example: "approved",
+            description:
+              "Decision to approve or reject the seller withdrawal request",
+          },
+        },
+      },
+      AdminSellerWithdrawalRequestsResponseData: {
+        type: "object",
+        properties: {
+          withdrawalRequests: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                _id: { type: "string", example: "66d1f2e3a4b5c6d7e8f9a0b1" },
+                seller: {
+                  type: "object",
+                  properties: {
+                    _id: {
+                      type: "string",
+                      example: "66d1f2e3a4b5c6d7e8f9a0b2",
+                    },
+                    FirstName: { type: "string", example: "Ahmed" },
+                    LastName: { type: "string", example: "Ali" },
+                    email: { type: "string", example: "seller@example.com" },
+                    storeName: { type: "string", example: "Cairo Tech" },
+                    bankAccount: {
+                      $ref: "#/components/schemas/BankAccountData",
+                    },
+                  },
+                },
+                balance: { type: "number", example: 8500 },
+                currency: { type: "string", example: "EGP" },
+                transactionHistory: {
+                  $ref: "#/components/schemas/WalletTransactionItem",
+                },
+              },
+            },
+          },
+          pagination: {
+            type: "object",
+            properties: {
+              page: { type: "integer", example: 1 },
+              limit: { type: "integer", example: 10 },
+              total: { type: "integer", example: 5 },
+              totalPages: { type: "integer", example: 1 },
+            },
+          },
+        },
+      },
+      AdminTotalSalesResponseData: {
+        type: "object",
+        properties: {
+          totalSales: {
+            type: "number",
+            example: 125430.5,
+            description: "Total gross sales across all orders on the platform",
+          },
+        },
+      },
+      AdminWithdrawalCompletedCountResponseData: {
+        type: "object",
+        properties: {
+          completedCount: {
+            type: "integer",
+            example: 24,
+            description: "Total number of completed seller withdrawal requests",
+          },
+        },
+      },
+      AdminWithdrawalPendingCountResponseData: {
+        type: "object",
+        properties: {
+          pendingCount: {
+            type: "integer",
+            example: 5,
+            description: "Total number of pending seller withdrawal requests",
           },
         },
       },
@@ -3175,69 +3445,6 @@ export const swaggerSpec = {
         },
       },
     },
-    "/api/seller/balance": {
-      get: {
-        tags: ["Seller"],
-        summary: "Get the authenticated seller's wallet balance",
-        description:
-          "Retrieves the available wallet balance for the authenticated seller.",
-        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
-        responses: {
-          200: {
-            description: "Wallet balance retrieved successfully",
-            content: {
-              "application/json": {
-                schema: {
-                  allOf: [
-                    { $ref: "#/components/schemas/ApiSuccessResponse" },
-                    {
-                      type: "object",
-                      properties: {
-                        data: {
-                          $ref: "#/components/schemas/SellerWalletBalanceResponse",
-                        },
-                      },
-                    },
-                  ],
-                },
-              },
-            },
-          },
-          401: {
-            description: "Unauthorized",
-            content: {
-              "application/json": {
-                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
-              },
-            },
-          },
-          403: {
-            description: "Forbidden - Unauthorized access or not a seller",
-            content: {
-              "application/json": {
-                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
-              },
-            },
-          },
-          404: {
-            description: "Seller not found",
-            content: {
-              "application/json": {
-                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
-              },
-            },
-          },
-          500: {
-            description: "Internal Server Error",
-            content: {
-              "application/json": {
-                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
-              },
-            },
-          },
-        },
-      },
-    },
     "/api/seller/avg-order-value": {
       get: {
         tags: ["Seller"],
@@ -3479,6 +3686,422 @@ export const swaggerSpec = {
           },
           404: {
             description: "Seller not found",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/seller/add-bank-account": {
+      post: {
+        tags: ["Seller"],
+        summary: "Add or link seller bank account",
+        description:
+          "Allows an authenticated seller to link their bank card or account for fund withdrawals. The account starts in pending_verification status.",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/AddBankAccountRequest" },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Bank account added successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/AdminSellerSummary",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          400: {
+            description: "Validation error or missing bank card/bank code",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description:
+              "Forbidden - You are not authorized to access this resource",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/seller/get-bank-account": {
+      get: {
+        tags: ["Seller"],
+        summary: "Get linked seller bank account",
+        description:
+          "Retrieves masked bank account details and verification status for the authenticated seller.",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Bank account fetched successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/BankAccountData",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description:
+              "Forbidden - You are not authorized to access this resource",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          404: {
+            description: "Bank account not found",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/seller/remove-bank-account": {
+      delete: {
+        tags: ["Seller"],
+        summary: "Remove seller bank account",
+        description:
+          "Allows an authenticated seller to unlink and remove their bank account.",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Bank account removed successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/AdminSellerSummary",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description:
+              "Forbidden - You are not authorized to access this resource",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/wallet/balance": {
+      get: {
+        tags: ["Wallet"],
+        summary: "Get seller wallet balance",
+        description:
+          "Retrieves the available, withdrawable balance for the authenticated seller calculated from delivered orders older than 2 days minus completed withdrawals.",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Wallet balance retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/SellerWalletBalanceResponse",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Unauthorized access or not a seller",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          404: {
+            description: "Seller not found",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/wallet/withdraw": {
+      post: {
+        tags: ["Wallet"],
+        summary: "Withdraw funds from seller wallet",
+        description:
+          "Submits a withdrawal request for the authenticated seller. Requires a linked and verified bank account and sufficient wallet balance.",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/WalletWithdrawRequest",
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Withdrawal request submitted successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/WalletWithdrawResponseData",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          400: {
+            description:
+              "Invalid withdrawal amount, bank account not linked/verified, or insufficient balance",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Unauthorized access or not a seller",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          404: {
+            description: "Seller or wallet not found",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/wallet/transactions": {
+      get: {
+        tags: ["Wallet"],
+        summary: "Get seller wallet transaction history",
+        description:
+          "Retrieves paginated transaction history for the authenticated seller's wallet, sorted latest first.",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        parameters: [
+          {
+            name: "page",
+            in: "query",
+            required: false,
+            schema: { type: "integer", minimum: 1, default: 1 },
+            description: "Page number for pagination",
+          },
+          {
+            name: "limit",
+            in: "query",
+            required: false,
+            schema: { type: "integer", minimum: 1, default: 10 },
+            description: "Number of transactions per page",
+          },
+        ],
+        responses: {
+          200: {
+            description: "Transaction history retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/WalletTransactionHistoryResponseData",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Unauthorized access or not a seller",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          404: {
+            description: "Seller or wallet not found",
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ApiErrorResponse" },
@@ -4557,7 +5180,7 @@ export const swaggerSpec = {
                 schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
               },
             },
-          }, 
+          },
           400: {
             description: "Seller ID or message is required",
             content: {
@@ -4972,8 +5595,7 @@ export const swaggerSpec = {
         ],
         responses: {
           200: {
-            description:
-              "Platform revenue growth data retrieved successfully",
+            description: "Platform revenue growth data retrieved successfully",
             content: {
               "application/json": {
                 schema: {
@@ -5013,6 +5635,526 @@ export const swaggerSpec = {
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/admin/verifySellerBankAccount/{sellerId}": {
+      patch: {
+        tags: ["Admin"],
+        summary: "Verify or reject a seller bank account",
+        description:
+          "Allows an admin to approve ('verified') or reject ('rejected') a seller's linked bank account.",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        parameters: [
+          {
+            name: "sellerId",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+            description:
+              "The ID of the seller whose bank account is being verified",
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/AdminVerifyBankAccountRequest",
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Seller bank account status updated successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/AdminSellerSummary",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          400: {
+            description:
+              "Seller ID is required, decision must be 'verified' or 'rejected', or seller does not have a bank account linked",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Unauthorized access",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          404: {
+            description: "Seller not found",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/admin/getAllSellerWithdrawlRequests": {
+      get: {
+        tags: ["Admin"],
+        summary: "Get all seller withdrawal requests",
+        description:
+          "Allows an admin to retrieve a paginated list of seller withdrawal requests, optionally filtered by status ('all', 'pending', 'completed', 'failed', 'rejected').",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        parameters: [
+          {
+            name: "page",
+            in: "query",
+            required: false,
+            schema: { type: "integer", default: 1, minimum: 1 },
+            description: "Page number for pagination",
+          },
+          {
+            name: "limit",
+            in: "query",
+            required: false,
+            schema: { type: "integer", default: 10, minimum: 1, maximum: 100 },
+            description: "Number of records per page (max: 100)",
+          },
+          {
+            name: "status",
+            in: "query",
+            required: false,
+            schema: {
+              type: "string",
+              enum: ["all", "pending", "completed", "failed", "rejected"],
+              default: "all",
+            },
+            example: "all",
+            description:
+              "Filter withdrawal requests by status ('all', 'pending', 'completed', 'failed', 'rejected')",
+          },
+        ],
+        responses: {
+          200: {
+            description:
+              "All seller withdrawal requests retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/AdminSellerWithdrawalRequestsResponseData",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Unauthorized access",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/admin/approveSellerWithdrawalRequest/{sellerId}/{transactionId}": {
+      patch: {
+        tags: ["Admin"],
+        summary: "Approve or reject a seller withdrawal request",
+        description:
+          "Allows an admin to approve ('approved') or reject ('rejected') a pending seller withdrawal transaction request.",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        parameters: [
+          {
+            name: "sellerId",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+            description:
+              "The ID of the seller whose withdrawal request is being processed",
+          },
+          {
+            name: "transactionId",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+            description: "The ID of the withdrawal transaction",
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/AdminApproveWithdrawalRequest",
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description:
+              "Seller withdrawal request approved or rejected successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          type: "object",
+                          description: "The updated seller wallet document",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          400: {
+            description:
+              "sellerId or transactionId is required, or decision must be 'approved' or 'rejected'",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Unauthorized access",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          404: {
+            description: "Transaction or wallet not found",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/admin/getTotalSales": {
+      get: {
+        tags: ["Admin"],
+        summary: "Get total sales across the platform",
+        description:
+          "Allows an admin to retrieve aggregated total gross sales from all orders placed on the platform.",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Total sales retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/AdminTotalSalesResponseData",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Unauthorized access",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/admin/getWithdrawalCompletedCount": {
+      get: {
+        tags: ["Admin"],
+        summary: "Get count of completed seller withdrawals",
+        description:
+          "Allows an admin to retrieve the total count of seller withdrawal transactions with status 'completed'.",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Withdrawal completed count retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/AdminWithdrawalCompletedCountResponseData",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Unauthorized access",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/admin/getWithdrawalPendingCount": {
+      get: {
+        tags: ["Admin"],
+        summary: "Get count of pending seller withdrawals",
+        description:
+          "Allows an admin to retrieve the total count of seller withdrawal transactions with status 'pending'.",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Pending withdrawal count retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/AdminWithdrawalPendingCountResponseData",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Unauthorized access",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/admin/get-salesOverview-last30days": {
+      get: {
+        tags: ["Admin"],
+        summary: "Get platform sales overview for the last 30 days",
+        description:
+          "Allows an admin to retrieve sales analytics, daily revenue series, total orders, average order value, and peak performance for the last 30 days. Emits real-time snapshot via Socket.IO.",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        responses: {
+          200: {
+            description:
+              "Sales overview for the last 30 days retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/AdminRevenueGrowthResponse",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Unauthorized access",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api-docs.json": {
+      get: {
+        tags: ["Health"],
+        summary: "Get raw OpenAPI 3.0 specification",
+        description:
+          "Returns the raw OpenAPI 3.0 specification document in JSON format.",
+        responses: {
+          200: {
+            description: "OpenAPI specification JSON object",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  description: "OpenAPI 3.0 root document",
+                },
               },
             },
           },
