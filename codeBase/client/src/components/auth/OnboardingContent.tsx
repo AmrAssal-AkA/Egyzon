@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import InputField from "@/components/ui/common/InputField";
 import Button from "@/components/ui/common/Button";
 import { Spinner } from "@/components/ui/spinner";
+import ErrorIcon  from "@/components/ui/ErrorIcon";
 
 const PHONE_REGEX = /^\+?[1-9]\d{7,14}$/;
 
@@ -174,20 +175,7 @@ export const OnboardingContent: React.FC = () => {
     return (
       <div className="space-y-6 py-6 text-center">
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 mb-2">
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
+          <ErrorIcon />
         </div>
         <h2 className="text-2xl font-bold tracking-tight text-foreground">
           Verification Required

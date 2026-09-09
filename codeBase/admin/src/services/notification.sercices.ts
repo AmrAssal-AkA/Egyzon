@@ -25,7 +25,7 @@ function getNotificationsBaseUrl(): string {
     return serverClient.defaults.baseURL.replace(/\/admin\/?$/, "");
   }
 
-  return process.env.REACT_APP_API_BASE_URL ?? "http://localhost:8080/api";
+  return process.env.REACT_APP_API_BASE_URL_WS?? "http://localhost:8080/api";
 }
 
 function formatNotificationTitle(type: NotificationType, title?: string): string {
