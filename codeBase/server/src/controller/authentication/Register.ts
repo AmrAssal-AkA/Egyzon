@@ -52,7 +52,7 @@ const RegisterUser = async (userData: any, res: Response, req: Request) => {
     const verificationUrl = `${process.env.FRONTEND_URL}/verifyEmail?token=${emailTokenValue}`;
     // Send verification email
     try {
-      verifyEmailTemplate(email, verificationUrl);
+      await verifyEmailTemplate(email, verificationUrl);
     }catch (err) {
       logger.error("Error sending verification email:", err);
     }
