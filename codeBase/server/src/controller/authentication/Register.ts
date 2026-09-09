@@ -50,6 +50,12 @@ const RegisterUser = async (userData: any, res: Response, req: Request) => {
     await newUser.save();
 
     const verificationUrl = `${process.env.FRONTEND_URL}/verifyEmail?token=${emailTokenValue}`;
+    // Send verification email
+    try {
+      verifyEmailTemplate(email, verificationUrl);
+    }catch (err) {
+      logger.error("Error sending verification email:", err);
+    }
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -62,16 +68,12 @@ const RegisterUser = async (userData: any, res: Response, req: Request) => {
       sameSite: "strict",
       maxAge: 60 * 60 * 24 * 7,
     });
+
+    // Send success response with token and refresh token
     sendSuccessResponse(res, 201, "User created successfully", {
       token,
       refreshToken: refreshToken,
     });
-    // Send verification email
-    try {
-    await verifyEmailTemplate(email, verificationUrl);
-    }catch (err) {
-      logger.error("Error sending verification email:", err);
-    }
   } catch (err) {
     sendErrorResponse(res, 500, "Something went wrong", (err as Error).message);
     return;
