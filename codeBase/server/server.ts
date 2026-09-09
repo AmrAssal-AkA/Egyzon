@@ -32,8 +32,7 @@ import logger from "./src/utils/logger";
 const app = express();
 const httpServer = http.createServer(app);
 const io = initSocket(httpServer);
-const allowedOrigin = process.env.FRONTEND_URL && process.env.ADMIN_FRONTEND_URL;
-
+const allowedOrigin = [process.env.FRONTEND_URL, process.env.ADMIN_FRONTEND_URL].filter(Boolean) as string[];
 
 
 const PORT = process.env.PORT;
