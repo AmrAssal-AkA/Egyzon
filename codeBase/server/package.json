@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "Egyzon server",
   "main": "server.js",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon dist/server.js",
+    "dev": "nodemon --watch src --ext ts --exec tsx ./server.ts",
     "build": "tsc",
     "docs:verify": "tsx src/scripts/verifySwagger.ts",
     "start": "node dist/server.js"
