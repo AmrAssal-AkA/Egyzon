@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import { FiUser, FiMenu, FiX, FiSearch } from "react-icons/fi";
 
@@ -46,7 +46,13 @@ export default function Header() {
             </Link>
           </div>
 
-            <SearchBarComponent />
+            <Suspense
+              fallback={
+                <div className="hidden md:flex flex-1 max-w-md lg:max-w-lg h-9 rounded-full bg-muted/30" />
+              }
+            >
+              <SearchBarComponent />
+            </Suspense>
           {/* Right Action Icons & Controls */}
           <div className="flex items-center gap-1.5 sm:gap-2.5">
             {/* Mobile Search Toggle */}
@@ -98,11 +104,13 @@ export default function Header() {
         {/* Mobile Expandable Search Bar */}
         {isMobileSearchOpen && (
           <div className="md:hidden pb-3 pt-1 border-t border-border/50 animate-in fade-in slide-in-from-top-2 duration-200">
-            <SearchBarComponent
-              isMobile
-              onClose={() => setIsMobileSearchOpen(false)}
-              autoFocus
-            />
+            <Suspense fallback={<div className="w-full h-9 rounded-full bg-muted/30" />}>
+              <SearchBarComponent
+                isMobile
+                onClose={() => setIsMobileSearchOpen(false)}
+                autoFocus
+              />
+            </Suspense>
           </div>
         )}
       </div>

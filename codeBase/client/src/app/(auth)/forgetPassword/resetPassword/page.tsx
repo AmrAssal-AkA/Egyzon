@@ -1,14 +1,18 @@
-import React, { Suspense } from 'react'
+import React, { Suspense } from "react";
 
-import {Spinner} from '@/components/ui/spinner'
-import ResetPasswordForm from '@/components/auth/Forms/resetPasswordForm'
+import { Spinner } from "@/components/ui/spinner";
+import ResetPasswordForm from "@/components/auth/Forms/resetPasswordForm";
 
-function ResetPasswordPage() {
+export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={<Spinner className="h-5 w-5" />}>
-        <ResetPasswordForm />
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center p-8">
+          <Spinner className="h-6 w-6 text-primary" />
+        </div>
+      }
+    >
+      <ResetPasswordForm />
     </Suspense>
-  )
+  );
 }
-
-export default ResetPasswordPage

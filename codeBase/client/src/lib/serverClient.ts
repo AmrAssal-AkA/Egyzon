@@ -7,3 +7,4 @@ export const serverClient = axios.create({
     Accept: "application/json",
   },
 });
+

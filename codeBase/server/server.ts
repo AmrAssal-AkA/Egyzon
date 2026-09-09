@@ -32,7 +32,7 @@ import logger from "./src/utils/logger";
 const app = express();
 const httpServer = http.createServer(app);
 const io = initSocket(httpServer);
-const allowedOrigin = "http://localhost:3000";
+const allowedOrigin = process.env.FRONTEND_URL && process.env.ADMIN_FRONTEND_URL;
 
 
 

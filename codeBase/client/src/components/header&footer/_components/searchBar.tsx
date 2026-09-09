@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect, useMemo, Suspense } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
+
 import { IoIosSearch } from "react-icons/io";
 import { FiX, FiArrowRight, FiLoader } from "react-icons/fi";
 
@@ -20,7 +21,7 @@ interface SearchBarComponentProps {
   autoFocus?: boolean;
 }
 
-export default function SearchBarComponent({
+function SearchBarInner({
   isMobile = false,
   onClose,
   autoFocus = false,
@@ -264,6 +265,26 @@ export default function SearchBarComponent({
         </div>
       )}
     </div>
+  );
+}
+
+export default function SearchBarComponent(props: SearchBarComponentProps) {
+  return (
+    <Suspense
+      fallback={
+        <div
+          className={`relative ${
+            props.isMobile
+              ? "w-full"
+              : "hidden md:flex flex-1 max-w-md lg:max-w-lg items-center"
+          }`}
+        >
+          <div className="w-full h-9 rounded-full border border-input bg-muted/30 animate-pulse" />
+        </div>
+      }
+    >
+      <SearchBarInner {...props} />
+    </Suspense>
   );
 }
 
