@@ -11,6 +11,8 @@ winston.addColors({
     silly: "gray",
 });
 
+const isProd = process.env.NODE_ENV === "production";
+
 const logger = winston.createLogger({
     levels,
     level: process.env.NODE_ENV === "production" ? "info" : "debug",
@@ -21,11 +23,18 @@ const logger = winston.createLogger({
     ),
     defaultMeta: {service: "egyzon-service"},
     transports: [
-        new winston.transports.File({ filename: "logs/error.log", level: "error" }),
-        new winston.transports.File({ filename: "logs/combined.log" }),
+        new winston.transports.Console({
+            format: isProd ? winston.format.json() : winston.format.combine(
+                winston.format.colorize(),
+                winston.format.simple()
+            )
+        })
     ]
 });
-
+if (!isProd) {
+    logger.add(new winston.transports.File({filename: "logs/error.log", level: "error"}));
+    logger.add(new winston.transports.File({filename: "logs/combined.log"}));
+}
 
 if (process.env.NODE_ENV !== "production") {
     logger.add(new winston.transports.Console({

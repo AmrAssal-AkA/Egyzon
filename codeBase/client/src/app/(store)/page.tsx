@@ -15,11 +15,10 @@ export const metadata = {
     title: "egyzon - Your One-Stop Destination for Products",
     description:
       "Welcome to Egyzon, your one-stop destination for a wide range of products. Explore our featured products, top categories, and trending items. Join our newsletter to stay updated with the latest offers and arrivals.",
-    url: "https://www.egyzon.com/",
     siteName: "Egyzon",
     images: [
       {
-        url: "https://www.egyzon.com/og-image.jpg",
+        image: "../favicon.ico",
         width: 1200,
         height: 630,
         alt: "Egyzon - Your One-Stop Destination for Products",
