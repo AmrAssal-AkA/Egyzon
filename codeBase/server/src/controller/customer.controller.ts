@@ -8,6 +8,7 @@ import Order from "../models/orderModel";
 import { hashPassword } from "../utils/password.ustils";
 import changePasswordTemplate from "../templates/changePasswordTemp";
 import { sendSuccessResponse, sendErrorResponse } from "../utils/Responses";
+import logger from "../utils/logger";
 
 
 export const CustomerController = {
@@ -31,7 +32,11 @@ export const CustomerController = {
       customer.password = hashedPassword;
 
       await customer.save();
-      await changePasswordTemplate(customer.email, customer.FirstName);
+      try {
+        await changePasswordTemplate(customer.email, customer.FirstName);
+      } catch (error) {
+        logger.error("Error sending change password email:", error);
+      }
       return sendSuccessResponse(res, 200, "Password changed successfully");
     } catch (error) {
       if (error instanceof AppError) {

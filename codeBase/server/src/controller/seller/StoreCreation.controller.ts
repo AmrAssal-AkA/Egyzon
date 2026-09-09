@@ -62,9 +62,9 @@ export const createRequestToJoin = async (req: Request, res: Response) => {
         "Bad Request",
         "Invalid image format. Only JPEG and PNG are allowed",
       );
-    // Check if the user is already a seller
+
     await SellerServices.checkExistingSeller(userId);
-    // Scan the uploaded images for viruses
+
     for (const file of files.commercialRegisterImage ?? []) {
       const { isInfected, viruses } = await scanFile(file.buffer);
       if (isInfected) {
@@ -118,7 +118,7 @@ export const createRequestToJoin = async (req: Request, res: Response) => {
       applicationId: new Date().toISOString(),
       applicantName: storeName,
       shopName: storeName,
-    })
+    });
 
     return sendSuccessResponse(res, 200, "Request sent successfully");
   } catch (error) {
@@ -146,9 +146,15 @@ export const createRequestToJoin = async (req: Request, res: Response) => {
 export const setupStore = async (req: Request, res: Response) => {
   try {
     // Check if user is authenticated
-    const userId = req.user?.userId 
-    const seller = req.user?.role
-    if (!userId || seller !== "seller") return sendErrorResponse(res, 401, "Unauthorized", "User not authenticated");
+    const userId = req.user?.userId;
+    const seller = req.user?.role;
+    if (!userId || seller !== "seller")
+      return sendErrorResponse(
+        res,
+        401,
+        "Unauthorized",
+        "User not authenticated",
+      );
     // Validate request body
     const {
       storeDescription,
@@ -161,7 +167,7 @@ export const setupStore = async (req: Request, res: Response) => {
       !storeDescription ||
       storeDescription.trim() === "" ||
       !storeType ||
-      storeType.trim() === "" 
+      storeType.trim() === ""
     ) {
       return sendErrorResponse(
         res,
@@ -171,13 +177,13 @@ export const setupStore = async (req: Request, res: Response) => {
       );
     }
 
-    if (
-      storeType !== "physical" &&
-      storeType !== "online" 
-    ) {
+    if (storeType !== "physical" && storeType !== "online") {
       return sendErrorResponse(res, 400, "Bad Request", "Invalid store type");
     }
-    if (storeType === "physical" && (!storephysicalAddress || storephysicalAddress.trim() === "")) {
+    if (
+      storeType === "physical" &&
+      (!storephysicalAddress || storephysicalAddress.trim() === "")
+    ) {
       return sendErrorResponse(
         res,
         400,
@@ -185,8 +191,10 @@ export const setupStore = async (req: Request, res: Response) => {
         "Physical address is required",
       );
     }
-    const finalOnlineAddress = storeType === "physical" ? "" : (storeOnlineAddress || "Online");
-    const finalPhysicalAddress = storeType === "online" ? "" : storephysicalAddress;
+    const finalOnlineAddress =
+      storeType === "physical" ? "" : storeOnlineAddress || "Online";
+    const finalPhysicalAddress =
+      storeType === "online" ? "" : storephysicalAddress;
     console.log("Request body after validation:", req.body);
     // Validate file uploads
     const files = req.files as {
@@ -249,15 +257,15 @@ export const setupStore = async (req: Request, res: Response) => {
     // Setup store data
     const storeData = {
       storeManagement: {
-      storeDescription,
-      storeType,
-      storephysicalAddress: finalPhysicalAddress,
-      storeOnlineAddress: finalOnlineAddress,
-      storeLogo: storeLogoUpload.secure_url,
-      storeBanner: storeBannerUpload.secure_url,
+        storeDescription,
+        storeType,
+        storephysicalAddress: finalPhysicalAddress,
+        storeOnlineAddress: finalOnlineAddress,
+        storeLogo: storeLogoUpload.secure_url,
+        storeBanner: storeBannerUpload.secure_url,
       },
     };
-    console.log('store data', storeData)
+    console.log("store data", storeData);
     await SellerServices.setupStore(storeData, userId);
     return sendSuccessResponse(res, 200, "Store setup successful");
   } catch (error) {
@@ -270,4 +278,3 @@ export const setupStore = async (req: Request, res: Response) => {
     }
   }
 };
-

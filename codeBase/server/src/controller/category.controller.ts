@@ -16,7 +16,7 @@ export const CategoryController = {
        if (!image || !image.buffer) {
            return sendErrorResponse(res, 400, "Image file is required");
        }
-       console.log("Image received:", image);
+
         const uploadedImage = await uploadImage(image.buffer, "Egyzon/Categories");
         if (!uploadedImage) {
             return sendErrorResponse(res, 400, "Image upload failed");
@@ -29,7 +29,6 @@ export const CategoryController = {
             Products: [],
         };
         const category = await CategoryService.createCategory(categoryData);
-        console.log("Category created successfully:", category);
         sendSuccessResponse(res, 201, "Category created successfully", category);
     } catch (error) {
       sendErrorResponse(res, 500, "Internal Server Error");

@@ -5,6 +5,7 @@ import type {
   ApiGetAllSellerWithdrawalsData,
   ApiSellerBankAccount,
   ApiSellerWalletWithdrawal,
+  ApiTransactionHistoryItem,
   FinancialSummaryMetrics,
   PaginatedWithdrawalsResponse,
   PaymentMethod,

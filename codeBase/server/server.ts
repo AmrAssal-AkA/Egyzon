@@ -23,17 +23,18 @@ import { attachTo } from "./src/middleware/attachTo";
 import orderRoute from "./src/routes/order.route";
 import NotificationRoute from "./src/routes/notifaication.routes";
 import PaymentRoute from "./src/routes/payment.route";
-import { generalLimiter} from "./src/middleware/rateLimiter"
+import { generalLimiter } from "./src/middleware/rateLimiter";
 import morganMiddleware from "./src/middleware/requestLogger";
-import walletRoute from "./src/routes/wallet.route"
+import walletRoute from "./src/routes/wallet.route";
 import logger from "./src/utils/logger";
-
 
 const app = express();
 const httpServer = http.createServer(app);
 const io = initSocket(httpServer);
-const allowedOrigin = [process.env.FRONTEND_URL, process.env.ADMIN_FRONTEND_URL].filter(Boolean) as string[];
-
+const allowedOrigin: string[] = [
+  process.env.FRONTEND_URL,
+  process.env.ADMIN_FRONTEND_URL,
+].filter((origin): origin is string => Boolean(origin));
 
 const PORT = process.env.PORT;
 //connect to db
@@ -52,22 +53,21 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(attachTo(io));
 app.use(morganMiddleware);
-app.set('trust proxy', 1);
-
+app.set("trust proxy", 1);
 
 //routes
 app.use("/api/auth", AuthentaicatingRoute);
-app.use("/api/product",generalLimiter, productRoute);
+app.use("/api/product", generalLimiter, productRoute);
 app.use("/api/wishlist", generalLimiter, wishlistRoute);
 app.use("/api/seller", generalLimiter, sellerRoute);
 app.use("/api/cart", generalLimiter, cartRoute);
 app.use("/api/category", generalLimiter, CategoryRoute);
 app.use("/api/customer", generalLimiter, customerRoute);
 app.use("/api/admin", adminRoute);
-app.use('/api/order', generalLimiter, orderRoute);
-app.use('/api/notifications', NotificationRoute);
-app.use('/api/payment', PaymentRoute);
-app.use('/api/wallet', walletRoute)
+app.use("/api/order", generalLimiter, orderRoute);
+app.use("/api/notifications", NotificationRoute);
+app.use("/api/payment", PaymentRoute);
+app.use("/api/wallet", walletRoute);
 //swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

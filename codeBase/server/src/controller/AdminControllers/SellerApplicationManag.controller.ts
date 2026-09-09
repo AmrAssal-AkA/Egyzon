@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 import { sendErrorResponse, sendSuccessResponse } from "../../utils/Responses";
 import { AdminService } from "../../services/admin.services";
 import { SellerApplyApplovalTemplate } from "../../templates/SellerApplyApplicant";
+import logger from "../../utils/logger";
 
 export const ManageSellerApplicationsController = {
   getAllSellers: async (req: Request, res: Response) => {
@@ -51,6 +52,15 @@ export const ManageSellerApplicationsController = {
           "Seller ID is required",
         );
       const updatedSeller = await AdminService.approveSeller(sellerId);
+      try {
+         SellerApplyApplovalTemplate(
+          updatedSeller.email,
+          updatedSeller.FirstName,
+          updatedSeller.storeName,
+        );
+      } catch (error) {
+        logger.error("Error sending seller approval email:", error);
+      }
       await SellerApplyApplovalTemplate(
         updatedSeller.email,
         updatedSeller.FirstName,

@@ -6,6 +6,7 @@ import Product from "../models/productModel";
 import { initializeRedisClient } from "../config/client";
 import { wishlistCacheKey, cartkeyById } from "../utils/keys";
 import { AppError } from "../utils/AppError";
+import logger from "../utils/logger";
 
 const TTL_Safely = 60 * 10;
 const cartExpiry = 60 * 60 * 24 * 30;
@@ -23,7 +24,6 @@ export const WishlistServices = {
       if (!product) {
         throw new Error("Product not found");
       }
-      // Add the product to the wishlist using $addToSet to avoid duplicates
       const addWishlistItem = await Wishlist.findOneAndUpdate(
         { userId: customer._id },
         {
@@ -31,14 +31,13 @@ export const WishlistServices = {
         },
         { returnDocument: "after", upsert: true },
       );
-      // Cache the wishlist in Redis
       try {
         const client = await initializeRedisClient();
         const cacheKey = wishlistCacheKey(userId);
         await client.hSet(cacheKey, productId, JSON.stringify(product));
         await client.expire(cacheKey, TTL_Safely);
       } catch (error) {
-        console.log("Cache error:", error);
+        logger.error("Cache error:", error);
       }
       // Return the updated wishlist item
       return addWishlistItem;
@@ -46,7 +45,7 @@ export const WishlistServices = {
       if (error instanceof AppError) {
         throw error;
       }
-      console.log(error);
+      logger.error("Error adding to wishlist:", error);
       throw error;
     }
   },
@@ -71,14 +70,14 @@ export const WishlistServices = {
         const cacheKey = wishlistCacheKey(userId);
         await client.hDel(cacheKey, productId);
       } catch (error) {
-        console.log("Cache error:", error);
+        logger.error("Cache error:", error);
       }
       return removeFromWishlist;
     } catch (error) {
       if (error instanceof AppError) {
         throw error;
       }
-      console.log(error);
+      logger.error("Error removing from wishlist:", error);
       throw error;
     }
   },
@@ -94,7 +93,7 @@ export const WishlistServices = {
         const client = await initializeRedisClient();
         cachedWishlist = await client.hGetAll(cachekey);
       } catch (error) {
-        console.log("Cache error:", error);
+        logger.error("Cache error:", error);
       }
       // check if the wishlist is cached in Redis
       if (Object.keys(cachedWishlist).length > 0) {
@@ -125,7 +124,7 @@ export const WishlistServices = {
         }
         return { userId: customer._id, productId: wishlistProducts };
       } catch (error) {
-        console.log("Cache error:", error);
+        logger.error ("Cache error:", error);
       }
     } catch (error) {
       if (error instanceof AppError) {

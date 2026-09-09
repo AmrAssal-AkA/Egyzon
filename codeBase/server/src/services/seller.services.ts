@@ -11,6 +11,7 @@ import { PaymentStatus } from "../types/payment.type";
 import { encrypt , dycrypt} from "../utils/encryption";
 import {addBankAccountInput, addBankAccountSchema} from "../validators/seller.validate"
 import { BankAccountStatus } from "../types/wallet.types";
+import logger from "../utils/logger";
 
 
 export const SellerServices = {
@@ -37,19 +38,18 @@ export const SellerServices = {
       { returnDocument: "after" },
     );
     try {
-      await SellerApplyApplicantTemplate(
+       SellerApplyApplicantTemplate(
         user.email,
         user.FirstName,
         sellerData.storeName,
       );
     } catch (err) {
-      console.error("Error sending email to applicant:", err);
+      logger.error("Error sending email to applicant:", err);
     }
     return SaveSellerData;
   },
   checkExistingSeller: async (userId: string) => {
     const user = await User.findById(userId);
-    console.log("user:", user);
     if (!user) throw new AppError(404, "user not found");
     const existingSeller = await Seller.findOne({ user: user._id });
     if (existingSeller)

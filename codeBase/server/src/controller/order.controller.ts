@@ -8,6 +8,7 @@ import { sendErrorResponse, sendSuccessResponse } from "../utils/Responses";
 import { NotificationServices } from "../services/notification.services";
 import { paymentServices } from "../controller/payment.controller";
 import { sendOrderReceivedConfirmationEmail } from "../templates/orderReceivedConfirmationTem";
+import logger from "../utils/logger";
 
 export const placeOrder = async (req: Request, res: Response) => {
   try {
@@ -74,7 +75,11 @@ export const placeOrder = async (req: Request, res: Response) => {
       address,
       billingData,
     });
-    await sendOrderReceivedConfirmationEmail(order.order);
+    try {
+        sendOrderReceivedConfirmationEmail(order.order);
+    } catch (error) {
+      logger.error("Error sending order confirmation email:", error);
+    }
     const sellerId = order.order.orderItems[0]?.seller?._id?.toString();
     if (sellerId) {
       await NotificationServices.notifySellerAdminForNewOrder({

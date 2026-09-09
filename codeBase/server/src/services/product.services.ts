@@ -1,10 +1,10 @@
 import Product from "../models/productModel";
-import { IProduct } from "../types/product.types";
 import { AppError } from "../utils/AppError";
 import Category from "../models/categoryModel";
 import Seller from "../models/sellerModel";
 import mongoose from "mongoose";
 import { initializeRedisClient } from "../config/client";
+import logger from "../utils/logger";
 
 const Soft_TTL_Safely = 60 * 10; // 10 minutes
 const Hard_TTL_Safely = 60 * 60 * 24 * 30; // 30 days
@@ -45,7 +45,7 @@ export const ProductServices = {
       { new: true });
       return newProduct;
     } catch (error) {
-      console.log(error);
+      logger.error("Error creating product:", error);
       throw new AppError(500, "Failed to create product");
     }
   },
@@ -73,13 +73,11 @@ export const ProductServices = {
     productData: any,
   ) => {
      const seller = await Seller.findById(sellerId).populate("products");
-     console.log(seller?.products);
     if (!seller) throw new AppError(404, "Seller not found");
     const isObjectId = mongoose.Types.ObjectId.isValid(productId);
     const query = isObjectId
       ? { _id: productId, sellerId }
       : { sku: productId, sellerId };
-      console.log("Query for finding product:", query);
     const product = await Product.findOne(query);
     if (!product) throw new AppError(404, "Product not found");
     if (product.sellerId.toString() !== sellerId) {
