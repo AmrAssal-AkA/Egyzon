@@ -9,6 +9,7 @@ import { sendSuccessResponse, sendErrorResponse } from "../../utils/Responses";
 import { generateToken } from "../../utils/cryptoTokens";
 import verifyEmailTemplate from "../../templates/verifyEmailTemplate";
 import RefreshTokenModel from "../../models/refreshToken";
+import logger from "../../utils/logger";
 
 const RegisterUser = async (userData: any, res: Response, req: Request) => {
   try {
@@ -47,9 +48,8 @@ const RegisterUser = async (userData: any, res: Response, req: Request) => {
     newUser.emailVerificationTokenExpiration = expiration;
   
     await newUser.save();
-    const verificationUrl = `${process.env.FRONTEND_URL}/verifyEmail?token=${emailTokenValue}`;
-    await verifyEmailTemplate(email, verificationUrl);
 
+    const verificationUrl = `${process.env.FRONTEND_URL}/verifyEmail?token=${emailTokenValue}`;
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -66,6 +66,12 @@ const RegisterUser = async (userData: any, res: Response, req: Request) => {
       token,
       refreshToken: refreshToken,
     });
+    // Send verification email
+    try {
+    await verifyEmailTemplate(email, verificationUrl);
+    }catch (err) {
+      logger.error("Error sending verification email:", err);
+    }
   } catch (err) {
     sendErrorResponse(res, 500, "Something went wrong", (err as Error).message);
     return;
