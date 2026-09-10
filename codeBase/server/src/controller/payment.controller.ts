@@ -155,6 +155,7 @@ const handlePaymobWebhook = async (req: Request, res: Response) => {
   try {
     const hmac = req.query.hmac as string;
     const transaction = req.body.obj;
+      logger.warn(`RAW PAYLOAD: ${JSON.stringify(transaction)}`);
     if(!hmac || !verifypaymobHMAC(transaction, hmac)) {
       return sendErrorResponse(res, 400, "Invalid HMAC signature");
     }
