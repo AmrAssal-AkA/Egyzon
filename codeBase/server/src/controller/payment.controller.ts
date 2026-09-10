@@ -38,7 +38,7 @@ const HMAC_FIELD_ORDERS = [
 ];
 
 function getNestedValue(obj: any, path: string): any {
-   return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+     return path.split('.').reduce((acc, key) => (acc == null ? undefined : acc[key]), obj)
 }
 function verifypaymobHMAC(data: any, hmac: string): boolean {
   const connected = HMAC_FIELD_ORDERS.map(field => {

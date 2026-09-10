@@ -69,7 +69,7 @@ export class PaymentService {
   async handlePaymobTransction(transaction: any) {
     const paymobOrderId = transaction.order.id;
     const isSuccess = transaction.success === true;
-
+     logger.warn(`RAW PAYLOAD: ${JSON.stringify(transaction)}`);
     const payment = await this.payment.findOne({ paymobOrderId });
     if (!payment) {
       throw new AppError(
