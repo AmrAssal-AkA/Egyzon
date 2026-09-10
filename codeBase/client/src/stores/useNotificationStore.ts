@@ -38,7 +38,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
         const socket = io(socketUrl, {
             withCredentials: true,
-            transports: ["websocket"],
+            transports: ["websocket", "polling"],
           
         });
 

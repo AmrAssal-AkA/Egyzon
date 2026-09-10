@@ -6,6 +6,7 @@ import {verifyAccessToken, verifyRefreshToken} from "../utils/jwt.util";
 import { Notification } from "../types/notification.types";
 import {Analytical} from "../services/analytics.services";
 import {AnalyticalDateTimeframe} from "../types/analyticalData.types"
+import logger from "../utils/logger";
 
 
 
@@ -29,10 +30,10 @@ export function initSocket(server: HttpServer) {
         try {
             const rawCookie = socket.handshake.headers.cookie;
             if (!rawCookie) return next(new Error("Authentication error"));
-            
+            logger.info(`Raw cookie received: ${rawCookie}`);
             const parsedCookie = cookie.parseCookie(rawCookie);
-            const accessToken = parsedCookie.token;
-            const refreshToken = parsedCookie.refreshToken;
+            const accessToken = parsedCookie['Access_token'];
+            const refreshToken = parsedCookie['Refresh_token'];
             if (!accessToken || !refreshToken) return next(new Error("Authentication error"));
 
             const accessTokenPayload = verifyAccessToken(accessToken);
