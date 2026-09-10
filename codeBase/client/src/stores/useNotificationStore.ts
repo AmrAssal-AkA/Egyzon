@@ -14,7 +14,7 @@ interface NotificationState {
 
     unreadCount: () => number;
 
-    connect: (token: string) => void;
+    connect: () => void;
     disconnect: () => void;
     markAsRead: (id: string) => Promise<void> | void;
     markAllAsRead: () => Promise<void> | void;
@@ -33,15 +33,13 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
     unreadCount: () => get().notifications.filter((n) => !n.isRead).length,
 
-    connect: (token: string) => {
+    connect: () => {
         if (get().socket) return;
 
         const socket = io(socketUrl, {
             withCredentials: true,
             transports: ["websocket"],
-            auth: {
-                token
-            }
+          
         });
 
         socket.on("connect", () => set({ isConnected: true }));
