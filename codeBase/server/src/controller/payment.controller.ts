@@ -15,7 +15,7 @@ const PaymobHmackey = process.env.PAYMOB_HMAC_KEY;
 const IframeId = process.env.PAYMOB_IFRAME_ID;
 
 const HMAC_FIELD_ORDERS = [
-  "amounts_cents",
+  "amount_cents",
   "created_at",
   "currency",
   "error_occured",
@@ -23,7 +23,7 @@ const HMAC_FIELD_ORDERS = [
   "id",
   "integration_id",
   "is_3d_secure",
-  "is_auth",
+  "is_auction",
   "is_capture",
   "is_refunded",
   "is_standalone_payment",
