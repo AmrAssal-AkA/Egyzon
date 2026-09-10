@@ -7,6 +7,7 @@ import { sendErrorResponse, sendSuccessResponse } from "../../utils/Responses";
 import { AppError } from "../../utils/AppError";
 import User from "../../models/userModel";
 import { generateToken, hashToken } from "../../utils/cryptoTokens";
+import logger from "../../utils/logger";
 
 const RequestForgetPassword = async (req: Request, res: Response) => {
   try {
@@ -23,7 +24,12 @@ const RequestForgetPassword = async (req: Request, res: Response) => {
     await user.save();
 
     const resetPasswordUrl = `${process.env.FRONTEND_URL}/forgetPassword/resetPassword?token=${token}&email=${emailAddress}`;
-    await forgetPasswordTemplate(emailAddress, token, resetPasswordUrl);
+    try {
+          await forgetPasswordTemplate(emailAddress, token, resetPasswordUrl);
+    } catch (error) {
+      logger.error("Error sending email:", error);
+      return sendErrorResponse(res, 500, "Failed to send reset password email");
+    }
 
     return sendSuccessResponse(
       res,
