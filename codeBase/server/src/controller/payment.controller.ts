@@ -29,7 +29,7 @@ const HMAC_FIELD_ORDERS = [
   "is_standalone_payment",
   "is_voided",
   "order.id",
-  "owner",
+  "data.owner",
   "pending",
   "source_data.pan",
   "source_data.sub_type",
@@ -155,7 +155,6 @@ const handlePaymobWebhook = async (req: Request, res: Response) => {
   try {
     const hmac = req.query.hmac as string;
     const transaction = req.body.obj;
-      logger.warn(`RAW PAYLOAD: ${JSON.stringify(transaction)}`);
     if(!hmac || !verifypaymobHMAC(transaction, hmac)) {
       return sendErrorResponse(res, 400, "Invalid HMAC signature");
     }
