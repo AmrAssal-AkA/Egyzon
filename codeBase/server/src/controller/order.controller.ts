@@ -7,6 +7,7 @@ import {AppError} from "../utils/AppError";
 import { sendErrorResponse, sendSuccessResponse } from "../utils/Responses";
 import { NotificationServices } from "../services/notification.services";
 import { paymentServices } from "../controller/payment.controller";
+import logger from "../utils/logger";
 
 
 export const placeOrder = async (req: Request, res: Response) => {
@@ -77,13 +78,18 @@ export const placeOrder = async (req: Request, res: Response) => {
 
     const sellerId = order.order.orderItems[0]?.seller?._id?.toString();
     if (sellerId) {
-      await NotificationServices.notifySellerAdminForNewOrder({
+      try {
+         NotificationServices.notifySellerAdminForNewOrder({
         orderId: order.order._id.toString(),
         sellerId,
         buyerName: `${billingData.firstName} ${billingData.lastName}`,
-      });
+        });
+      } catch (error) {
+        logger.error("Error notifying seller admin for new order:", error);
+      }
     }
-    return sendSuccessResponse(res, 201, "Order placed successfully", order);
+      return sendSuccessResponse(res, 201, "Order placed successfully", order);
+
   } catch (error: any) {
     return sendErrorResponse(
       res,

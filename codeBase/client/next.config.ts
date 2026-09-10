@@ -7,7 +7,7 @@ const cspHeaders = `
     script-src 'self' 'unsafe-eval' 'unsafe-inline';
     img-src 'self' blob: data: https://res.cloudinary.com;
     font-src 'self';
-    connect-src 'self' https://accept.paymob.com ws://acceptable-contentment-production-ac53.up.railway.app/ wss://acceptable-contentment-production-ac53.up.railway.app;
+    connect-src 'self' https://accept.paymob.com wss://egyzon-production.up.railway.app;
     frame-src 'self' https://accept.paymob.com;
     media-src 'self';
     object-src 'none';

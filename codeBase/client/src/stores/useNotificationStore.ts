@@ -23,7 +23,7 @@ interface NotificationState {
     setLoading: (loading: boolean) => void;
 }
 
-const socketUrl = process.env.NEXT_PUBLIC_API_URL|| "http://localhost:8080";
+const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL?.replace(/^http/, "ws") || "ws://localhost:8080";
 
 export const useNotificationStore = create<NotificationState>((set, get) => ({
    socket: null,
