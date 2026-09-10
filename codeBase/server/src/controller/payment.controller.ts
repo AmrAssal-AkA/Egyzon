@@ -29,7 +29,7 @@ const HMAC_FIELD_ORDERS = [
   "is_standalone_payment",
   "is_voided",
   "order.id",
-  "data.owner",
+  "owner",
   "pending",
   "source_data.pan",
   "source_data.sub_type",
@@ -41,8 +41,9 @@ function getNestedValue(obj: any, path: string): any {
      return path.split('.').reduce((acc, key) => (acc == null ? undefined : acc[key]), obj)
 }
 function verifypaymobHMAC(data: any, hmac: string): boolean {
+  const patched = {...data, owner: data?.data?.owner};
   const connected = HMAC_FIELD_ORDERS.map(field => {
-    const value = getNestedValue(data, field);
+    const value = getNestedValue(patched, field);
     return value === undefined || value === null ? '' : String(value);
   }).join('');
   const computedHmac = crypto.createHmac('sha512', PaymobHmackey!).update(connected).digest('hex');
@@ -155,6 +156,7 @@ const handlePaymobWebhook = async (req: Request, res: Response) => {
   try {
     const hmac = req.query.hmac as string;
     const transaction = req.body.obj;
+    logger.warn(`RAW PAYLOAD: ${JSON.stringify(transaction)}`);
     if(!hmac || !verifypaymobHMAC(transaction, hmac)) {
       return sendErrorResponse(res, 400, "Invalid HMAC signature");
     }

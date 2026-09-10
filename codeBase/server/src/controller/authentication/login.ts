@@ -36,10 +36,14 @@ const LoginUser = async (req: Request, res: Response) => {
     await refreshTokenDoc.save();
     res.cookie("Access_token", token, {
       httpOnly: true,
+      secure: true,
+      sameSite: "none",
       maxAge: 60 * 60 * 1000,
     });
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
+      secure: true,
+      sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000,
     });
     user.lastActiveDate = new Date();

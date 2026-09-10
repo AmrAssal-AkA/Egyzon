@@ -9,7 +9,7 @@ const apiBaseUrl =
     process.env.REACT_APP_API_BASE_URL;
 
 export const serverClient = axios.create({
-    baseURL: `${apiBaseUrl}/admin`,
+    baseURL: `${apiBaseUrl}/admin/`,
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

@@ -21,17 +21,17 @@ export async function POST(req: NextRequest) {
       message: "Registration successful",
       data: meRes.data.data,
     });
-    res.cookies.set("token", token, {
+    res.cookies.set("Access_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       path: "/",
       maxAge: 60 * 15,
     });
-    res.cookies.set("refreshToken", refreshToken, {
+    res.cookies.set("refresh_token", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       path: "/",
       maxAge: 60 * 60 * 24 * 7,
     });

@@ -56,16 +56,16 @@ const RegisterUser = async (userData: any, res: Response, req: Request) => {
     }catch (err) {
       logger.error("Error sending verification email:", err);
     }
-    res.cookie("token", token, {
+    res.cookie("Access_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       maxAge: 60 * 15 ,
     });
-    res.cookie("refreshToken", refreshToken, {
+    res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       maxAge: 60 * 60 * 24 * 7,
     });
 

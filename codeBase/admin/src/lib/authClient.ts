@@ -8,7 +8,7 @@ const apiBaseUrl =
   process.env.REACT_APP_API_BASE_URL;
 
 export const authClient = axios.create({
-  baseURL: `${apiBaseUrl}/auth`,
+  baseURL: `${apiBaseUrl}/auth/`,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",

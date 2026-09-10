@@ -7,12 +7,13 @@ declare const process: {
 };
 
 function getSocketServerUrl(): string {
-  if (process.env.REACT_APP_SOCKET_URL) {
-    return process.env.REACT_APP_SOCKET_URL;
+  const apiUrl = process.env.REACT_APP_API_BASE_URL_WS;
+
+  if (apiUrl === undefined) {
+    throw new Error("REACT_APP_API_BASE_URL_WS is not configured");
   }
 
-  const apiUrl = process.env.REACT_APP_API_BASE_URL ?? "http://localhost:8080";
-  return apiUrl.replace(/\/api\/?$/, "");
+  return apiUrl;
 }
 
 const socketContext = createContext<Socket | null>(null);
