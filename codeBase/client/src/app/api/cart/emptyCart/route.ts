@@ -8,7 +8,7 @@ export async function DELETE(req: NextRequest) {
     console.log("API /api/cart/emptyCart hit.");
     
     const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
+    const token = cookieStore.get("Access_token")?.value || cookieStore.get("token")?.value;
     console.log("Extracted token from cookies:", token ? "Token exists" : "No token");
 
     if (!token) {

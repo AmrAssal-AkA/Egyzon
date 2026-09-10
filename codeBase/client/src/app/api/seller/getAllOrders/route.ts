@@ -7,6 +7,7 @@ export async function GET(req: NextRequest) {
   try {
     const cookieStore = await cookies();
     const token =
+      cookieStore.get("Access_token")?.value ||
       cookieStore.get("token")?.value ||
       req.headers.get("authorization")?.replace("Bearer ", "");
 

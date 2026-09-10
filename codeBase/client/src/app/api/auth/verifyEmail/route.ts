@@ -14,16 +14,16 @@ export async function GET(req: NextRequest) {
         }
 
         const cookieStore = await cookies();
-        let accessToken = cookieStore.get("token")?.value;
+        let accessToken = cookieStore.get("Access_token")?.value || cookieStore.get("token")?.value;
 
         if (!accessToken) {
-            const refreshToken = cookieStore.get("refreshToken")?.value;
+            const refreshToken = cookieStore.get("refresh_token")?.value || cookieStore.get("refreshToken")?.value;
             if (refreshToken) {
                 try {
                     const refreshRes = await serverClient.post("/api/auth/refresh", {}, {
                         headers: { Cookie: `refresh_token=${refreshToken}` },
                     });
-                    accessToken = refreshRes.data?.data?.accessToken;
+                    accessToken = refreshRes.data?.data?.Access_token || refreshRes.data?.data?.accessToken || refreshRes.data?.data?.token;
                 } catch {
                     // Refresh failed — proceed without access token
                 }

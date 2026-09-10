@@ -6,7 +6,7 @@ export async function PATCH(req: NextRequest) {
   try {
     const payload = await req.json();
 
-    const token = req.cookies.get("token")?.value;
+    const token = req.cookies.get("Access_token")?.value || req.cookies.get("token")?.value;
     const headers: Record<string, string> = {};
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;

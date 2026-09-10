@@ -11,6 +11,7 @@ import { isSeller as checkIsSeller } from "@/lib/auth/roles";
 interface AuthContextType {
   user: User | null;
   token: string | null;
+  Access_token: string | null;
   loading: boolean;
   isAuthenticated: boolean;
   role: string | null;
@@ -29,7 +30,7 @@ const readAccessTokenFromCookies = (): string | null => {
   const match = document.cookie
     .split(";")
     .map((cookie) => cookie.trim())
-    .find((cookie) => cookie.startsWith("Access_token="));
+    .find((cookie) => cookie.startsWith("Access_token=") || cookie.startsWith("token="));
 
   if (!match) return null;
 
@@ -64,7 +65,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const cookieToken = readAccessTokenFromCookies();
         const nextToken = cookieToken ?? token ?? null;
         setToken(nextToken);
-        setUser({ ...meRes.data, token: nextToken });
+        setUser({ ...meRes.data, token: nextToken, Access_token: nextToken });
         syncUserBuyerStores(meRes.data.role);
         return true;
       }
@@ -77,7 +78,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const cookieToken = readAccessTokenFromCookies();
           const nextToken = cookieToken ?? token ?? null;
           setToken(nextToken);
-          setUser({ ...meRes2.data, token: nextToken });
+          setUser({ ...meRes2.data, token: nextToken, Access_token: nextToken });
           syncUserBuyerStores(meRes2.data.role);
           return true;
         }
@@ -105,7 +106,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const res = await authServices.me();
     if (res.success && res.data) {
-      setUser({ ...res.data, token: cookieToken ?? token ?? null });
+      const nextToken = cookieToken ?? token ?? null;
+      setUser({ ...res.data, token: nextToken, Access_token: nextToken });
       syncUserBuyerStores(res.data.role);
     } else {
       await refreshSession();
@@ -138,10 +140,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (payload: LoginPayload) => {
     const res = await authServices.login(payload);
     if (res.success && res.data) {
-      const loginData = res.data as User & { token?: string };
-      const nextToken = loginData.token ?? readAccessTokenFromCookies();
+      const loginData = res.data as User & { token?: string; Access_token?: string };
+      const nextToken = loginData.Access_token ?? loginData.token ?? readAccessTokenFromCookies();
       setToken(nextToken ?? null);
-      setUser({ ...loginData, token: nextToken ?? null });
+      setUser({ ...loginData, token: nextToken ?? null, Access_token: nextToken ?? null });
       syncUserBuyerStores(loginData.role);
     }
     return res;
@@ -150,10 +152,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const register = async (payload: RegisterPayload) => {
     const res = await authServices.register(payload);
     if (res.success && res.data) {
-      const registerData = res.data as User & { token?: string };
-      const nextToken = registerData.token ?? readAccessTokenFromCookies();
+      const registerData = res.data as User & { token?: string; Access_token?: string };
+      const nextToken = registerData.Access_token ?? registerData.token ?? readAccessTokenFromCookies();
       setToken(nextToken ?? null);
-      setUser({ ...registerData, token: nextToken ?? null });
+      setUser({ ...registerData, token: nextToken ?? null, Access_token: nextToken ?? null });
       syncUserBuyerStores(registerData.role);
     }
     return res;
@@ -180,7 +182,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, isAuthenticated, role, isSeller, login, register, logout, refreshSession, verifyEmail, continueWithGoogle }}>
+    <AuthContext.Provider value={{ user, token, Access_token: token, loading, isAuthenticated, role, isSeller, login, register, logout, refreshSession, verifyEmail, continueWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );

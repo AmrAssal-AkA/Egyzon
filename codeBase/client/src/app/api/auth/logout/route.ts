@@ -5,8 +5,8 @@ import { cookies } from "next/headers";
 export async function POST() {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-    const refreshToken = cookieStore.get("refreshToken")?.value;
+    const token = cookieStore.get("Access_token")?.value || cookieStore.get("token")?.value;
+    const refreshToken = cookieStore.get("refresh_token")?.value || cookieStore.get("refreshToken")?.value;
 
     await serverClient.post("/api/auth/logout", {}, {
       headers: {
@@ -16,6 +16,8 @@ export async function POST() {
     });
 
     const res = NextResponse.json({ success: true, message: "Logged out successfully" });
+    res.cookies.delete("Access_token");
+    res.cookies.delete("refresh_token");
     res.cookies.delete("token");
     res.cookies.delete("refreshToken");
     return res;
@@ -26,6 +28,8 @@ export async function POST() {
       { success: true, message: "Logged out" },
       { status: 200 },
     );
+    res.cookies.delete("Access_token");
+    res.cookies.delete("refresh_token");
     res.cookies.delete("token");
     res.cookies.delete("refreshToken");
     return res;

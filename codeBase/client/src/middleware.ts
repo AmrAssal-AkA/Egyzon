@@ -13,7 +13,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const accessToken = request.cookies.get("token")?.value;
+  const accessToken = request.cookies.get("Access_token")?.value || request.cookies.get("token")?.value;
 
   if (!accessToken) {
     const loginUrl = new URL("/login", request.url);

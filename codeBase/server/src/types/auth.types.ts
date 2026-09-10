@@ -33,4 +33,5 @@ export interface LoginInput {
 export interface RefreshTokenInput {
     refreshToken: string;
     userId: string;
+    createdAt?: Date;
 }

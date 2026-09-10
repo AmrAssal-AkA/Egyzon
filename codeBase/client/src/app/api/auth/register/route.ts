@@ -12,7 +12,8 @@ export async function POST(req: NextRequest) {
         headers: { "Content-Type": "application/json" },
       },
     );
-    const { token, refreshToken } = data.data;
+    const token = data.data?.Access_token || data.data?.token;
+    const refreshToken = data.data?.refresh_token || data.data?.refreshToken;
     const meRes = await serverClient.get("/api/auth/me", {
       headers: { Authorization: `Bearer ${token}` },
     });

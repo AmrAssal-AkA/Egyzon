@@ -7,7 +7,8 @@ export async function POST(req: NextRequest) {
     const {email, password} = await req.json();
 
     const {data} = await serverClient.post("/api/auth/login", { email, password }, {withCredentials: true});
-    const {token, refreshToken} = data.data;
+    const token = data.data?.Access_token || data.data?.token;
+    const refreshToken = data.data?.refresh_token || data.data?.refreshToken;
 
     const meRes = await serverClient.get("/api/auth/me", {
       headers: { Authorization: `Bearer ${token}` },

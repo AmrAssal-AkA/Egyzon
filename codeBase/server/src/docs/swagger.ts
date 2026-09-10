@@ -8,6 +8,10 @@ export const swaggerSpec = {
   },
   servers: [
     {
+      url: "https://egyzon-production.up.railway.app",
+      description: "Production deployed server",
+    },
+    {
       url: "http://localhost:8080",
       description: "Local development server",
     },
@@ -37,6 +41,10 @@ export const swaggerSpec = {
     {
       name: "Wallet",
       description: "Seller wallet balance and fund withdrawals",
+    },
+    {
+      name: "Newsletter",
+      description: "Newsletter subscription and updates",
     },
   ],
   components: {
@@ -1421,6 +1429,18 @@ export const swaggerSpec = {
             type: "integer",
             example: 5,
             description: "Total number of pending seller withdrawal requests",
+          },
+        },
+      },
+      SubscribeNewsletterRequest: {
+        type: "object",
+        required: ["email"],
+        properties: {
+          email: {
+            type: "string",
+            format: "email",
+            example: "user@example.com",
+            description: "Email address to subscribe to the newsletter",
           },
         },
       },
@@ -6134,6 +6154,80 @@ export const swaggerSpec = {
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/newsletter/subscribe": {
+      post: {
+        tags: ["Newsletter"],
+        summary: "Subscribe to the newsletter",
+        description:
+          "Allows users or visitors to subscribe their email address to the Egyzon newsletter.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/SubscribeNewsletterRequest",
+              },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description: "Successfully subscribed to the newsletter",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "#/components/schemas/ApiSuccessResponse",
+                },
+                example: {
+                  success: true,
+                  message: "Successfully subscribed to the newsletter.",
+                  data: null,
+                },
+              },
+            },
+          },
+          400: {
+            description:
+              "Bad Request - Validation error or email already subscribed",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                examples: {
+                  alreadySubscribed: {
+                    summary: "Already subscribed",
+                    value: {
+                      success: false,
+                      message:
+                        "Email is already subscribed to the newsletter.",
+                    },
+                  },
+                  validationError: {
+                    summary: "Validation error",
+                    value: {
+                      success: false,
+                      message: "Invalid email address.",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+                example: {
+                  success: false,
+                  message:
+                    "An error occurred while subscribing to the newsletter.",
+                },
               },
             },
           },

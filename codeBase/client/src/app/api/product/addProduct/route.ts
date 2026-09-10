@@ -7,7 +7,10 @@ import { serverClient } from "@/lib/serverClient";
 export async function POST(req: NextRequest) {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
+    const token =
+      cookieStore.get("Access_token")?.value ||
+      cookieStore.get("token")?.value ||
+      req.headers.get("authorization")?.replace("Bearer ", "");
 
     if (!token) {
       return NextResponse.json(

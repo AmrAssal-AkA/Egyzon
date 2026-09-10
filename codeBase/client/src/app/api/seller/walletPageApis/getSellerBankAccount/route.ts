@@ -8,6 +8,7 @@ export async function GET(request: Request | NextRequest) {
   try {
     const cookieStore = await cookies();
     const token =
+      cookieStore.get("Access_token")?.value ||
       cookieStore.get("token")?.value ||
       request.headers.get("authorization")?.replace("Bearer ", "");
 

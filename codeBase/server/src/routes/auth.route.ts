@@ -26,6 +26,7 @@ import type { jwtPayload } from "../types/auth.types";
 import { passportAuthMW } from "../middleware/passportAuthMW";
 import { RequestForgetPassword, ForgetPassword } from "../controller/authentication/forgetPassword";
 import {authLimiter} from '../middleware/rateLimiter'
+import RefreshTokenModel from "../models/refreshToken";
 
 const router = express.Router();
 
@@ -65,14 +66,14 @@ router.patch(
 router.post("/refresh", RefreshToken);
 
 // Logout route
-router.post("/logout", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/logout",async (req: Request, res: Response) => {
   const refreshToken = req.cookies["refresh_token"];
 
   if (!refreshToken) {
     res.clearCookie("refresh_token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
     });
     return sendSuccessResponse(res, 200, "Logged out successfully");
   }
@@ -81,7 +82,7 @@ router.post("/logout", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const decoded = verifyRefreshToken(refreshToken);
       userId = decoded.userId;
-    } catch (err) {
+    } catch {
       const decodedExpire = jwt.decode(refreshToken) as {
         userId: string;
         exp: number;
@@ -91,15 +92,12 @@ router.post("/logout", isAuthenticated, async (req: Request, res: Response) => {
       }
     }
     if (userId) {
-      await User.updateOne(
-        { _id: userId, refreshToken },
-        { $set: { refreshToken: null } },
-      );
+        await RefreshTokenModel.deleteOne({ userId: userId, refreshToken: refreshToken });
     }
     res.clearCookie("refresh_token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
     });
     return sendSuccessResponse(res, 200, "Logged out successfully");
   } catch (err) {

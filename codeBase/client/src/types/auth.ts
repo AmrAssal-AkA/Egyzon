@@ -10,8 +10,15 @@ export interface LoginPayload {
     password: string;
 }
 
+export interface AuthTokens {
+    Access_token: string;
+    refresh_token?: string;
+}
+
 export interface User {
     token?: string | null;
+    Access_token?: string | null;
+    refresh_token?: string | null;
     userId: string;
     email: string;
     FirstName: string;

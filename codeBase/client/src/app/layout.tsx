@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
 
-
-
-import {Toaster} from "@/components/ui/sonner";
-
 import "./globals.css";
 import { Geist } from "next/font/google";
+import {Toaster} from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/provider/theme-provider";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -20,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Egyzon",
     description: "Egyzon is a platform that provides a comprehensive solution for managing and optimizing your business operations. Our platform offers a range of features designed to streamline processes, improve efficiency, and enhance decision-making. With Egyzon, you can easily track performance metrics, manage resources, and gain valuable insights into your business operations. Whether you're a small business owner or a large enterprise, Egyzon is the perfect tool to help you achieve your goals and drive success.",
-    url: "https://www.egyzon.com",
+    url: "https://egyzon.vercel.app/",
     siteName: "Egyzon",
     images: [
       {
@@ -52,7 +49,7 @@ export default function RootLayout({children} : Readonly<{children: React.ReactN
           >
             <AuthProvider>
               {children}
-              <Toaster position="bottom-right" />
+              <Toaster position="bottom-left" />
               <NotificationListener />
               <ToastContainer />
             </AuthProvider>

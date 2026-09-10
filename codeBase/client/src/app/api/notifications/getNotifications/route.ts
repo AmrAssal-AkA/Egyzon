@@ -10,6 +10,7 @@ export async function GET(req: NextRequest) {
   try {
     const cookieStore = await cookies();
     const token =
+      cookieStore.get("Access_token")?.value ||
       cookieStore.get("token")?.value ||
       cookieStore.get("jwt")?.value ||
       req.headers.get("authorization")?.replace("Bearer ", "");
@@ -32,7 +33,7 @@ export async function GET(req: NextRequest) {
     if (rawCookie) {
       headers.Cookie = rawCookie;
     } else {
-      headers.Cookie = `token=${token}`;
+      headers.Cookie = `Access_token=${token}`;
     }
 
     const response = await serverClient.get("/api/notifications", {

@@ -27,6 +27,7 @@ import { generalLimiter } from "./src/middleware/rateLimiter";
 import morganMiddleware from "./src/middleware/requestLogger";
 import walletRoute from "./src/routes/wallet.route";
 import logger from "./src/utils/logger";
+import newletterRoute from "./src/routes/newsletter.routes";
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -68,6 +69,7 @@ app.use("/api/order", generalLimiter, orderRoute);
 app.use("/api/notifications", NotificationRoute);
 app.use("/api/payment", PaymentRoute);
 app.use("/api/wallet", walletRoute);
+app.use("/api/newsletter", newletterRoute);
 //swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

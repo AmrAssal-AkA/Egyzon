@@ -4,7 +4,7 @@ import {serverClient} from "@/lib/serverClient";
 
 export async function POST(){
   const cookieStore = await cookies();
-  const refreshToken = cookieStore.get("refreshToken")?.value;
+  const refreshToken = cookieStore.get("refresh_token")?.value || cookieStore.get("refreshToken")?.value;
   if (!refreshToken) {
     return NextResponse.json({ success: false, message: "No refresh token found" }, { status: 401 });
   }
@@ -12,7 +12,7 @@ export async function POST(){
     const response = await serverClient.post("/api/auth/refresh", {}, {
       headers: { Cookie: `refresh_token=${refreshToken}` },
     });
-    const { accessToken } = response.data.data;
+    const accessToken = response.data?.data?.Access_token || response.data?.data?.accessToken || response.data?.data?.token;
 
     // Extract the new refresh token from Express's Set-Cookie header
     const setCookieHeader = response.headers["set-cookie"];
@@ -30,20 +30,21 @@ export async function POST(){
 
     const res = NextResponse.json({ success: true, message: "Token refreshed successfully" });
 
-    res.cookies.set("token", accessToken, {
+    res.cookies.set("Access_token", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       path: "/",
       maxAge: 60 * 15,
     });
 
-    // Forward the new refresh token to the browser
-    if (newRefreshToken) {
-      res.cookies.set("refreshToken", newRefreshToken, {
+    // Forward the new refresh token (or retain current) to the browser
+    const finalRefreshToken = newRefreshToken || refreshToken;
+    if (finalRefreshToken) {
+      res.cookies.set("refresh_token", finalRefreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        secure: true,
+        sameSite: "none",
         path: "/",
         maxAge: 60 * 60 * 24 * 7,
       });
