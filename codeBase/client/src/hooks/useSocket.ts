@@ -11,7 +11,7 @@ export function useSocket() {
   const disconnect = useNotificationStore((state) => state.disconnect);
   const initialNotifications = useNotificationStore((state) => state.setInitialNotifications);
   const setLoading = useNotificationStore((state) => state.setLoading);
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   
   const notifications = useNotificationStore((state) => state.notifications);
   const isConnected = useNotificationStore((state) => state.isConnected);
@@ -21,7 +21,7 @@ export function useSocket() {
   
   useEffect(() => {
     let cancelled = false;
-    if (!user) return;
+    if (!user || !token) return;
     async function fetchInitialNotifications() {
       setLoading(true);
       try {

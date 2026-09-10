@@ -11,7 +11,7 @@ import logger from "../utils/logger";
 const paymobBaseUrl = process.env.PAYMOB_BASE_URL;
 const paymobApiKey = process.env.PAYMOB_API_KEY;
 const paymobIntegrationId = process.env.PAYMOB_INTEGRATION_ID;
-const PaymobHmackey = process.env.PAYMOB_HMAC_KEY;
+const PaymobHmackey = process.env.PAYMOB_HMAC_KEY?.trim();
 const IframeId = process.env.PAYMOB_IFRAME_ID;
 
 const HMAC_FIELD_ORDERS = [
@@ -48,6 +48,7 @@ function verifypaymobHMAC(data: any, hmac: string): boolean {
   const computedHmac = crypto.createHmac('sha512', PaymobHmackey!).update(connected).digest('hex');
   if(computedHmac !== hmac) {
     logger.warn(`HMAC verification failed. Computed: ${computedHmac}, Provided: ${hmac}`);
+    logger.warn(`HMAC mismatch — connected string: ${connected}`);
         logger.warn(`HMAC mismatch — computed: ${computedHmac}, received: ${hmac}`);
   }
   return computedHmac === hmac;

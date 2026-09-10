@@ -18,7 +18,8 @@ let ioInstance: Server | null = null;
 export function initSocket(server: HttpServer) {
     const io = new Server(server, {
         cors: {
-            origin: "http://localhost:3000",
+            origin: [process.env.FRONTEND_URL, process.env.ADMIN_FRONTEND_URL]
+                .filter((origin): origin is string => Boolean(origin)),
             methods: ["GET", "POST"],
             credentials: true,
         },
