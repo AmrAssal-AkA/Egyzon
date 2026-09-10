@@ -41,8 +41,15 @@ function getNestedValue(obj: any, path: string): any {
    return path.split('.').reduce((acc, part) => acc && acc[part], obj);
 }
 function verifypaymobHMAC(data: any, hmac: string): boolean {
-  const connected = HMAC_FIELD_ORDERS.map(field => String(getNestedValue(data, field))).join('');
+  const connected = HMAC_FIELD_ORDERS.map(field => {
+    const value = getNestedValue(data, field);
+    return value === undefined || value === null ? '' : String(value);
+  }).join('');
   const computedHmac = crypto.createHmac('sha512', PaymobHmackey!).update(connected).digest('hex');
+  if(computedHmac !== hmac) {
+    logger.warn(`HMAC verification failed. Computed: ${computedHmac}, Provided: ${hmac}`);
+        logger.warn(`HMAC mismatch — computed: ${computedHmac}, received: ${hmac}`);
+  }
   return computedHmac === hmac;
 }
 
