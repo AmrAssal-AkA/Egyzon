@@ -170,7 +170,7 @@ export const AdminService = {
       throw new AppError(500, "Internal Server Error");
     }
   },
-  approveSeller: async (sellerId: string) => {
+  approveSeller: async (sellerId: string): Promise<ISeller> => {
     try {
       const seller = await Seller.findOne({
         _id: sellerId,
@@ -182,7 +182,8 @@ export const AdminService = {
         { applicantStatus: "approved" },
         { returnDocument: "after" },
       );
-      if (!approvedSeller) return;
+      if (!approvedSeller)
+        throw new AppError(409, "Seller could not be approved");
       return approvedSeller;
     } catch (error) {
       if (error instanceof AppError)
@@ -190,13 +191,13 @@ export const AdminService = {
       throw new AppError(500, "Internal Server Error");
     }
   },
-  rejectSeller: async (sellerId: string)=> {
+  rejectSeller: async (sellerId: string): Promise<ISeller> => {
     try {
       const seller = await Seller.findOne({
         _id: sellerId,
         applicantStatus: "pending",
       });
-      if (!seller) return;
+      if (!seller) throw new AppError(404, "Pending seller not found");
       const rejectSeller = await Seller.findOneAndUpdate(
         { _id: sellerId, applicantStatus: "pending" },
         { applicantStatus: "rejected" },
@@ -214,20 +215,20 @@ export const AdminService = {
   requestAdditionalDocuments: async (
     sellerId: string,
     message: string,
-  ) => {
+  ): Promise<ISeller> => {
     logger.info(
       `Admin requesting additional documents for seller: ${sellerId}`,
     );
     const seller = await User.findById(sellerId);
     try {
       const getSellerApplicationById = await Seller.findById(sellerId);
-      if (!getSellerApplicationById) return;
+      if (!getSellerApplicationById) throw new AppError(404, "Seller application not found");
       const requestAdditionalDocuments = await Seller.findOneAndUpdate(
         { _id: sellerId, applicantStatus: "pending" },
         { applicantStatus: "additional_docs_requested", notes: message },
         { returnDocument: "after" },
       );
-      if (!requestAdditionalDocuments) return;
+      if (!requestAdditionalDocuments) throw new AppError(409, "Request for additional documents could not be sent");
       return requestAdditionalDocuments;
     } catch (error) {
       if (error instanceof AppError)

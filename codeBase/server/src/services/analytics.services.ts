@@ -76,7 +76,7 @@ export const Analytical = {
       }
     }
     const series = Array.from(buckets.values());
-    const {totalRevenue} = await SellerServices.getTotalRevenue(sellerId);
+    const { totalRevenue = 0 } = (await SellerServices.getTotalRevenue(sellerId)) ?? {};
     const totalOrders = series.reduce((sum, point) => sum + point.orders, 0);
     const AverageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 

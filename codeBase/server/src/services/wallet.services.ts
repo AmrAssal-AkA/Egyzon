@@ -23,7 +23,9 @@ export const WalletServices = {
       }
 
       const { totalRevenue: withdrawableRevenue } =
-        await SellerServices.getTotalRevenue(sellerId, { minAgeDays: 2 });
+        (await SellerServices.getTotalRevenue(sellerId, { minAgeDays: 2 })) ?? {
+          totalRevenue: 0,
+        };
       const totalWithdrawn = wallet.transactionHistory
         .filter(
           (t) =>

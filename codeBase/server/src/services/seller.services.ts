@@ -15,7 +15,7 @@ import logger from "../utils/logger";
 
 
 export const SellerServices = {
-  ApplyAsPartner: async (sellerData: any, userId: string) => {
+  ApplyAsPartner: async (sellerData: any, userId: string)=> {
     const userModel = Seller.db.model("User");
     const user = await userModel.findById(userId);
 
