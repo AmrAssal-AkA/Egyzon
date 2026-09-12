@@ -9,11 +9,11 @@ export default function SellerFooter() {
         <span>&copy; {new Date().getFullYear()} Egyzon Seller Hub. All rights reserved.</span>
       </div>
       <div className="flex items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-400">
-        <Link href="/Partner#hub" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+        <Link href="/Partner#hub" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors" aria-label="Seller Guide">
           Seller Guide
         </Link>
         <span className="text-slate-300 dark:text-slate-700">•</span>
-        <Link href="/contact" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+        <Link href="/contact" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors" aria-label="Contact Support">
           Vendor Support
         </Link>
       </div>

@@ -15,8 +15,9 @@ export function ActionBar({
         <button
           onClick={onBackHome}
           className="inline-flex items-center justify-center gap-2 text-sm font-semibold px-4 py-2.5 border border-border hover:bg-muted text-foreground rounded-xl transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-[0.99]"
+          aria-label="Back to Home"
         >
-          <Home className="w-4 h-4" />
+          <Home className="w-4 h-4" aria-hidden="true" />
           Back to Home
         </button>
 

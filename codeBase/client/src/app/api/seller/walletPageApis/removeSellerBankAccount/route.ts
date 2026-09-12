@@ -20,7 +20,6 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    // Call backend endpoint: DELETE /api/seller/remove-bank-account
     const { data, status } = await serverClient.delete(
       "/api/seller/remove-bank-account",
       {
@@ -40,10 +39,6 @@ export async function DELETE(req: NextRequest) {
     );
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      console.error(
-        "[removeSellerBankAccount] Backend error status:",
-        error.response.status
-      );
 
       return NextResponse.json(
         {
@@ -58,7 +53,6 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    console.error("[removeSellerBankAccount] Server error occurred:", error);
     return NextResponse.json(
       { success: false, message: "Internal Server Error" },
       { status: 500 }

@@ -40,12 +40,6 @@ export async function GET(req: NextRequest) {
     );
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      console.error(
-        "[getTopProduct] Backend error response:",
-        error.response.status,
-        error.response.data,
-      );
-
       if (error.response.status === 404) {
         return NextResponse.json(
           { success: true, message: "No top selling products found", data: [] },
@@ -65,7 +59,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    console.error("[getTopProduct] API route error:", error);
     return NextResponse.json(
       { success: false, message: "Internal Server Error" },
       { status: 500 },

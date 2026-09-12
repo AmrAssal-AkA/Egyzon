@@ -275,6 +275,7 @@ export const OnboardingContent: React.FC = () => {
           loading={submitLoading}
           disabled={!isFormValid || submitLoading}
           className="w-full"
+          aria-label="Complete Setup"
         >
           {submitLoading ? "Submitting..." : "Complete Setup"}
         </Button>

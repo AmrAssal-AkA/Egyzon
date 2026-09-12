@@ -34,7 +34,6 @@ function RegisterForm() {
         setError(message);
         return;
       }
-      console.log("Registration response:", res);
       toast.success("Registration successful!");
       router.push("/");
     } catch (error: unknown) {
@@ -55,8 +54,9 @@ function RegisterForm() {
           type="button"
           onClick={continueWithGoogle}
           className="flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background cursor-pointer"
-        >
-          <FaGoogle className="text-base" />
+          aria-label="Continue with Google"
+       >
+          <FaGoogle className="text-base" aria-hidden="true" />
           Continue with Google
         </button>
 
@@ -134,8 +134,9 @@ function RegisterForm() {
               type="button"
               onClick={togglePasswordVisibility}
               className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+              aria-label={isPasswordVisible ? "Hide password" : "Show password"}
             >
-              {isPasswordVisible ? <FaEyeSlash /> : <FaEye />}
+              {isPasswordVisible ? <FaEyeSlash aria-hidden="true" /> : <FaEye aria-hidden="true" />}
             </button>
           </div>
         </div>
@@ -144,6 +145,7 @@ function RegisterForm() {
           type="submit"
           disabled={loading}
           className="w-full rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          aria-label={loading ? "Creating account..." : "Register"}
         >
           {loading ? "Creating account…" : "Register"}
         </button>
@@ -155,6 +157,7 @@ function RegisterForm() {
           type="button"
           className="font-semibold text-foreground hover:text-blue-600"
           onClick={() => router.push("/login")}
+          aria-label="Login"
         >
           Login
         </button>

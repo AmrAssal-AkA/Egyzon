@@ -3,22 +3,31 @@ import { apiClient } from "@/lib/apiClient";
 import { Category, CategoryListResponse } from "@/types/category.type";
 import { Product } from "@/types/product.type";
 
+const normalizeCategory = (cat: Category): Category => {
+  if (!cat || typeof cat !== "object") return cat;
+  const name = cat.categoryName || cat.categroyName || cat.name || "";
+  return {
+    ...cat,
+    categoryName: name,
+    categroyName: name,
+  };
+};
+
 export const fetchCategories = async (): Promise<Category[]> => {
   try {
     const response = await apiClient.get<CategoryListResponse | Category[]>("/api/category/getCategories");
     const resData = response.data;
 
+    let list: Category[] = [];
     if (Array.isArray(resData)) {
-      return resData;
-    }
-    if (resData && typeof resData === "object" && "data" in resData && Array.isArray(resData.data)) {
-      return resData.data;
-    }
-    if (Array.isArray((resData as any)?.categories)) {
-      return (resData as any).categories;
+      list = resData;
+    } else if (resData && typeof resData === "object" && "data" in resData && Array.isArray(resData.data)) {
+      list = resData.data;
+    } else if (Array.isArray(resData?.categories)) {
+      list = resData.categories;
     }
 
-    return [];
+    return list.map(normalizeCategory);
   } catch (error) {
     console.error("Failed to fetch categories:", error);
     return [];

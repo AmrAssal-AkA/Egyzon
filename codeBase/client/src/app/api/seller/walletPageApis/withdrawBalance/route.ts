@@ -59,12 +59,6 @@ export async function POST(req: NextRequest) {
     );
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      console.error(
-        "[withdrawBalance] Backend error response:",
-        error.response.status,
-        error.response.data
-      );
-
       return NextResponse.json(
         {
           success: false,
@@ -79,7 +73,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.error("[withdrawBalance] API route error:", error);
     return NextResponse.json(
       { success: false, message: "Internal Server Error" },
       { status: 500 }

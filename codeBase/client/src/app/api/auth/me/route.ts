@@ -14,7 +14,6 @@ export async function GET() {
       const { data } = await serverClient.get("/api/auth/me", { headers: { Authorization: `Bearer ${token}` } });
       return NextResponse.json({ success: true, data: data.data });
    } catch (error) {
-    console.error("Fetch user data error:", error);
       return NextResponse.json({ success: false, message: "Failed to fetch user data" }, { status: 500 });
    }
 }

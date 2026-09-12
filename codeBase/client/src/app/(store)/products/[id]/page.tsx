@@ -97,7 +97,11 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const rawCategory = product.category;
   let categoryDisplayName = "General";
   if (typeof rawCategory === "object" && rawCategory !== null) {
-    categoryDisplayName = rawCategory.categoryName || "General";
+    categoryDisplayName =
+      rawCategory.categoryName ||
+      rawCategory.categroyName ||
+      rawCategory.name ||
+      "General";
   } else if (typeof rawCategory === "string" && rawCategory.trim() !== "") {
     categoryDisplayName = rawCategory;
   }

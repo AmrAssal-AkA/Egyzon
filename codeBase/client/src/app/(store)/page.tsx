@@ -40,12 +40,14 @@ export default async function Home() {
 
   return (
     <main className="w-full min-h-screen bg-background flex flex-col items-center justify-start py-15">
+      <h1 className="sr-only">Egyzon - Egypt&apos;s Multi-Vendor Marketplace for Handcrafted & Modern Goods</h1>
+
       <div className="w-full max-w-10xl">
         <HeroCarousel />
       </div>
       {/* Featured Products Section */}
-      <div className="w-full max-w-10xl px-4 md:px-20 mt-10">
-        <h2 className="text-3xl font-bold  mt-10 mb-5">Featured Products</h2>
+      <section className="w-full max-w-10xl px-4 md:px-20 mt-10" aria-labelledby="featured-products-heading">
+        <h2 id="featured-products-heading" className="text-3xl font-bold mt-10 mb-5">Featured Products</h2>
         <p className="text-muted-foreground mb-10">
           Discover our latest and greatest products, carefully selected just for
           you.
@@ -59,10 +61,10 @@ export default async function Home() {
             <ProductGrid products={products} />
           </div>
         )}
-      </div>
+      </section>
       {/* Categories Section */}
-      <div className="w-full max-w-10xl px-4 md:px-20 mt-10 ">
-        <h2 className="text-3xl font-bold  mt-10 mb-5">Our Top Categories</h2>
+      <section className="w-full max-w-10xl px-4 md:px-20 mt-10" aria-labelledby="top-categories-heading">
+        <h2 id="top-categories-heading" className="text-3xl font-bold mt-10 mb-5">Our Top Categories</h2>
         <p className="text-muted-foreground mb-10">
           Explore our diverse range of categories and find the perfect products
           to suit your needs.
@@ -72,10 +74,10 @@ export default async function Home() {
         ) : (
           <CategoryGrid categories={limitedCategories} />
         )}
-      </div>
+      </section>
       {/* Trending Products Section */}
-      <div className="w-full max-w-10xl px-4 md:px-20 mt-10">
-        <h2 className="text-3xl font-bold  mt-10 mb-5">Trending Products</h2>
+      <section className="w-full max-w-10xl px-4 md:px-20 mt-10" aria-labelledby="trending-products-heading">
+        <h2 id="trending-products-heading" className="text-3xl font-bold mt-10 mb-5">Trending Products</h2>
         <p className="text-muted-foreground mb-10">
           Check out the latest products that are trending in the market.
         </p>
@@ -88,12 +90,15 @@ export default async function Home() {
             <ProductGrid products={products} />
           </div>
         )}
-      </div>
+      </section>
       {/* Newsletter Section */}
-      <section className="w-full max-w-10xl px-4 md:px-20 mt-10 bg-blue-300 text-blue-950 py-10 rounded-lg flex flex-col items-center justify-center dark:bg-blue-950 dark:text-blue-50">
-        <FaRegEnvelope className="text-4xl text-blue-600 dark:text-blue-300" />
-        <h2 className="text-3xl font-bold  mt-4 mb-2">Join the Inner Circle</h2>
-        <p className=" mb-6 text-center">
+      <section
+        aria-labelledby="newsletter-heading"
+        className="w-full max-w-10xl px-4 md:px-20 mt-10 bg-linear-to-r from-blue-700 via-indigo-700 to-blue-800 text-white py-12 rounded-2xl flex flex-col items-center justify-center shadow-md dark:from-blue-900 dark:via-indigo-950 dark:to-slate-900"
+      >
+        <FaRegEnvelope className="text-4xl text-blue-200 mb-2" aria-hidden="true" />
+        <h2 id="newsletter-heading" className="text-2xl sm:text-3xl font-bold mt-2 mb-2 text-white">Join the Inner Circle</h2>
+        <p className="mb-6 text-center max-w-xl text-blue-100 text-sm sm:text-base leading-relaxed">
           Sign up for our newsletter and be the first to know about exclusive
           offers, new arrivals, and insider tips. Stay connected and never miss
           out on the latest trends!

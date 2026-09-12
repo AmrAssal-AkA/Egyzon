@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { HeroCarouselProps } from "./types";
+import { HeroCarouselProps } from "../../../types/Hero.types";
 import { DEFAULT_SLIDES } from "./carousel-data";
 import { HeroSlide } from "./HeroSlide";
 import { CarouselControls } from "./CarouselControls";
@@ -39,7 +39,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
         nextSlide();
       }
     },
-    [nextSlide, prevSlide]
+    [nextSlide, prevSlide],
   );
 
   // Auto-play timer effect
@@ -82,7 +82,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
       aria-label="Promotional Campaigns"
     >
       <div
-        className="relative w-full h-[620px] sm:h-[550px] md:h-[480px] lg:h-[540px] rounded-[24px] md:rounded-[32px] overflow-hidden shadow-md group outline-none"
+        className="relative w-full h-155 sm:h-137.5 md:h-120 lg:h-135 rounded-[24px] md:rounded-[32px] overflow-hidden shadow-md group outline-none"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onFocus={() => setIsPaused(true)}
@@ -104,6 +104,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
               aria-roledescription="slide"
               aria-label={`Slide ${index + 1} of ${totalSlides}`}
               aria-hidden={index !== currentIndex}
+              inert={index !== currentIndex}
               className="absolute inset-0 w-full h-full"
             >
               <HeroSlide slide={slide} isActive={index === currentIndex} />

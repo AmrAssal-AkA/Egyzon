@@ -135,8 +135,162 @@ export default function OrdersTable({
 
   return (
     <div className="w-full bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden flex flex-col">
-      {/* Table Container */}
-      <div className="overflow-x-auto">
+      {/* Mobile Card List View (Visible on small screens, hidden on md and up) */}
+      <div className="md:hidden divide-y divide-slate-100 dark:divide-slate-800">
+        {isLoading ? (
+          // Mobile Skeletons
+          Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="p-4 space-y-3 animate-pulse">
+              <div className="flex items-center justify-between">
+                <div className="h-4 w-24 bg-slate-200 dark:bg-slate-800 rounded" />
+                <div className="h-5 w-20 bg-slate-200 dark:bg-slate-800 rounded-full" />
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800" />
+                <div className="space-y-1.5 flex-1">
+                  <div className="h-3.5 w-32 bg-slate-200 dark:bg-slate-800 rounded" />
+                  <div className="h-3 w-20 bg-slate-200 dark:bg-slate-800 rounded" />
+                </div>
+              </div>
+              <div className="flex items-center justify-between pt-1">
+                <div className="h-8 w-12 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                <div className="h-4 w-24 bg-slate-200 dark:bg-slate-800 rounded" />
+              </div>
+            </div>
+          ))
+        ) : paginatedOrders.length === 0 ? (
+          <div className="py-12 px-4 text-center">
+            <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 mx-auto mb-3">
+              <ShoppingBag className="w-6 h-6 stroke-1 text-slate-400" />
+            </div>
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+              No orders found
+            </p>
+            <p className="text-xs text-slate-400 max-w-xs mx-auto mt-1">
+              There are no orders matching your current search or tab filter.
+            </p>
+          </div>
+        ) : (
+          paginatedOrders.map((order, idx) => {
+            const orderId =
+              order.orderNumber ||
+              (order._id
+                ? `#ORD-${String(order._id).slice(-6).toUpperCase()}`
+                : `#ORD-${String(order.id || idx + 1)}`);
+
+            const customer = getCustomerInfo(order);
+            const orderItems = Array.isArray(order.orderItems)
+              ? order.orderItems
+              : [];
+
+            // Thumbnail handling
+            const firstItem = orderItems[0];
+            const firstProd =
+              typeof firstItem?.product === "object" && firstItem?.product !== null
+                ? firstItem.product
+                : null;
+            const imageSrc = firstProd
+              ? Array.isArray(firstProd.imageUrl)
+                ? firstProd.imageUrl[0]
+                : firstProd.imageUrl
+              : "";
+
+            const remainingCount = orderItems.length - 1;
+            const amount = Number(order.totalAmount || order.subTotal || 0);
+            const status = order.orderStatus || order.status || "Pending";
+
+            return (
+              <div
+                key={String(order._id || order.id || idx)}
+                onClick={() => onSelectOrder(order)}
+                className="p-4 space-y-3 hover:bg-slate-50/70 dark:hover:bg-slate-800/40 active:bg-slate-100/70 dark:active:bg-slate-800/70 transition-colors cursor-pointer"
+              >
+                {/* Top: ID + Status */}
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-xs font-semibold text-blue-600 dark:text-blue-400">
+                    {orderId}
+                  </span>
+                  {getStatusBadge(status)}
+                </div>
+
+                {/* Customer Info & Date */}
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div
+                      className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${customer.colorClass}`}
+                    >
+                      {customer.initials}
+                    </div>
+                    <span className="font-medium text-xs text-slate-900 dark:text-slate-100 truncate">
+                      {customer.name}
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-slate-400 shrink-0">
+                    {formatDate(order.orderDate || order.createdAt)}
+                  </span>
+                </div>
+
+                {/* Items preview + Price + Details Action */}
+                <div className="flex items-center justify-between gap-3 pt-1 border-t border-slate-100/80 dark:border-slate-800/80">
+                  <div className="flex items-center gap-2">
+                    <div className="relative w-10 h-8 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700/60 overflow-hidden flex items-center justify-center shrink-0">
+                      {imageSrc &&
+                      (imageSrc.startsWith("http") ||
+                        imageSrc.startsWith("/") ||
+                        imageSrc.startsWith("blob:")) ? (
+                        <Image
+                          src={imageSrc}
+                          alt="Order item"
+                          width={40}
+                          height={32}
+                          unoptimized
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Package className="w-4 h-4 text-slate-400" />
+                      )}
+
+                      {remainingCount > 0 && (
+                        <div className="absolute inset-0 bg-blue-900/40 dark:bg-blue-950/60 backdrop-blur-[1px] flex items-center justify-center text-[9px] font-bold text-white">
+                          +{remainingCount}
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                      {orderItems.length} {orderItems.length === 1 ? "item" : "items"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2.5">
+                    <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100">
+                      EGP{" "}
+                      {amount.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectOrder(order);
+                      }}
+                      title="View order details"
+                      aria-label="View order details"
+                      className="p-1.5 rounded-md text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                    >
+                      <Eye className="w-4 h-4" aria-hidden="true" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Desktop Table View (Visible on md screens and up) */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left text-xs border-collapse">
           {/* Table Header */}
           <thead>
@@ -328,14 +482,16 @@ export default function OrdersTable({
                     {/* Actions */}
                     <td className="py-4 px-6 whitespace-nowrap text-right">
                       <button
+                        type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           onSelectOrder(order);
                         }}
                         title="View order details"
+                        aria-label="View order details"
                         className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition-all cursor-pointer inline-flex items-center justify-center"
                       >
-                        <Eye className="w-4 h-4" />
+                        <Eye className="w-4 h-4" aria-hidden="true" />
                       </button>
                     </td>
                   </tr>
@@ -347,8 +503,8 @@ export default function OrdersTable({
       </div>
 
       {/* Table Footer / Pagination */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 px-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-        <span className="text-xs text-slate-500 dark:text-slate-400">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 px-4 sm:px-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+        <span className="text-xs text-slate-500 dark:text-slate-400 text-center sm:text-left">
           Showing{" "}
           <span className="font-semibold text-slate-800 dark:text-slate-200">
             {orders.length === 0 ? 0 : startIndex + 1}
@@ -365,41 +521,56 @@ export default function OrdersTable({
         </span>
 
         {/* Pagination Navigation */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 justify-center">
           <button
+            type="button"
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1 || isLoading}
-            className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+            aria-label="Previous page"
+            className="p-2 sm:p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-4 h-4" aria-hidden="true" />
           </button>
 
-          {getPageNumbers().map((page, i) =>
-            typeof page === "number" ? (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(page)}
-                className={`w-7 h-7 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                  currentPage === page
-                    ? "bg-blue-600 text-white shadow-xs"
-                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-                }`}
-              >
-                {page}
-              </button>
-            ) : (
-              <span key={i} className="px-1 text-slate-400 text-xs">
-                ...
-              </span>
-            )
-          )}
+          {/* Desktop full pagination numbers */}
+          <div className="hidden sm:flex items-center gap-1.5">
+            {getPageNumbers().map((page, i) =>
+              typeof page === "number" ? (
+                <button
+                  type="button"
+                  key={i}
+                  onClick={() => setCurrentPage(page)}
+                  aria-label={`Page ${page}`}
+                  aria-current={currentPage === page ? "page" : undefined}
+                  className={`w-7 h-7 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    currentPage === page
+                      ? "bg-blue-600 text-white shadow-xs"
+                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  }`}
+                >
+                  {page}
+                </button>
+              ) : (
+                <span key={i} className="px-1 text-slate-400 text-xs">
+                  ...
+                </span>
+              )
+            )}
+          </div>
+
+          {/* Mobile compact page indicator */}
+          <span className="sm:hidden text-xs font-medium text-slate-600 dark:text-slate-400 px-2">
+            {currentPage} / {totalPages}
+          </span>
 
           <button
+            type="button"
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages || totalPages === 0 || isLoading}
-            className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+            aria-label="Next page"
+            className="p-2 sm:p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
       </div>

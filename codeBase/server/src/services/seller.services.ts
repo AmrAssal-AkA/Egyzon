@@ -19,9 +19,8 @@ export const SellerServices = {
     const userModel = Seller.db.model("User");
     const user = await userModel.findById(userId);
 
-    if (!user) throw new AppError(404, "User not found");
-    if (user.role === "seller")
-      throw new AppError(400, "User is already a seller");
+    if (!user) return;
+    if (user.role === "seller") return;
 
     const SaveSellerData = await userModel.collection.findOneAndUpdate(
       { _id: user._id },
@@ -59,12 +58,8 @@ export const SellerServices = {
   setupStore: async (storeData: any, sellerId: string) => {
     try {
       const seller = await Seller.findById(sellerId);
-      if (!seller) {
-        throw new AppError(404, "Seller not found");
-      }
-      if (seller.applicantStatus !== "approved") {
-        throw new AppError(403, "Seller is not approved to set up a store");
-      }
+      if (!seller) return;
+      if (seller.applicantStatus !== "approved") return;
       const updatedSeller = await Seller.findByIdAndUpdate(
         sellerId,
         {
@@ -79,14 +74,14 @@ export const SellerServices = {
       }
       return updatedSeller;
     } catch (error) {
-      console.log(error);
-      throw new AppError(500, "Internal Server Error");
+      if (error instanceof AppError) throw error;
+      throw new AppError (500, "Invalid server error");
     }
   },
   getTotalProductsBySeller: async (sellerId: string) => {
     try {
       const seller = await Seller.findById(sellerId);
-      if (!seller) throw new AppError(404, "Seller not found");
+      if (!seller) return;
       const totalProductCounts = await Product.countDocuments({
         sellerId: seller.id,
       });
@@ -101,7 +96,7 @@ export const SellerServices = {
   getTotalOrder: async (sellerId: string) => {
     try {
       const seller = await Seller.findById(sellerId);
-      if (!seller) throw new AppError(404, "Seller not found");
+      if (!seller) return;
       const getProducts = await Product.find({ sellerId: seller.id });
       const productIds = getProducts.map((product) => product._id);
       const totalOrders = await Order.countDocuments({
@@ -116,7 +111,7 @@ export const SellerServices = {
   },
   getTotalRevenue: async (sellerId: string, options?: {minAgeDays?: number}) => {
     const seller = await Seller.findById(sellerId);
-    if (!seller) throw new AppError(404, "Seller not found");
+    if (!seller) return;
     const getPlatformFee = await AdminService.getPlatformFee();
     try {
       const getProducts = await Product.find({ sellerId: seller.id });
@@ -156,7 +151,7 @@ export const SellerServices = {
   getTopProductsByRevenue: async (sellerId: string) => {
     try {
       const seller = await Seller.findById(sellerId);
-      if (!seller) throw new AppError(404, "Seller not found");
+      if (!seller) return;
       const getProducts = await Product.find({ sellerId: seller.id });
       const productIds = getProducts.map((product) => product._id.toString());
       const orders = await Order.find({
@@ -203,7 +198,7 @@ export const SellerServices = {
   getAllOrders: async (sellerId: string) => {
     try {
       const seller = await Seller.findById(sellerId);
-      if (!seller) throw new AppError(404, "Seller not found");
+      if (!seller) return;
       const getProducts = await Product.find({ sellerId: seller.id }).lean();
       const productIds = getProducts.map((product) => product._id);
       const orders = await Order.find({
@@ -219,11 +214,7 @@ export const SellerServices = {
   totalInventoryValue: async (sellerId: string) => {
     try {
       const seller = await Seller.findById(sellerId);
-      if (!seller || seller.role !== "seller")
-        throw new AppError(
-          403,
-          "Forbidden, You are not authorized to access this resource",
-        );
+      if (!seller || seller.role !== "seller") return;
       const products = await Product.find({ sellerId: seller.id });
       const totalInventoryValue = products.reduce((total, product) => {
         return total + product.price * (product.stock || 0);
@@ -243,7 +234,7 @@ export const SellerServices = {
   ) => {
     try {
       const seller = await Seller.findById(sellerId);
-      if (!seller) throw new AppError(404, "Seller not found");
+      if (!seller) return;
       const order = await Order.findById(orderId);
       if (!order) throw new AppError(404, "Order not found");
       const getProducts = await Product.find({ sellerId: seller.id });
@@ -277,7 +268,7 @@ export const SellerServices = {
   getAvgOrderValue: async (sellerId: string) => {
     try {
      const seller = await Seller.findById(sellerId);
-     if (!seller) throw new AppError(404, "seller not found");
+     if (!seller) return;
      const getProducts = await Product.find({ sellerId: seller.id });
       const productIds = getProducts.map((product) => product._id.toString());
       const orders = await Order.find({
@@ -314,7 +305,7 @@ export const SellerServices = {
   getSalesByCategory: async (sellerId: string) => {
     try {
       const seller = await Seller.findById(sellerId);
-      if (!seller) throw new AppError(404, "Seller not found");
+      if (!seller) return;
       const getProducts = await Product.find({ sellerId: seller.id }).populate("category", "categoryName");
       const productIds = getProducts.map((product) => product._id.toString());
       const orders = await Order.find({
@@ -346,9 +337,8 @@ export const SellerServices = {
   getStoreFront: async (sellerId: string)  => {
     try {
       const seller = await Seller.findById(sellerId);
-      if(!seller) throw new AppError(404, "Seller not found");
+      if(!seller) return;
       const store = await Seller.find().populate("storeManagement", "storeLogo storeBanner storeDescription storeType storephysicalAddress storeOnlineAddress ").populate("products", "productName price discount stock imageUrl category brand");
-      console.log("store:", store);
       return store;
     }catch(error){
       if (error instanceof AppError) throw new AppError(error.statusCode, error.message)
@@ -392,7 +382,6 @@ export const SellerServices = {
       return seller.bankAccount
     }catch(error){
       if (error instanceof AppError) throw error
-      console.error(error)
       throw new AppError(500, "internal Server Error")
     }
   },

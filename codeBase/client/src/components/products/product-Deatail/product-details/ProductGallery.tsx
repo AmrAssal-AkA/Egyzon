@@ -56,8 +56,11 @@ export default function ProductGallery({ images, title }: ProductGalleryProps) {
                   src={img}
                   alt={`${title} thumbnail ${index + 1}`}
                   fill
-                  sizes="80px"
+                  priority
+                  sizes="{(max-width: 768px) 100vw, 25vw}"
+                  quality={75}
                   className="object-contain p-1"
+
                 />
               </button>
             );

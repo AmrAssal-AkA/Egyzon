@@ -10,8 +10,8 @@ import TopOrders from '@/components/seller/dashboardComp/topOrders'
 
 function SellerDashboard() {
   return (
-    <main className="min-h-screen p-4 md:p-6 lg:p-8 flex flex-col gap-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <main className="w-full min-w-0 flex flex-col gap-5 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <TotalRevenueCard change="+5.2%" description="Increase in revenue compared to last month" />
         <TotalOrdersCard change="+3.1%" description="Increase in orders compared to last month" />
         <TotalProductsCard change="-1.2%" description="Total products listed in store" />
@@ -19,7 +19,7 @@ function SellerDashboard() {
       </div>
 
       <AnalyticsGraph />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <TopProduct />
         <TopOrders />
       </div>

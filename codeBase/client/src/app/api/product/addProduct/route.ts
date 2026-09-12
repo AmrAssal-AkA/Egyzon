@@ -53,8 +53,7 @@ export async function POST(req: NextRequest) {
       data || { success: true, message: "Product created successfully" },
       { status: backendRes.status || 201 }
     );
-  } catch (error: any) {
-    console.error("Add product route error:", error);
+  } catch (error: unknown) {
 
     if (axios.isAxiosError(error) && error.response) {
       return NextResponse.json(
@@ -67,7 +66,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { success: false, message: error?.message || "Internal Server Error" },
+      { success: false, message: error instanceof Error ? error.message : "Internal Server Error" },
       { status: 500 }
     );
   }

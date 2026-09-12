@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowUpRight, Play } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface HeroProps {
@@ -42,7 +42,7 @@ export default function Hero({ onOpenRegister }: HeroProps) {
 
         {/* Right column: image & floating card */}
         <div className="lg:col-span-6 relative w-full flex justify-center lg:justify-end">
-          <div className="relative w-full max-w-[540px] aspect-[4/3] md:aspect-[4/3] lg:aspect-[4/3] rounded-[24px] overflow-hidden border border-border shadow-2xl">
+          <div className="relative w-full max-w-135 aspect-4/3 md:aspect-4/3 lg:aspect-4/3 rounded-[24px] overflow-hidden border border-border shadow-2xl">
             <Image
               src="/images/seller_hero.jpg"
               alt="Egyzon online seller dashboard workspace"
@@ -52,7 +52,7 @@ export default function Hero({ onOpenRegister }: HeroProps) {
               className="object-cover transition-transform duration-700 hover:scale-105"
             />
             {/* Overlay gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
 
             {/* Floating analytics card */}
             <div className="absolute bottom-6 left-6 right-6 sm:right-auto sm:max-w-xs bg-background/90 dark:bg-card/90 backdrop-blur-md p-4 rounded-2xl border border-white/20 dark:border-border/30 shadow-xl flex items-center gap-4 transition-all duration-300 hover:translate-y-[-4px]">

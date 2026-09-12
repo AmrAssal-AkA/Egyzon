@@ -30,7 +30,7 @@ export function useSocket() {
           initialNotifications(response.data);
         }
       } catch (error) {
-        console.error("Error fetching initial notifications:", error);
+         // Handle error if needed
       } finally {
         if (!cancelled) {
           setLoading(false);

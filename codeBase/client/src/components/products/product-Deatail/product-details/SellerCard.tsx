@@ -72,28 +72,7 @@ export default function SellerCard({ seller }: SellerCardProps) {
           <span className="w-1 h-1 rounded-full bg-border shrink-0" />
         </div>
       </div>
-
-      {(() => {
-        const targetSellerId =
-          seller.id || (seller as any)._id || (seller as any).sellerId;
-        if (
-          !targetSellerId ||
-          targetSellerId === "undefined" ||
-          targetSellerId === "null"
-        ) {
-          return null;
-        }
-
-        return (
-          <Link
-            href={`/products/storePage/${targetSellerId}`}
-            className="ml-auto inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors py-2 px-3 border border-blue-600/20 rounded-lg hover:bg-blue-50/5"
-          >
-            <Store className="w-3.5 h-3.5" />
-            <span>Visit Store</span>
-          </Link>
-        );
-      })()}
+        
     </div>
   );
 }

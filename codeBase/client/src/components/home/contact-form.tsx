@@ -197,6 +197,7 @@ export function ContactFormSection() {
                   type="submit"
                   isLoading={loading}
                   className="w-full sm:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2 transition-colors"
+                  aria-label={loading ? "Sending message..." : "Send Message"}
                 >
                   <Send className="w-4 h-4" />
                   <span>Send Message</span>

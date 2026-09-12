@@ -9,6 +9,8 @@ import {
   type AvailabilityFilter,
 } from "@/stores/buyer/filter";
 
+import { useCategories } from "@/hooks/useCategory";
+
 const availabilityLabels: Record<AvailabilityFilter, string> = {
   inStock: "In Stock",
   outOfStock: "Out of Stock",
@@ -27,6 +29,7 @@ interface FilterChip {
 }
 
 function ActiveFilters() {
+  const { categories: allCategories } = useCategories();
   const category = useFilterStore((state) => state.category);
   const brand = useFilterStore((state) => state.brand);
   const minPrice = useFilterStore((state) => state.minPrice);
@@ -40,11 +43,23 @@ function ActiveFilters() {
   const setRating = useFilterStore((state) => state.setRating);
   const resetFilters = useFilterStore((state) => state.resetFilters);
 
+  const categoryIdToName = useMemo(() => {
+    const map = new Map<string, string>();
+    (allCategories || []).forEach((c) => {
+      const name = c.categoryName || c.categroyName || c.name || "";
+      if (name) {
+        if (c._id) map.set(c._id, name);
+        if (c.id) map.set(c.id, name);
+      }
+    });
+    return map;
+  }, [allCategories]);
+
   const chips = useMemo<FilterChip[]>(() => {
     const activeChips: FilterChip[] = [
       ...category.map((value) => ({
         key: `category-${value}`,
-        label: value,
+        label: categoryIdToName.get(value) || value,
         onRemove: () => removeFilter("category", value),
       })),
       ...brand.map((value) => ({
@@ -90,6 +105,7 @@ function ActiveFilters() {
     availability,
     brand,
     category,
+    categoryIdToName,
     color,
     discount,
     maxPrice,

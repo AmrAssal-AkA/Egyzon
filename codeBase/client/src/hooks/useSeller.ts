@@ -108,7 +108,6 @@ export const useSellerOrders = () => {
       revalidateOnFocus: true,
     }
   );
-  console.log("data?.data:", data?.data);
   return {
     orders: Array.isArray(data?.data) ? data.data : [],
     isLoading,

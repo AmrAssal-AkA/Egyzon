@@ -97,9 +97,7 @@ async function handleEdit(req: NextRequest) {
       data || { success: true, message: "Product updated successfully" },
       { status: backendRes.status || 200 }
     );
-  } catch (error: any) {
-    console.error("Edit product route error:", error);
-
+  } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response) {
       return NextResponse.json(
         error.response.data || {
@@ -111,7 +109,7 @@ async function handleEdit(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { success: false, message: error?.message || "Internal Server Error" },
+      { success: false, message: error instanceof Error ? error.message : "Internal Server Error" },
       { status: 500 }
     );
   }

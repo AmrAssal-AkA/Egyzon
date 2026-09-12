@@ -56,12 +56,14 @@ export default function Model({ onClose }: { onClose: () => void }) {
   return (
     <div className="absolute top-full right-0 mt-2 bg-popover text-popover-foreground p-4 rounded-lg shadow-lg w-48 flex flex-col z-50 border border-border">
       <div className="flex flex-col">
-        <h2 className="text-2xl font-bold mb-4">Account</h2>
+        <h3 className="text-xl font-bold mb-4">Account</h3>
         <button
+          type="button"
           onClick={onClose}
-          className="absolute top-2 right-2 text-muted-foreground hover:text-foreground transition-colors duration-300 ease-in-out cursor-pointer"
+          aria-label="Close account menu"
+          className="absolute top-2 right-2 text-muted-foreground hover:text-foreground transition-colors duration-300 ease-in-out cursor-pointer p-1 min-h-8 min-w-8 flex items-center justify-center"
         >
-          <FiX size={20} />
+          <FiX size={20} aria-hidden="true" />
         </button>
         <div className="flex flex-col space-y-2">
           {displayedLinks.map((accountLink) => (
@@ -69,15 +71,18 @@ export default function Model({ onClose }: { onClose: () => void }) {
               key={accountLink.id}
               href={accountLink.href}
               onClick={onClose}
-              className="text-popover-foreground px-4 py-2 hover:text-blue-600 transition-colors duration-300 ease-in-out block text-center border border-border rounded-md"
+              aria-label={accountLink.name}
+              className="text-popover-foreground px-4 py-2 hover:text-blue-600 transition-colors duration-300 ease-in-out block text-center border border-border rounded-md text-sm font-medium"
             >
               {accountLink.name}
             </Link>
           ))}
           {user && (
             <button
+              type="button"
               onClick={handleLogout}
-              className="text-red-600 px-4 py-2 hover:text-blue-600 transition-colors duration-300 ease-in-out block text-center border border-border rounded-md cursor-pointer"
+              aria-label="Log out of your account"
+              className="text-red-600 px-4 py-2 hover:text-blue-600 transition-colors duration-300 ease-in-out block text-center border border-border rounded-md cursor-pointer text-sm font-medium"
             >
               Logout
             </button>

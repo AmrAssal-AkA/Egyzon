@@ -36,7 +36,6 @@ export async function PATCH(req: NextRequest) {
         { status: error.response.status }
       );
     }
-    console.error("Reset password error:", error);
     return NextResponse.json(
       { success: false, message: "Password reset failed" },
       { status: 500 }

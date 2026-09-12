@@ -1,5 +1,8 @@
 import { NextResponse, NextRequest } from "next/server";
+import axios from "axios";
 import { cookies } from "next/headers";
+
+import { serverClient } from "@/lib/serverClient";
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,23 +30,30 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
     
-    const backendRes = await fetch(`${backendUrl}/api/seller/apply`, {
-      method: "POST",
-      headers: { 
-        Authorization: `Bearer ${token}`
+    const backendRes = await serverClient.post("/api/seller/apply", outgoing, {
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
-      body: outgoing,
+      withCredentials: true,
     });
 
-    const data = await backendRes.json();
+    const data = await backendRes.data;
     return NextResponse.json(data, { status: backendRes.status });
   } catch (error) {
-    console.error("Seller apply proxy error:", error);
+    if (axios.isAxiosError(error) && error.response) {
+      return NextResponse.json(
+        error.response.data || {
+          success: false,
+          message: error.response.statusText || "Failed to update product",
+        },
+        { status: error.response.status }
+      );
+    }
+
     return NextResponse.json(
-      { success: false, message: "Internal Server Error" },
-      { status: 500 },
+      { success: false, message: error instanceof Error ? error.message : "Internal Server Error" },
+      { status: 500 }
     );
   }
-}
+  }

@@ -2,6 +2,7 @@ export interface Category {
   _id?: string;
   id?: string;
   categoryName?: string;
+  categroyName?: string;
   name?: string;
   description?: string;
   imageUrl?: string;
@@ -13,5 +14,6 @@ export interface Category {
 export interface CategoryListResponse {
   success: boolean;
   message: string;
-  data: Category[];
+  categories?: Category[];
+
 }

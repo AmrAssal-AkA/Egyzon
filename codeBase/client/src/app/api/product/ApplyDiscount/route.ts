@@ -65,8 +65,7 @@ export async function PATCH(req: NextRequest) {
       data || { success: true, message: "Product updated / discount applied successfully" },
       { status: backendRes.status || 200 }
     );
-  } catch (error: any) {
-    console.error("Apply discount route error:", error);
+  } catch (error: unknown) {
 
     if (axios.isAxiosError(error) && error.response) {
       return NextResponse.json(
@@ -79,7 +78,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { success: false, message: error?.message || "Internal Server Error" },
+      { success: false, message: error instanceof Error ? error.message : "Internal Server Error" },
       { status: 500 }
     );
   }

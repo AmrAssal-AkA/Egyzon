@@ -18,15 +18,9 @@ export const AdminService = {
   AdminLoggingin: async (email: string, password: string) => {
     try {
       const existingAdmin = await Admin.findOne({ email }).select("+password");
-      if (!existingAdmin) {
-        throw new AppError(401, "Invalid email or password");
-      }
-      if (existingAdmin.role !== "admin") {
-        throw new AppError(403, "Access denied. Not an admin user");
-      }
-      if (existingAdmin.isBlocked) {
-        throw new AppError(403, "Access denied. Admin account is blocked");
-      }
+      if (!existingAdmin) return;
+      if (existingAdmin.role !== "admin") return;
+      if (existingAdmin.isBlocked) return;
 
       const isPasswordValid = await comparePasswords(
         password,
@@ -70,10 +64,10 @@ export const AdminService = {
   promoteToAdmin: async (userId: string) => {
     try {
       const user = await User.findById(userId);
-      if (!user) throw new AppError(404, "User not found");
+      if (!user) return;
 
       const existingAdmin = await Admin.findOne({ user: user._id });
-      if (existingAdmin) throw new AppError(400, "User is already an admin");
+      if (existingAdmin) return;
 
       const newAdmin = new Admin({
         user: user._id,
@@ -91,10 +85,10 @@ export const AdminService = {
       throw new AppError(500, "Internal Server Error");
     }
   },
-  blockUser: async (userId: string): Promise<IUser> => {
+  blockUser: async (userId: string)=> {
     try {
       const user = await User.findById(userId);
-      if (!user) throw new AppError(404, "User not found");
+      if (!user) return;
 
       const blockUser = await User.findByIdAndUpdate(
         userId,
@@ -115,14 +109,14 @@ export const AdminService = {
     try {
       const user = await User.findById(userId);
       const isBlocked = user?.isBlocked;
-      if (!user) throw new AppError(404, "User not found");
-      if (!isBlocked) throw new AppError(400, "User is already active");
+      if (!user) return;
+      if (!isBlocked) return;
       const activateUser = await User.findByIdAndUpdate(
         userId,
         { isBlocked: false },
         { new: true },
       );
-      if (!activateUser) throw new AppError(500, "Failed to activate user");
+      if (!activateUser) return;
       logger.info(`Admin: User ${user.email} activated successfully`);
       return activateUser;
     } catch (error) {
@@ -176,24 +170,19 @@ export const AdminService = {
       throw new AppError(500, "Internal Server Error");
     }
   },
-  approveSeller: async (sellerId: string): Promise<ISeller> => {
+  approveSeller: async (sellerId: string) => {
     try {
       const seller = await Seller.findOne({
         _id: sellerId,
         applicantStatus: "pending",
       });
-      if (!seller)
-        throw new AppError(
-          404,
-          "No pending seller application found for the user",
-        );
+      if (!seller) throw new AppError(404, "Pending seller not found");
       const approvedSeller = await Seller.findOneAndUpdate(
         { _id: sellerId, applicantStatus: "pending" },
         { applicantStatus: "approved" },
         { returnDocument: "after" },
       );
-      if (!approvedSeller)
-        throw new AppError(500, "Failed to approve seller application");
+      if (!approvedSeller) return;
       return approvedSeller;
     } catch (error) {
       if (error instanceof AppError)
@@ -201,24 +190,20 @@ export const AdminService = {
       throw new AppError(500, "Internal Server Error");
     }
   },
-  rejectSeller: async (sellerId: string): Promise<ISeller> => {
+  rejectSeller: async (sellerId: string)=> {
     try {
       const seller = await Seller.findOne({
         _id: sellerId,
         applicantStatus: "pending",
       });
-      if (!seller)
-        throw new AppError(
-          404,
-          "No pending seller application found for the seller",
-        );
+      if (!seller) return;
       const rejectSeller = await Seller.findOneAndUpdate(
         { _id: sellerId, applicantStatus: "pending" },
         { applicantStatus: "rejected" },
         { returnDocument: "after" },
       );
       if (!rejectSeller)
-        throw new AppError(500, "Failed to reject seller application");
+        throw new AppError(409, "Seller could not be rejected");
       return rejectSeller;
     } catch (error) {
       if (error instanceof AppError)
@@ -229,28 +214,20 @@ export const AdminService = {
   requestAdditionalDocuments: async (
     sellerId: string,
     message: string,
-  ): Promise<ISeller> => {
+  ) => {
     logger.info(
       `Admin requesting additional documents for seller: ${sellerId}`,
     );
     const seller = await User.findById(sellerId);
     try {
       const getSellerApplicationById = await Seller.findById(sellerId);
-      if (!getSellerApplicationById)
-        throw new AppError(
-          404,
-          "No pending seller application found for the user",
-        );
+      if (!getSellerApplicationById) return;
       const requestAdditionalDocuments = await Seller.findOneAndUpdate(
         { _id: sellerId, applicantStatus: "pending" },
         { applicantStatus: "additional_docs_requested", notes: message },
         { returnDocument: "after" },
       );
-      if (!requestAdditionalDocuments)
-        throw new AppError(
-          500,
-          "Failed to request additional documents for seller application",
-        );
+      if (!requestAdditionalDocuments) return;
       return requestAdditionalDocuments;
     } catch (error) {
       if (error instanceof AppError)
@@ -445,7 +422,8 @@ export const AdminService = {
           },
         },
       ]);
-      const revenue = totalRevenue.length > 0 ? totalRevenue[0].totalRevenue : 0;
+      const revenue =
+        totalRevenue.length > 0 ? totalRevenue[0].totalRevenue : 0;
       return { totalRevenue: revenue };
     } catch (error) {
       if (error instanceof AppError)
@@ -498,22 +476,32 @@ export const AdminService = {
       throw new AppError(500, "Invalid Server Error");
     }
   },
-  verifySellerBankAccount: async (sellerId: string, decision: 'verified' | 'rejected') => {
+  verifySellerBankAccount: async (
+    sellerId: string,
+    decision: "verified" | "rejected",
+  ) => {
     try {
       const seller = await Seller.findById(sellerId).select("bankAccount");
       if (!seller) throw new AppError(404, "Seller not found");
       if (!seller.bankAccount || !seller.bankAccount.last4) {
         throw new AppError(400, "Seller does not have a bank account linked");
       }
-      seller.bankAccount.status = decision === 'verified' ? BankAccountStatus.VERIFIED : BankAccountStatus.REJECTED;
+      seller.bankAccount.status =
+        decision === "verified"
+          ? BankAccountStatus.VERIFIED
+          : BankAccountStatus.REJECTED;
       await seller.save();
       return seller;
-    }catch(error){
+    } catch (error) {
       if (error instanceof AppError) throw error;
-      throw new AppError(500, "Internal server error")
+      throw new AppError(500, "Internal server error");
     }
   },
-  getAllSellerWithdrawlRequests: async (page: number, limit: number, status: 'pending' | 'completed' | 'failed' | 'rejected' | "all") => {
+  getAllSellerWithdrawlRequests: async (
+    page: number,
+    limit: number,
+    status: "pending" | "completed" | "failed" | "rejected" | "all",
+  ) => {
     try {
       const currentPage = Math.max(1, parseInt(String(page), 10) || 1);
       const currentLimit = Math.min(
@@ -543,10 +531,10 @@ export const AdminService = {
       const withdrawalRequests = result[0]?.data || [];
       const total = result[0]?.totalCounts?.[0]?.count || 0;
 
-    await Wallet.populate(withdrawalRequests, {
-      path: "seller",
-      select: "FirstName LastName email storeName bankAccount",
-    });
+      await Wallet.populate(withdrawalRequests, {
+        path: "seller",
+        select: "FirstName LastName email storeName bankAccount",
+      });
 
       return {
         withdrawalRequests,
@@ -557,22 +545,31 @@ export const AdminService = {
           totalPages: Math.ceil(total / currentLimit),
         },
       };
-    }catch(error){
+    } catch (error) {
       if (error instanceof AppError) throw error;
-      throw new AppError(500, "Internal server error")
+      throw new AppError(500, "Internal server error");
     }
   },
-  approveSellerWithdrawalRequest: async (sellerId: string, transactionId: string, decision: 'approved' | 'rejected') => {
+  approveSellerWithdrawalRequest: async (
+    sellerId: string,
+    transactionId: string,
+    decision: "approved" | "rejected",
+  ) => {
     try {
       const wallet = await Wallet.findOne({ seller: sellerId });
       if (!wallet) return;
-      const transaction = wallet.transactionHistory.find(t => t.id === transactionId);
+      const transaction = wallet.transactionHistory.find(
+        (t) => t.id === transactionId,
+      );
       if (!transaction) throw new AppError(404, "Transaction not found");
-      transaction.status = decision === 'approved' ? TransactionStatus.completed : TransactionStatus.failed;
+      transaction.status =
+        decision === "approved"
+          ? TransactionStatus.completed
+          : TransactionStatus.failed;
 
       await wallet.save();
       return wallet;
-    }catch(error){
+    } catch (error) {
       if (error instanceof AppError) throw error;
       throw new AppError(500, "Invalid Server Error");
     }
@@ -589,27 +586,31 @@ export const AdminService = {
       ]);
       const sales = totalSales.length > 0 ? totalSales[0].totalSales : 0;
       return { totalSales: sales };
-    }catch(error){
+    } catch (error) {
       if (error instanceof AppError) throw error;
       throw new AppError(500, "Invalid Server Error");
     }
   },
   getWithdrawalCompletedCount: async () => {
     try {
-      const completedCount = await Wallet.find({ "transactionHistory.status": TransactionStatus.completed }).countDocuments();
+      const completedCount = await Wallet.find({
+        "transactionHistory.status": TransactionStatus.completed,
+      }).countDocuments();
       return { completedCount };
-    }catch (error){
-        if (error instanceof AppError) throw error;
-        throw new AppError(500, "Invalid Server Error");
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      throw new AppError(500, "Invalid Server Error");
     }
   },
   getPendingWithdrawalCount: async () => {
     try {
-      const pendingCount = await Wallet.find({ "transactionHistory.status": TransactionStatus.pending }).countDocuments();
+      const pendingCount = await Wallet.find({
+        "transactionHistory.status": TransactionStatus.pending,
+      }).countDocuments();
       return { pendingCount };
-    }catch (error){
+    } catch (error) {
       if (error instanceof AppError) throw error;
       throw new AppError(500, "Invalid Server Error");
     }
-  }
+  },
 };

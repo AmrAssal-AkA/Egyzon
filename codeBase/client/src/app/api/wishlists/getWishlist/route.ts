@@ -29,12 +29,20 @@ export async function GET(req: NextRequest) {
     );
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      console.error(
-        "[getWishlist] Backend error response:",
-        JSON.stringify(error.response.data, null, 2)
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            error.response.data?.message ||
+            error.response.data?.error ||
+            "Failed to get wishlist",
+          error: error.response.data?.error,
+          details: error.response.data,
+        },
+        { status: error.response.status }
       );
     }
-    console.error("[getWishlist] API route error:", error);
+
     if (axios.isAxiosError(error) && error.response) {
       if (error.response.status === 404 || error.response.status >= 500) {
         return NextResponse.json(

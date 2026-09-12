@@ -34,11 +34,6 @@ export async function GET(req: NextRequest) {
     );
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      console.error(
-        "[getTotalProduct] Backend error response:",
-        error.response.status,
-        error.response.data
-      );
 
       return NextResponse.json(
         {
@@ -50,7 +45,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    console.error("[getTotalProduct] API route error:", error);
     return NextResponse.json(
       { success: false, message: "Internal Server Error" },
       { status: 500 }

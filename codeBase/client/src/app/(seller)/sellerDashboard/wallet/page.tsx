@@ -15,16 +15,16 @@ export const metadata = {
 
 function WalletPage() {
   return (
-    <main className="min-h-screen flex flex-col gap-6 p-4">
-      <div className="flex flex-col gap-2 px-4">
-        <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-200 font-serif">
+    <main className="w-full min-w-0 flex flex-col gap-5 sm:gap-6">
+      <div className="flex flex-col gap-1 sm:gap-2">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-gray-200 font-serif tracking-tight">
           Wallet
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
           Manage your wallet and view transaction history
         </p>
       </div>
-      <div className="flex flex-col gap-6 px-4">
+      <div className="flex flex-col gap-5 sm:gap-6">
         <BalanceWallet />
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
           <div className="xl:col-span-7 2xl:col-span-8 min-w-0">

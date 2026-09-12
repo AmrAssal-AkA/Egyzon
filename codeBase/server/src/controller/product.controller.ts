@@ -85,7 +85,6 @@ export const ProductController = {
     });
     sendSuccessResponse(res, 201, "Product created successfully", newProduct);
   } catch (error: any) {
-    console.log(error);
     sendErrorResponse(
       res,
       error.statusCode || 500,
@@ -114,7 +113,6 @@ applyDiscount: async (req: Request, res: Response) => {
       updatedProduct,
     );
   } catch (error) {
-    console.log(error);
     sendErrorResponse(res, 500, "Internal Server Error");
   }
 },
@@ -202,7 +200,6 @@ getProductById: async (req: Request, res: Response) => {
       products,
     );
   } catch (error) {
-    console.log(error);
     sendErrorResponse(res, 500, "Internal Server Error");
   }
 },
@@ -224,7 +221,6 @@ deleteProduct: async (req: Request, res: Response) => {
       deletedProduct,
     );
   } catch (error) {
-    console.log(error);
     sendErrorResponse(res, 500, "Internal Server Error");
   }
 },

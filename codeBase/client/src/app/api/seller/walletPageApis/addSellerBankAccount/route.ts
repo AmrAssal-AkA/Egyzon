@@ -45,8 +45,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Call backend endpoint: POST /api/seller/add-bank-account
-    // Note: NEVER log bankCardNumber to logs or console
     const { data, status } = await serverClient.post(
       "/api/seller/add-bank-account",
       {
@@ -72,10 +70,6 @@ export async function POST(req: NextRequest) {
     );
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      console.error(
-        "[addSellerBankAccount] Backend error status:",
-        error.response.status
-      );
 
       return NextResponse.json(
         {
@@ -90,7 +84,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.error("[addSellerBankAccount] Server error occurred");
     return NextResponse.json(
       { success: false, message: "Internal Server Error" },
       { status: 500 }

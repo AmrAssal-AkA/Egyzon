@@ -201,7 +201,7 @@ export default function BalanceWallet({
   };
 
   return (
-    <div className="w-full flex flex-col lg:flex-row gap-6 p-4">
+    <div className="w-full flex flex-col lg:flex-row gap-4 sm:gap-6">
       
       {/* --- Main Available Balance Card --- */}
       <div className="flex-1 relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-900 via-indigo-950 to-slate-900 p-6 md:p-8 shadow-xl border border-blue-950 dark:border-blue-900/50">

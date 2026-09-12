@@ -30,7 +30,6 @@ export const authServices = {
             const { data } = await ApiCall.post<ApiResponse<User>>("/auth/register", payload);
             return data;
         } catch (error: unknown) {
-            console.error("Registration error:", error);
             return { success: false, message: getErrorMessage(error, "Registration failed") };
         }
     },
@@ -71,7 +70,6 @@ export const authServices = {
     completeOnboarding: async (payload: OnboardingPayload): Promise<ApiResponse<unknown>> => {
         try {
             const { data } = await ApiCall.patch<ApiResponse<unknown>>("/auth/onBoarding", payload);
-            console.log("Onboarding Data: ", data)
             return data;
         } catch (error: unknown) {
             return { success: false, message: getErrorMessage(error, "Onboarding failed") };

@@ -5,7 +5,7 @@ import Hero from "./Hero";
 import Stats from "./Stats";
 import WhyChoose from "./WhyChoose";
 import Journey from "./Journey";
-import Testimonials from "./Testimonials";
+
 import CTA from "./CTA";
 import { RegisterAsSellerModal } from "./RegisterAsSeller";
 
@@ -28,9 +28,6 @@ export default function PartnerPage() {
       </div>
       <div className="w-full">
         <Journey />
-      </div>
-      <div className="w-full">
-        <Testimonials />
       </div>
       <div className="w-full">
         <CTA onOpenRegister={handleOpenRegister} />

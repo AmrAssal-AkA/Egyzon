@@ -48,12 +48,6 @@ export async function GET(req: NextRequest) {
       );
     } catch (backendError) {
       if (axios.isAxiosError(backendError) && backendError.response) {
-        console.error(
-          "[getAllOrders] Backend error response:",
-          backendError.response.status,
-          backendError.response.data
-        );
-
         if (backendError.response.status === 404 || backendError.response.status === 500) {
           return NextResponse.json(
             {
@@ -78,9 +72,8 @@ export async function GET(req: NextRequest) {
       throw backendError;
     }
   } catch (error) {
-    console.error("[getAllOrders] API route error:", error);
     return NextResponse.json(
-      { success: true, message: "No orders found", data: [] },
+      { success: true, message: error instanceof Error ? error.message : "Internal Server Error", data: [] },
       { status: 200 }
     );
   }

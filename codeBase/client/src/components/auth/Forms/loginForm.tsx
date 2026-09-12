@@ -56,8 +56,9 @@ function LoginForm() {
           type="button"
           onClick={continueWithGoogle}
           className="flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background cursor-pointer"
+          aria-label="Continue with Google"
         >
-          <FaGoogle className="text-base" />
+          <FaGoogle className="text-base" aria-hidden="true" />
           Continue with Google
         </button>
       </div>
@@ -111,6 +112,7 @@ function LoginForm() {
               type="button"
               onClick={togglePasswordVisibility}
               className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+              aria-label={isPasswordVisible ? "Hide password" : "Show password"}
             >
               {isPasswordVisible ? <FaEyeSlash /> : <FaEye />}
             </button>
@@ -121,6 +123,7 @@ function LoginForm() {
             type="button"
             className="text-sm font-medium text-foreground hover:text-blue-600"
             onClick={() => router.push("/forgetPassword")}
+            aria-label="Forgot Password"
           >
             Forgot Password?
           </button>
@@ -140,6 +143,7 @@ function LoginForm() {
           type="button"
           className="font-semibold text-foreground hover:text-blue-600"
           onClick={() => router.push("/Register")}
+          aria-label="Register"
         >
           Register
         </button>

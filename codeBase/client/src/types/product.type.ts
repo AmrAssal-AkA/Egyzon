@@ -56,8 +56,9 @@ export interface Product {
         _id?: string;
         id?: string;
         categoryName?: string;
+        categroyName?: string;
         name?: string;
-        [key: string]: any;
+        description?: string;
       };
   brand?: string;
 }

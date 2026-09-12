@@ -10,6 +10,11 @@ type ErrorPageProps = {
   unstable_retry: () => void;
 };
 
+export const metadata = {
+  title: "Server Error",
+  description: "An unexpected error occurred while loading the page.",
+};
+
 export default function ErrorPage({ error, reset, unstable_retry }: ErrorPageProps) {
   useEffect(() => {
     console.error(error);

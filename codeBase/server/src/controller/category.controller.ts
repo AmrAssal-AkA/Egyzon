@@ -54,7 +54,6 @@ export const CategoryController = {
       const updatedCategory = await CategoryService.addProductToCategory(categoryId, productId);
       sendSuccessResponse(res, 200, "Product added to category successfully", updatedCategory);
     }catch (error) {
-      console.log(error);
       sendErrorResponse(res, 500, "Internal Server Error");
     }
   },

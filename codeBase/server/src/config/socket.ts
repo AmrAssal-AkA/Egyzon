@@ -44,7 +44,6 @@ export function initSocket(server: HttpServer) {
                 userId: accessTokenPayload.userId,
                 role: accessTokenPayload.role,
             };
-            console.log(`Socket authenticated for user ${socket.user.userId} with role ${socket.user.role}`);
             next();
         }catch(error){
             next(new Error("Authentication error"));
@@ -59,7 +58,7 @@ export function initSocket(server: HttpServer) {
             }
             userSockets.get(userId)!.add(socket.id);
             socket.join(`user-${userId}`);
-            console.log(`User ${userId} connected with socket ID ${socket.id}`);
+
         }
 
         socket.on("sales-indicator:subscribe",async (timeframe: AnalyticalDateTimeframe) => {

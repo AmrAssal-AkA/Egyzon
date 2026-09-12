@@ -85,8 +85,9 @@ export default function ForgetPasswordForm() {
             type="submit"
             className="w-full"
             disabled={handledisabledButton()}
+            aria-label="Send Reset Link"
           >
-            {loading ? <Spinner className="h-5 w-5" /> : "Send Reset Link"}
+            {loading ? <Spinner className="h-5 w-5" aria-hidden="true" /> : "Send Reset Link"}
           </Button>
         </div>
         {error && <p className="text-sm text-red-500">{error}</p>}
@@ -96,7 +97,7 @@ export default function ForgetPasswordForm() {
         <p>
           {" "}
           Don&apos;t have an account?{" "}
-          <Link href="/Register" className="text-primary hover:underline">
+          <Link href="/Register" className="text-primary hover:underline" aria-label="Register">
             Register
           </Link>
         </p>

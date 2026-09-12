@@ -318,7 +318,7 @@ export default function TransactionTable({
   return (
     <div className="w-full h-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden flex flex-col gap-1 transition-all duration-300">
       {/* --- Card Header --- */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between p-6 gap-4 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 gap-3 sm:gap-4 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
         <div>
           <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
             Recent Transactions
@@ -329,26 +329,25 @@ export default function TransactionTable({
         </div>
 
         {/* --- Header Controls --- */}
-        <div className="flex items-center flex-wrap gap-2">
+        <div className="flex items-center flex-wrap sm:flex-nowrap gap-2 w-full sm:w-auto">
           {/* Search Box */}
-          <div className="relative">
+          <div className="relative flex-1 sm:flex-initial">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400 dark:text-slate-500" />
             <input
               type="text"
               placeholder="Search ID..."
               value={currentQuery.searchTerm}
               onChange={(e) => updateQuery({ searchTerm: e.target.value })}
-              className="pl-9 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 rounded-lg text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all w-44"
+              className="pl-9 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 rounded-lg text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all w-full sm:w-44"
             />
           </div>
-
 
           {/* Export Button */}
           <Button
             variant="outline"
             size="sm"
             onClick={handleExport}
-            className="gap-2 h-9 px-3 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium cursor-pointer"
+            className="gap-2 h-9 px-3 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium cursor-pointer shrink-0"
           >
             <Download className="h-4 w-4" />
             Export

@@ -41,12 +41,6 @@ export async function GET(req: NextRequest) {
     );
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      console.error(
-        "[getTotalInventoryValue] Backend error response:",
-        error.response.status,
-        error.response.data
-      );
-
       return NextResponse.json(
         {
           success: false,
@@ -59,7 +53,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    console.error("[getTotalInventoryValue] Error:", error);
     return NextResponse.json(
       {
         success: false,

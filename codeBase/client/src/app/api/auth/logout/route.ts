@@ -22,7 +22,6 @@ export async function POST() {
     res.cookies.delete("refreshToken");
     return res;
   } catch (error) {
-    console.error("Logout error:", error);
     // Still clear cookies on the client even if the server request fails
     const res = NextResponse.json(
       { success: true, message: "Logged out" },

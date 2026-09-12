@@ -34,12 +34,6 @@ export async function GET(req: NextRequest) {
     );
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      console.error(
-        "[getTotalRevenue] Backend error response:",
-        error.response.status,
-        error.response.data
-      );
-
       return NextResponse.json(
         {
           success: false,
@@ -50,7 +44,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    console.error("[getTotalRevenue] API route error:", error);
     return NextResponse.json(
       { success: false, message: "Internal Server Error" },
       { status: 500 }

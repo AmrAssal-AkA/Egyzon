@@ -70,7 +70,6 @@ async function createCart(req: Request, res: Response) {
     if (error instanceof AppError) {
       sendErrorResponse(res, error.statusCode, error.message);
     } else {
-      console.error("Error creating cart:", error);
       sendErrorResponse(res, 500, "Internal Server Error");
     }
   }
@@ -105,7 +104,6 @@ const getCart = async (req: Request, res: Response) => {
     const cart: Cart = JSON.parse(cartData);
     sendSuccessResponse(res, 200, "Cart retrieved successfully", cart);
   } catch (error) {
-    console.error("Error retrieving cart:", error);
     if (error instanceof AppError) {
       return sendErrorResponse(res, error.statusCode, error.message);
     }

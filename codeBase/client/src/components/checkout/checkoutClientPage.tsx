@@ -214,7 +214,7 @@ export default function CheckoutClientPage() {
 
     if (!isValid) {
       toast.error("Please fill in all required shipping details correctly.");
-      // Scroll to the first invalid field
+
       const firstErrorField = Object.keys(newErrors)[0];
       if (firstErrorField) {
         const element = document.getElementById(firstErrorField);
@@ -404,8 +404,8 @@ export default function CheckoutClientPage() {
 
       toast.success("Order placed successfully!");
       router.push("/checkout/confirmation");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to place order. Please try again.");
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : "Failed to place order. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

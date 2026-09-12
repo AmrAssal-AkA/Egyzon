@@ -94,7 +94,7 @@ export default function ProductViewer({
 
       const productCat =
         typeof p.category === "object" && p.category !== null
-          ? (p.category as any).categoryName || (p.category as any).name || ""
+          ? p.category.categoryName || ""
           : typeof p.category === "string"
             ? p.category
             : "";
@@ -279,7 +279,7 @@ export default function ProductViewer({
     <div className="w-full flex flex-col gap-4">
       {/* Bulk Action Toolbar */}
       {selectedIds.length > 0 && (
-        <div className="flex items-center justify-between px-4 py-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 rounded-xl transition-all animate-in fade-in slide-in-from-top-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 px-4 py-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 rounded-xl transition-all animate-in fade-in slide-in-from-top-2">
           <div className="flex items-center gap-2">
             <span className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold">
               {selectedIds.length}
@@ -289,8 +289,9 @@ export default function ProductViewer({
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
+              type="button"
               onClick={handleBulkDelete}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500 hover:bg-rose-600 text-white text-xs font-medium shadow-xs transition-all cursor-pointer"
             >
@@ -298,6 +299,7 @@ export default function ProductViewer({
               <span>Delete Selected</span>
             </button>
             <button
+              type="button"
               onClick={() => setSelectedIds([])}
               className="px-3 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-medium transition-all cursor-pointer"
             >
@@ -307,9 +309,192 @@ export default function ProductViewer({
         </div>
       )}
 
-      {/* Main Table Card */}
+      {/* Main Card */}
       <div className="w-full bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden transition-all">
-        <div className="overflow-x-auto">
+        {/* Mobile Product Card List View (Visible on small screens, hidden on md and up) */}
+        <div className="md:hidden divide-y divide-slate-100 dark:divide-slate-800">
+          {paginatedProducts.length > 0 ? (
+            paginatedProducts.map((product) => {
+              const prodId = getProductId(product);
+              const isSelected = selectedIds.includes(prodId);
+              const maxStock = product.maxStock || Math.max(100, product.stock);
+              const stockPercentage = Math.min(
+                100,
+                Math.round((product.stock / maxStock) * 100),
+              );
+              const displayName =
+                product.name || product.productName || "Untitled Product";
+              const displaySku =
+                product.sku ||
+                (prodId ? `SKU-${String(prodId).slice(-6)}` : "SKU-N/A");
+              const displayCategory =
+                typeof product.category === "object" &&
+                product.category !== null
+                  ? product.category.categoryName || "General"
+                  : typeof product.category === "string" &&
+                      product.category.trim() !== ""
+                    ? product.category
+                    : "General";
+              const imageSrc = Array.isArray(product.imageUrl)
+                ? product.imageUrl[0]
+                : typeof product.imageUrl === "string"
+                  ? product.imageUrl
+                  : product.image;
+
+              return (
+                <div
+                  key={String(prodId)}
+                  className={`p-4 space-y-3 transition-colors ${
+                    isSelected ? "bg-blue-50/40 dark:bg-blue-950/20" : ""
+                  }`}
+                >
+                  {/* Card Top: Checkbox, Name, SKU, and Actions Menu */}
+                  <div className="flex items-start gap-3">
+                    <div className="pt-0.5">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => handleSelectOne(prodId)}
+                        aria-label={`Select ${displayName}`}
+                        className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
+                      />
+                    </div>
+
+                    <div className="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-center overflow-hidden text-base shrink-0">
+                      {imageSrc &&
+                      (imageSrc.startsWith("http") ||
+                        imageSrc.startsWith("/") ||
+                        imageSrc.startsWith("blob:")) ? (
+                        <Image
+                          src={imageSrc}
+                          alt={displayName}
+                          width={44}
+                          height={44}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        imageSrc || "📦"
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-1.5">
+                        <div className="min-w-0">
+                          <h4 className="font-semibold text-slate-900 dark:text-slate-100 text-sm truncate">
+                            {displayName}
+                          </h4>
+                          <span className="text-[11px] text-slate-400 font-mono">
+                            SKU: {displaySku}
+                          </span>
+                        </div>
+
+                        {/* Dropdown Action Menu */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger
+                            aria-label="Product actions"
+                            className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 focus:outline-none"
+                          >
+                            <MoreHorizontal className="w-4 h-4" aria-hidden="true" />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-44">
+                            <DropdownMenuItem
+                              onClick={() => onEditProduct?.(product)}
+                              className="cursor-pointer gap-2"
+                            >
+                              <Pencil className="w-4 h-4 text-slate-500" aria-hidden="true" />
+                              <span>Edit</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleProductDiscount(product)}
+                              className="cursor-pointer gap-2"
+                            >
+                              <BadgePercentIcon className="w-4 h-4 text-amber-500" aria-hidden="true" />
+                              <span>Apply Discount</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleStockItem(product)}
+                              className="cursor-pointer gap-2"
+                            >
+                              <PackagePlus className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                              <span>Stock Item</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              variant="destructive"
+                              onClick={() => setProductToDelete(product)}
+                              className="cursor-pointer gap-2 text-rose-600 focus:text-rose-600 dark:text-rose-400 dark:focus:text-rose-400"
+                            >
+                              <Trash2Icon className="w-4 h-4 text-rose-600 dark:text-rose-400" aria-hidden="true" />
+                              <span>Delete Product</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card Middle: Category, Status, Price */}
+                  <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100/70 dark:border-slate-800/70 text-xs">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium text-[11px]">
+                        {displayCategory}
+                      </span>
+                      {getStatusBadge(product.status)}
+                    </div>
+                    <span className="font-bold text-slate-900 dark:text-white text-sm whitespace-nowrap">
+                      {product.price.toLocaleString()} EGP
+                    </span>
+                  </div>
+
+                  {/* Card Bottom: Stock progress bar + Quick stock adjustment button */}
+                  <div className="space-y-1.5 pt-0.5">
+                    <div className="flex justify-between items-center text-[11px]">
+                      <span className="font-medium text-slate-700 dark:text-slate-300">
+                        Stock: {product.stock} units
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleStockItem(product)}
+                        aria-label={`Update stock for ${product.name || product.productName || "product"}`}
+                        className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer flex items-center gap-1"
+                      >
+                        <PackagePlus className="w-3 h-3" aria-hidden="true" />
+                        <span>Update Stock</span>
+                      </button>
+                    </div>
+                    <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          product.stock === 0
+                            ? "bg-rose-500"
+                            : product.stock <= 5
+                              ? "bg-amber-500"
+                              : "bg-emerald-500"
+                        }`}
+                        style={{ width: `${stockPercentage}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="py-12 px-4 text-center">
+              <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 mx-auto mb-3">
+                <Package className="w-6 h-6" />
+              </div>
+              <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                No products found
+              </p>
+              <p className="text-xs text-slate-400 max-w-xs mx-auto mt-1">
+                Try adjusting your search query, filters, or tab selection.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Table View (Visible on md screens and up) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             {/* Table Header */}
             <thead>
@@ -363,9 +548,7 @@ export default function ProductViewer({
                   const displayCategory =
                     typeof product.category === "object" &&
                     product.category !== null
-                      ? (product.category as any).categoryName ||
-                        (product.category as any).name ||
-                        "General"
+                      ? product.category.categoryName || "General"
                       : typeof product.category === "string" &&
                           product.category.trim() !== ""
                         ? product.category
@@ -473,8 +656,11 @@ export default function ProductViewer({
                       <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end">
                           <DropdownMenu>
-                            <DropdownMenuTrigger className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-400/20">
-                              <MoreHorizontal className="w-4 h-4" />
+                            <DropdownMenuTrigger
+                              aria-label="Open actions menu"
+                              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-400/20"
+                            >
+                              <MoreHorizontal className="w-4 h-4" aria-hidden="true" />
                               <span className="sr-only">Open actions menu</span>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-44">
@@ -482,21 +668,21 @@ export default function ProductViewer({
                                 onClick={() => onEditProduct?.(product)}
                                 className="cursor-pointer gap-2"
                               >
-                                <Pencil className="w-4 h-4 text-slate-500" />
+                                <Pencil className="w-4 h-4 text-slate-500" aria-hidden="true" />
                                 <span>Edit</span>
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => handleProductDiscount(product)}
                                 className="cursor-pointer gap-2"
                               >
-                                <BadgePercentIcon className="w-4 h-4 text-amber-500" />
+                                <BadgePercentIcon className="w-4 h-4 text-amber-500" aria-hidden="true" />
                                 <span>Apply Discount</span>
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => handleStockItem(product)}
                                 className="cursor-pointer gap-2"
                               >
-                                <PackagePlus className="w-4 h-4 text-emerald-500" />
+                                <PackagePlus className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                 <span>Stock Item</span>
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
@@ -505,7 +691,7 @@ export default function ProductViewer({
                                 onClick={() => setProductToDelete(product)}
                                 className="cursor-pointer gap-2 text-rose-600 focus:text-rose-600 dark:text-rose-400 dark:focus:text-rose-400"
                               >
-                                <Trash2Icon className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                                <Trash2Icon className="w-4 h-4 text-rose-600 dark:text-rose-400" aria-hidden="true" />
                                 <span>Delete Product</span>
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -539,8 +725,8 @@ export default function ProductViewer({
         </div>
 
         {/* Table Footer / Pagination */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-          <span className="text-xs text-slate-500 dark:text-slate-400">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 px-4 sm:px-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+          <span className="text-xs text-slate-500 dark:text-slate-400 text-center sm:text-left">
             Showing{" "}
             <span className="font-semibold text-slate-800 dark:text-slate-200">
               {filteredProducts.length === 0
@@ -558,35 +744,52 @@ export default function ProductViewer({
             products
           </span>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 justify-center">
             <button
+              type="button"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+              disabled={currentPage === 1 || totalPages === 0}
+              aria-label="Previous page"
+              className="p-2 sm:p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-4 h-4" aria-hidden="true" />
             </button>
 
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`w-7 h-7 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                  currentPage === page
-                    ? "bg-blue-600 text-white shadow-xs"
-                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-                }`}
-              >
-                {page}
-              </button>
-            ))}
+            {/* Desktop page numbers */}
+            <div className="hidden sm:flex items-center gap-1.5">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    type="button"
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    aria-label={`Page ${page}`}
+                    aria-current={currentPage === page ? "page" : undefined}
+                    className={`w-7 h-7 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                      currentPage === page
+                        ? "bg-blue-600 text-white shadow-xs"
+                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ),
+              )}
+            </div>
+
+            {/* Mobile compact page indicator */}
+            <span className="sm:hidden text-xs font-medium text-slate-600 dark:text-slate-400 px-2">
+              {currentPage} / {totalPages}
+            </span>
 
             <button
+              type="button"
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages || totalPages === 0}
-              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+              aria-label="Next page"
+              className="p-2 sm:p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -680,7 +883,10 @@ export default function ProductViewer({
             </div>
 
             {/* Modal Form */}
-            <form onSubmit={handleSaveStock} className="p-5 flex flex-col gap-4">
+            <form
+              onSubmit={handleSaveStock}
+              className="p-5 flex flex-col gap-4"
+            >
               {/* Product Info Preview */}
               <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
                 <div className="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-center overflow-hidden text-lg shrink-0">
@@ -696,7 +902,11 @@ export default function ProductViewer({
                         img.startsWith("blob:")) ? (
                       <Image
                         src={img}
-                        alt={productToStock.name || productToStock.productName || "Product"}
+                        alt={
+                          productToStock.name ||
+                          productToStock.productName ||
+                          "Product"
+                        }
                         width={48}
                         height={48}
                         className="w-full h-full object-cover"
@@ -708,7 +918,9 @@ export default function ProductViewer({
                 </div>
                 <div className="flex flex-col min-w-0 flex-1">
                   <span className="font-semibold text-slate-900 dark:text-slate-100 text-sm truncate">
-                    {productToStock.name || productToStock.productName || "Untitled Product"}
+                    {productToStock.name ||
+                      productToStock.productName ||
+                      "Untitled Product"}
                   </span>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-[11px] text-slate-400 font-mono">

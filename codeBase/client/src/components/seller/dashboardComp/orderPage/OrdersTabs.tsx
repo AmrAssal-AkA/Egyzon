@@ -31,8 +31,8 @@ export default function OrdersTabs({
   ];
 
   return (
-    <div className="border-b border-slate-200 dark:border-slate-800 overflow-x-auto scrollbar-none">
-      <nav className="flex items-center gap-6 sm:gap-8 min-w-max pb-px">
+    <div className="border-b border-slate-200 dark:border-slate-800 overflow-x-auto scrollbar-none -mx-2 px-2 sm:mx-0 sm:px-0">
+      <nav className="flex items-center gap-4 sm:gap-6 lg:gap-8 min-w-max pb-px">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           const count = counts[tab.id] || 0;

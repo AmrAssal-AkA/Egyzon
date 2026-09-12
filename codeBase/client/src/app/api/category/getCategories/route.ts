@@ -21,7 +21,6 @@ export async function GET() {
       { status: 200 }
     );
   } catch (error: any) {
-    console.error("Get categories route error:", error);
 
     if (axios.isAxiosError(error) && error.response) {
       return NextResponse.json(

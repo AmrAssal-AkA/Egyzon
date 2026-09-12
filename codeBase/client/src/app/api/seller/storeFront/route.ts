@@ -68,7 +68,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    console.error("[storeFront] API route error:", error);
     return NextResponse.json(
       { success: false, message: "Internal Server Error", data: null },
       { status: 500 }

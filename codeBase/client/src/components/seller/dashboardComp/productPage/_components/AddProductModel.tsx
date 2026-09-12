@@ -618,27 +618,27 @@ export default function AddProductModel({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl w-full max-w-lg my-8 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl w-full max-w-lg my-auto max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 flex items-center justify-center">
+        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 flex items-center justify-center shrink-0">
               {isDiscountOnly ? (
                 <BadgePercentIcon className="w-5 h-5" />
               ) : (
                 <Package className="w-5 h-5" />
               )}
             </div>
-            <div>
-              <h3 className="font-bold text-slate-900 dark:text-white text-base">
+            <div className="min-w-0">
+              <h3 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base truncate">
                 {isDiscountOnly
                   ? "Apply Discount"
                   : editingProduct
                     ? "Edit Product"
                     : "Add New Product"}
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 truncate">
                 {isDiscountOnly
                   ? "Update promotional discount percentage for this product"
                   : "Fill in details for your product catalog"}
@@ -647,7 +647,8 @@ export default function AddProductModel({
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+            aria-label="Close modal"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
@@ -656,7 +657,7 @@ export default function AddProductModel({
         {/* Modal Form */}
         <form
           onSubmit={handleSubmit}
-          className="p-5 flex flex-col gap-4 max-h-[80vh] overflow-y-auto"
+          className="p-4 sm:p-5 flex flex-col gap-3.5 sm:gap-4 overflow-y-auto flex-1"
         >
           {formError && (
             <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs flex items-center gap-2">
@@ -716,12 +717,12 @@ export default function AddProductModel({
             </div>
 
             {/* Checkpoint Mode Selector */}
-            <div className="grid grid-cols-2 gap-2 bg-white dark:bg-slate-900 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
+            <div className="grid grid-cols-2 gap-1.5 sm:gap-2 bg-white dark:bg-slate-900 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
               <button
                 type="button"
                 disabled={isDiscountOnly}
                 onClick={() => setCategoryMode("existing")}
-                className={`py-1.5 px-3 rounded-md text-xs font-medium transition-all ${
+                className={`py-1.5 px-2 sm:px-3 rounded-md text-[11px] sm:text-xs font-medium transition-all text-center truncate ${
                   isDiscountOnly
                     ? "cursor-not-allowed opacity-60"
                     : "cursor-pointer"
@@ -737,7 +738,7 @@ export default function AddProductModel({
                 type="button"
                 disabled={isDiscountOnly}
                 onClick={() => setCategoryMode("new")}
-                className={`py-1.5 px-3 rounded-md text-xs font-medium transition-all flex items-center justify-center gap-1 ${
+                className={`py-1.5 px-2 sm:px-3 rounded-md text-[11px] sm:text-xs font-medium transition-all flex items-center justify-center gap-1 text-center truncate ${
                   isDiscountOnly
                     ? "cursor-not-allowed opacity-60"
                     : "cursor-pointer"
@@ -747,8 +748,8 @@ export default function AddProductModel({
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
                 }`}
               >
-                <Plus className="w-3.5 h-3.5" />
-                Create New Category
+                <Plus className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">Create New Category</span>
               </button>
             </div>
 
@@ -878,7 +879,7 @@ export default function AddProductModel({
           </div>
 
           {/* Pricing & Stock */}
-          <div className="grid grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Price (EGP) *
@@ -898,10 +899,10 @@ export default function AddProductModel({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 items-center gap-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 <span>Discount (%)</span>
                 {isDiscountOnly && (
-                  <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold">
+                  <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold ml-1">
                     (Editable)
                   </span>
                 )}
@@ -963,19 +964,19 @@ export default function AddProductModel({
                 className="absolute inset-0 w-full h-full opacity-0 disabled:cursor-not-allowed cursor-pointer"
               />
               <Upload className="w-5 h-5 text-slate-400" />
-              <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">
+              <p className="text-xs text-slate-600 dark:text-slate-300 font-medium text-center">
                 {isDiscountOnly
                   ? "Image uploads disabled in discount mode"
                   : "Click or drag & drop product images"}
               </p>
-              <p className="text-[10px] text-slate-400">
+              <p className="text-[10px] text-slate-400 text-center">
                 PNG, JPG, WEBP up to 5MB
               </p>
             </div>
 
             {/* Image Previews */}
             {imagePreviews.length > 0 && (
-              <div className="flex items-center gap-2 mt-2 overflow-x-auto py-1">
+              <div className="flex items-center gap-2 mt-2 overflow-x-auto py-1 scrollbar-none">
                 {imagePreviews.map((src, i) => (
                   <div
                     key={i}
@@ -1004,18 +1005,18 @@ export default function AddProductModel({
           </div>
 
           {/* Form Footer Buttons */}
-          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800 mt-2">
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800 mt-2 shrink-0">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium text-xs transition-all cursor-pointer"
+              className="flex-1 sm:flex-initial px-4 py-2.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium text-xs text-center transition-all cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs shadow-md shadow-blue-500/20 transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+              className="flex-1 sm:flex-initial px-4 py-2.5 sm:py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs shadow-md shadow-blue-500/20 transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
             >
               {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               <span>

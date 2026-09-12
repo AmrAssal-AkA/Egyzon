@@ -11,24 +11,6 @@ export const metadata = {
 };
 
 export default function ContactPage() {
-  const faqs = [
-    {
-      q: "How do I track my order delivery?",
-      a: "You can track your active orders under your Account Dashboard in the Order History section, or contact customer support with your Order ID.",
-    },
-    {
-      q: "How can I register as a vendor on Egyzon?",
-      a: "Visit our Seller Registration page or select 'Become a Vendor' in the contact form to connect with our seller onboarding team.",
-    },
-    {
-      q: "What payment methods are supported?",
-      a: "We support major credit/debit cards, cash on delivery (COD), and local mobile wallets across Egyptian governorates.",
-    },
-    {
-      q: "What is the return and refund policy?",
-      a: "Products eligible for return can be requested within 14 days of delivery directly from your customer account dashboard.",
-    },
-  ];
 
   return (
     <main className="w-full min-h-screen bg-background flex flex-col items-center justify-start py-12 md:py-16 md:mt-20">
@@ -52,37 +34,6 @@ export default function ContactPage() {
 
         {/* Main Contact Form & Info Section */}
         <ContactFormSection />
-
-        {/* FAQ Section */}
-        <section className="space-y-6 pt-4">
-          <div className="text-center max-w-2xl mx-auto space-y-2">
-            <div className="inline-flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-              <HelpCircle className="w-4 h-4" />
-              <span>Frequently Asked Questions</span>
-            </div>
-            <h2 className="text-3xl font-bold tracking-tight">Quick Answers</h2>
-            <p className="text-muted-foreground text-sm">
-              Find quick answers to common questions about orders, shipping, and seller accounts.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-            {faqs.map((faq, idx) => (
-              <Card key={idx} className="border border-border/80 shadow-sm">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base font-bold text-foreground">
-                    {faq.q}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {faq.a}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
 
         {/* Call to Action */}
         <section className="text-center py-6 space-y-4 max-w-xl mx-auto border-t pt-10">

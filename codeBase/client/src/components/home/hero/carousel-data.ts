@@ -1,4 +1,4 @@
-import { HeroSlideItem } from "./types";
+import { HeroSlideItem } from "../../../types/Hero.types";
 
 export const DEFAULT_SLIDES: HeroSlideItem[] = [
   {
@@ -6,7 +6,8 @@ export const DEFAULT_SLIDES: HeroSlideItem[] = [
     campaignLabel: "SPRING COLLECTION 2026",
     headline: "The Alexandria",
     headlineItalic: "Edit",
-    description: "Curated essentials from world-renowned independent vendors. Experience craftsmanship redefined for the modern explorer.",
+    description:
+      "Curated essentials from world-renowned independent vendors. Experience craftsmanship redefined for the modern explorer.",
     primaryCtaText: "Shop Collection",
     primaryCtaLink: "/collections/spring-2026",
     secondaryCtaText: "View Lookbook",
@@ -18,7 +19,8 @@ export const DEFAULT_SLIDES: HeroSlideItem[] = [
     campaignLabel: "TECH ESSENTIALS 2026",
     headline: "The Modern",
     headlineItalic: "Workspace",
-    description: "Elevate your productivity with our curated collection of sleek mechanical keyboards, studio headphones, and desktop organizers.",
+    description:
+      "Elevate your productivity with our curated collection of sleek mechanical keyboards, studio headphones, and desktop organizers.",
     primaryCtaText: "Explore Tech",
     primaryCtaLink: "/collections/tech-essentials",
     secondaryCtaText: "Learn More",
@@ -30,7 +32,8 @@ export const DEFAULT_SLIDES: HeroSlideItem[] = [
     campaignLabel: "CURATED LIVING",
     headline: "The Art of",
     headlineItalic: "Living",
-    description: "Handcrafted ceramics, minimalist lighting, and organic textiles designed to bring serenity and elegance to your home.",
+    description:
+      "Handcrafted ceramics, minimalist lighting, and organic textiles designed to bring serenity and elegance to your home.",
     primaryCtaText: "Shop Home",
     primaryCtaLink: "/collections/curated-living",
     imageUrl: "/images/curated_living.png",

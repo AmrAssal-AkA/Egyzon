@@ -41,7 +41,6 @@ export async function GET(req: NextRequest) {
       { status: 200 }
     );
   } catch (error: any) {
-    console.error("Get category by id route error:", error);
 
     if (axios.isAxiosError(error) && error.response) {
       return NextResponse.json(

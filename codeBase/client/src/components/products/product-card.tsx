@@ -34,12 +34,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const rating = product.AvgRating ?? product.rating ?? 0;
   const productStatus = product.status || "active";
 
-  const productId: string = String(
-    (product as any)._id ||
-    (product as any).id ||
-    (product as any).productId ||
-    ""
-  );
+  const productId: string = String(product._id || product.id);
 
   const image =
     (Array.isArray(imageUrl) ? imageUrl[0] : imageUrl) ||
@@ -101,6 +96,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     <div className="group flex flex-col h-full bg-card text-card-foreground shadow-xs hover:shadow-md rounded-xl overflow-hidden border border-border transition-all duration-300">
       <Link
         href={`/products/${productId}`}
+        aria-label={`View product details for ${title}`}
         className="flex flex-col flex-1 min-w-0"
       >
         <div className="relative aspect-square w-full bg-muted overflow-hidden">
@@ -108,6 +104,8 @@ export default function ProductCard({ product }: ProductCardProps) {
             src={image}
             alt={title}
             fill
+            priority
+            quality={75}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
@@ -184,9 +182,9 @@ export default function ProductCard({ product }: ProductCardProps) {
               className="p-1.5 sm:p-2 rounded-full transition-colors hover:bg-muted text-muted-foreground hover:text-foreground shrink-0 cursor-pointer"
             >
               {isWishlisted ? (
-                <Heart className="w-4 h-4 sm:w-5 sm:h-5 fill-rose-600 text-rose-600" />
+                <Heart className="w-4 h-4 sm:w-5 sm:h-5 fill-rose-600 text-rose-600" aria-hidden="true" />
               ) : (
-                <Heart className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Heart className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
               )}
             </button>
 
@@ -218,6 +216,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 });
                 toast.success("Added to cart");
               }}
+              aria-label={`Add ${title} to cart`}
             >
               Add to Cart
             </button>

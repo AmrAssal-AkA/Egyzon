@@ -2,14 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import {
-  X,
-  Calendar,
-  User,
-  MapPin,
-  CreditCard,
-  Package,
-} from "lucide-react";
+import { X, Calendar, User, MapPin, CreditCard, Package } from "lucide-react";
 import { SellerOrder } from "@/types/seller";
 import { Button } from "@/components/ui/button";
 
@@ -96,7 +89,7 @@ export default function OrderDetailsModal({
                 </h2>
                 <span
                   className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border capitalize ${getStatusBadge(
-                    orderStatus
+                    orderStatus,
                   )}`}
                 >
                   {orderStatus}
@@ -175,7 +168,9 @@ export default function OrderDetailsModal({
                 const title =
                   prod?.productName ||
                   prod?.name ||
-                  (typeof item.product === "string" ? item.product : `Product #${idx + 1}`);
+                  (typeof item.product === "string"
+                    ? item.product
+                    : `Product #${idx + 1}`);
 
                 let imgUrl = "";
                 if (prod && prod.imageUrl) {
@@ -262,27 +257,43 @@ export default function OrderDetailsModal({
               <div className="flex justify-between text-slate-500 dark:text-slate-400">
                 <span>Subtotal</span>
                 <span className="font-medium text-slate-800 dark:text-slate-200">
-                  EGP {(order.subTotal || order.totalAmount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  EGP{" "}
+                  {(order.subTotal || order.totalAmount || 0).toLocaleString(
+                    undefined,
+                    { minimumFractionDigits: 2 },
+                  )}
                 </span>
               </div>
               {order.shippingFee !== undefined && order.shippingFee > 0 && (
                 <div className="flex justify-between text-slate-500 dark:text-slate-400">
                   <span>Shipping Fee</span>
                   <span className="font-medium text-slate-800 dark:text-slate-200">
-                    EGP {order.shippingFee.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    EGP{" "}
+                    {order.shippingFee.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                    })}
                   </span>
                 </div>
               )}
               {order.discount !== undefined && order.discount > 0 && (
                 <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
                   <span>Discount</span>
-                  <span>-EGP {order.discount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  <span>
+                    -EGP{" "}
+                    {order.discount.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                    })}
+                  </span>
                 </div>
               )}
               <div className="border-t border-slate-200 dark:border-slate-700 pt-2 flex justify-between text-sm font-bold text-slate-900 dark:text-slate-100">
                 <span>Total Amount</span>
                 <span>
-                  EGP {(order.totalAmount || order.subTotal || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  EGP{" "}
+                  {(order.totalAmount || order.subTotal || 0).toLocaleString(
+                    undefined,
+                    { minimumFractionDigits: 2 },
+                  )}
                 </span>
               </div>
             </div>

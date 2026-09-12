@@ -28,6 +28,7 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
           <Link
             key={catId}
             href={targetHref}
+            aria-label={`Browse ${catName} category`}
             className="block focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-xl"
           >
             <CategoryCard

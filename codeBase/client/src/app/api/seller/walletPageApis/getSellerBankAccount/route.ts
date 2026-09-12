@@ -36,12 +36,6 @@ export async function GET(request: Request | NextRequest) {
     );
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      console.error(
-        "[getSellerBankAccount] Backend error response:",
-        error.response.status,
-        error.response.data
-      );
-
       return NextResponse.json(
         {
           success: false,
@@ -53,7 +47,6 @@ export async function GET(request: Request | NextRequest) {
       );
     }
 
-    console.error("[getSellerBankAccount] API route error:", error);
     return NextResponse.json(
       { success: false, message: "Internal Server Error" },
       { status: 500 }

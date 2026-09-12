@@ -44,14 +44,14 @@ export default function VerifyEmailContent() {
     };
 
     verify();
-  }, [token, verifyEmail]);
+  }, [router, token, verifyEmail]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
       <div className="w-full max-w-md p-8 bg-white dark:bg-zinc-950 border rounded-2xl shadow-sm text-center">
         {status === "loading" && (
           <div className="flex flex-col items-center gap-4">
-            <Loader2 className="h-12 w-12 text-primary animate-spin" />
+            <Loader2 className="h-12 w-12 text-primary animate-spin" aria-hidden="true" />
             <h2 className="text-xl font-semibold">Verifying your email...</h2>
             <p className="text-muted-foreground">Please wait while we verify your email address.</p>
           </div>
@@ -59,23 +59,27 @@ export default function VerifyEmailContent() {
 
         {status === "success" && (
           <div className="flex flex-col items-center gap-4">
-            <CheckCircle className="h-16 w-16 text-green-500" />
+            <CheckCircle className="h-16 w-16 text-green-500" aria-hidden="true" />
             <h2 className="text-2xl font-semibold">Verification Successful!</h2>
             <p className="text-muted-foreground">{message}</p>
             <p className="text-sm text-muted-foreground">Redirecting to onboarding...</p>
-            <Button asChild className="mt-6 w-full">
-              <Link href="/onBoarding">Continue to Onboarding</Link>
+            <Button asChild className="mt-6 w-full" aria-label="Continue to Onboarding">
+              <Link href="/onBoarding" aria-label="Continue to Onboarding">
+                Continue to Onboarding
+              </Link>
             </Button>
           </div>
         )}
 
         {status === "error" && (
           <div className="flex flex-col items-center gap-4">
-            <XCircle className="h-16 w-16 text-destructive" />
+            <XCircle className="h-16 w-16 text-destructive" aria-hidden="true" />
             <h2 className="text-2xl font-semibold">Verification Failed</h2>
             <p className="text-muted-foreground">{message}</p>
-            <Button asChild variant="outline" className="mt-6 w-full">
-              <Link href="/">Return to Home</Link>
+            <Button asChild variant="outline" className="mt-6 w-full" aria-label="Return to Home">
+              <Link href="/" aria-label="Return to Home">
+                Return to Home
+              </Link>
             </Button>
           </div>
         )}

@@ -51,10 +51,7 @@ export async function POST(req: NextRequest) {
       { status: backendRes.status || 201 }
     );
   } catch (error: any) {
-    console.error("Add category route error:", error);
-
     if (axios.isAxiosError(error) && error.response) {
-      console.error("[addCategory] Backend error details:", error.response.status, error.response.data);
       return NextResponse.json(
         error.response.data || {
           success: false,

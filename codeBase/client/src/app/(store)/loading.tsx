@@ -76,7 +76,7 @@ export default function HomeSkeleton() {
           {[...Array(4)].map((_, i) => (
             <div
               key={i}
-              className="relative rounded-xl overflow-hidden bg-muted animate-pulse h-full min-h-[260px] p-6 flex flex-col justify-end border border-border"
+              className="relative rounded-xl overflow-hidden bg-muted animate-pulse h-full min-h-65 p-6 flex flex-col justify-end border border-border"
             >
               <div className="space-y-2">
                 <div className="h-6 w-1/2 bg-muted-foreground/25 rounded" />

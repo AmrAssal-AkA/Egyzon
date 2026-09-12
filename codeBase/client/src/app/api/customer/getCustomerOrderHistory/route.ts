@@ -64,7 +64,6 @@ export async function GET(req: NextRequest) {
       { status: res.status || 200 }
     );
   } catch (error) {
-    console.error("Get customer order history route error:", error);
 
     if (axios.isAxiosError(error) && error.response) {
       return NextResponse.json(

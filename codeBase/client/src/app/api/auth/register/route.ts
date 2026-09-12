@@ -39,11 +39,6 @@ export async function POST(req: NextRequest) {
     return res;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      console.error(
-        "Registration backend error:",
-        error.response.status,
-        error.response.data,
-      );
       return NextResponse.json(
         {
           success: false,
@@ -52,7 +47,6 @@ export async function POST(req: NextRequest) {
         { status: error.response.status },
       );
     }
-    console.error("Registration error:", error);
     return NextResponse.json(
       { success: false, message: "Registration failed" },
       { status: 500 },

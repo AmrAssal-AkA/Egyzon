@@ -22,16 +22,16 @@ export const metadata = {
 
 function AnalyticsPage() {
   return (
-    <main className="min-h-screen flex flex-col gap-4 p-4">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-200 font-serif">
+    <main className="w-full min-w-0 flex flex-col gap-5 sm:gap-6">
+      <div className="flex flex-col gap-1 sm:gap-2">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-gray-200 font-serif tracking-tight">
           Analytics Overview
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          comprehensive Insights into your store&apos;s performance
+        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+          Comprehensive insights into your store&apos;s performance
         </p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <TotalRevenueCard
           change="+5.20"
           description="Increase in revenue compared to last month"
@@ -44,12 +44,12 @@ function AnalyticsPage() {
           change="+1.2%"
           description="Increase in products listed"
         />
-       <AverageOrderValueCard
+        <AverageOrderValueCard
           change="+3.5%"
           description="Improvement in average order value"
         />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <RevenueGraph />
         <ChartPieDonutText />
       </div>

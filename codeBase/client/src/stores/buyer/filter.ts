@@ -5,7 +5,7 @@ export type DiscountFilter = 'onSale' | 'featured' | 'newArrival';
 
 interface FilterStore {
     searchQuery: string;
-    category: string[];
+    category: string[]; // Selected category names
     brand: string[];
     maxPrice: number;
     minPrice: number;

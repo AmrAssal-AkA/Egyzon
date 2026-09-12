@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function OrderPage() {
   return (
-    <main className="w-full min-h-screen">
+    <main className="w-full min-w-0 max-w-full min-h-screen">
       <OrdersContainer />
     </main>
   );

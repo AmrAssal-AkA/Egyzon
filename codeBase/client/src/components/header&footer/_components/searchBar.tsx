@@ -109,6 +109,7 @@ function SearchBarInner({
           type="text"
           value={query}
           autoComplete="on"
+          aria-label="Search products, brands, and categories"
           onChange={(e) => {
             setQuery(e.target.value);
             if (!isOpen) setIsOpen(true);
@@ -129,26 +130,26 @@ function SearchBarInner({
 
         <div className="absolute right-1 flex items-center gap-1">
           {isLoading && shouldSearch && (
-            <FiLoader className="w-4 h-4 text-muted-foreground animate-spin mr-1" />
+            <FiLoader className="w-4 h-4 text-muted-foreground animate-spin mr-1" aria-hidden="true" />
           )}
 
           {query.length > 0 && (
             <button
               type="button"
               onClick={handleClear}
-              aria-label="Clear search"
-              className="p-1 text-muted-foreground hover:text-foreground rounded-full transition-colors cursor-pointer"
+              aria-label="Clear search input"
+              className="p-1 min-h-8 min-w-8 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-full transition-colors cursor-pointer"
             >
-              <FiX className="w-4 h-4" />
+              <FiX className="w-4 h-4" aria-hidden="true" />
             </button>
           )}
 
           <button
             type="submit"
-            aria-label="Search"
-            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center shadow-xs"
+            aria-label="Submit search"
+            className="px-3 py-1.5 min-h-8 min-w-8 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center shadow-xs"
           >
-            <IoIosSearch className="w-4 h-4" />
+            <IoIosSearch className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
       </form>
@@ -158,7 +159,7 @@ function SearchBarInner({
         <div className="absolute top-full left-0 right-0 mt-2 bg-popover text-popover-foreground border border-border rounded-2xl shadow-xl z-50 overflow-hidden backdrop-blur-md animate-in fade-in-50 zoom-in-95 duration-150">
           {isLoading ? (
             <div className="p-4 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <FiLoader className="w-4 h-4 animate-spin text-blue-600" />
+              <FiLoader className="w-4 h-4 animate-spin text-blue-600" aria-hidden="true" />
               <span>Searching for &quot;{debouncedQuery}&quot;...</span>
             </div>
           ) : products.length > 0 ? (
@@ -203,6 +204,7 @@ function SearchBarInner({
                       <button
                         type="button"
                         onClick={() => handleSelectProduct(id)}
+                        aria-label={`View product details for ${name}`}
                         className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-muted/60 transition-colors text-left group cursor-pointer"
                       >
                         <div className="w-10 h-10 shrink-0 relative rounded-lg overflow-hidden bg-muted border border-border/50">
@@ -236,7 +238,7 @@ function SearchBarInner({
                           </div>
                         </div>
 
-                        <FiArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" />
+                        <FiArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" aria-hidden="true" />
                       </button>
                     </li>
                   );
@@ -247,10 +249,11 @@ function SearchBarInner({
                 <button
                   type="button"
                   onClick={handleSubmit}
+                  aria-label={`View all results for ${debouncedQuery}`}
                   className="w-full py-2 px-3 text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <span>View all results for &quot;{debouncedQuery}&quot;</span>
-                  <FiArrowRight className="w-3.5 h-3.5" />
+                  <FiArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
                 </button>
               </div>
             </div>

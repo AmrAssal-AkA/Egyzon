@@ -66,7 +66,7 @@ export default function TopBar({
       {/* Controls Row: Search & Filters */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-slate-800/60">
         {/* Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none -mx-1 px-1 sm:mx-0 sm:px-0">
           {defaultTabs.map((tab) => {
             const isActive = activeTab === tab.id;
             const count = counts[tab.id];
@@ -75,7 +75,7 @@ export default function TopBar({
               <button
                 key={tab.id}
                 onClick={() => onTabChange?.(tab.id)}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
                   isActive
                     ? "bg-blue-600 text-white shadow-xs"
                     : "bg-slate-100 hover:bg-slate-200/70 text-slate-600 dark:bg-slate-800/80 dark:hover:bg-slate-800 dark:text-slate-300"
@@ -99,7 +99,7 @@ export default function TopBar({
         </div>
 
         {/* Search & Category Filter */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 w-full md:w-auto flex-wrap sm:flex-nowrap">
           {/* Search Box */}
           <div className="relative flex-1 sm:w-64">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -113,7 +113,7 @@ export default function TopBar({
           </div>
 
           {/* Category Dropdown */}
-          <div className="relative">
+          <div className="relative shrink-0">
             <select
               value={selectedCategory}
               onChange={(e) => onCategoryChange?.(e.target.value)}

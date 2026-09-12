@@ -99,7 +99,7 @@ export default function ResetPasswordForm() {
       {success ? (
         <div className="p-6 bg-background border border-border rounded-2xl shadow-sm text-center space-y-4">
           <div className="flex justify-center text-green-500">
-            <CheckCircle className="h-14 w-14" />
+            <CheckCircle className="h-14 w-14"  aria-hidden="true" />
           </div>
           <h2 className="text-2xl font-bold tracking-tight text-foreground">
             Password Reset Successful!
@@ -171,8 +171,9 @@ export default function ResetPasswordForm() {
             type="submit"
             className="w-full"
             disabled={loading || !newPassword || !confirmPassword || newPassword !== confirmPassword}
+            aria-label="Reset Password"
           >
-            {loading ? <Spinner className="h-5 w-5" /> : "Reset Password"}
+            {loading ? <Spinner className="h-5 w-5" aria-hidden="true" /> : "Reset Password"}
           </Button>
 
           {error && (
@@ -182,6 +183,7 @@ export default function ResetPasswordForm() {
                 <Link
                   href="/forgetPassword"
                   className="block text-sm text-primary hover:underline text-center"
+                  aria-label="Request a new password reset link"
                 >
                   Request a new password reset link
                 </Link>

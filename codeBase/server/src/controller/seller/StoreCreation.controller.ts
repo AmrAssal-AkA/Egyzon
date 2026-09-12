@@ -102,7 +102,6 @@ export const createRequestToJoin = async (req: Request, res: Response) => {
     ]);
     uploadedCommercialRegister = crUpload;
     uploadedTaxCard = taxUpload;
-    console.log("Uploaded images:", crUpload.secure_url, taxUpload.secure_url);
     const sellerData = {
       storeName,
       commercialRegisterNumber,
@@ -162,7 +161,6 @@ export const setupStore = async (req: Request, res: Response) => {
       storephysicalAddress,
       storeOnlineAddress,
     } = req.body;
-    console.log("Request body:", req.body);
     if (
       !storeDescription ||
       storeDescription.trim() === "" ||
@@ -195,7 +193,6 @@ export const setupStore = async (req: Request, res: Response) => {
       storeType === "physical" ? "" : storeOnlineAddress || "Online";
     const finalPhysicalAddress =
       storeType === "online" ? "" : storephysicalAddress;
-    console.log("Request body after validation:", req.body);
     // Validate file uploads
     const files = req.files as {
       storeLogo?: Express.Multer.File[];
@@ -265,15 +262,12 @@ export const setupStore = async (req: Request, res: Response) => {
         storeBanner: storeBannerUpload.secure_url,
       },
     };
-    console.log("store data", storeData);
     await SellerServices.setupStore(storeData, userId);
     return sendSuccessResponse(res, 200, "Store setup successful");
   } catch (error) {
     if (error instanceof AppError) {
-      console.log(error);
       sendErrorResponse(res, error.statusCode, error.status, error.message);
     } else {
-      console.log(error);
       sendErrorResponse(res, 500, "Internal Server Error");
     }
   }

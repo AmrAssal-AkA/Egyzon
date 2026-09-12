@@ -68,7 +68,6 @@ export const fetchProducts = async (page: number = 1, limit: number = 10): Promi
 
     return data as productListResponse;
   } catch (error) {
-    console.error("Failed to fetch products:", error);
     return {
       success: false,
       message: "Failed to fetch products",
@@ -108,7 +107,6 @@ export const fetchProductById = async (id: string | number): Promise<Product | n
       error?.response?.data?.message ||
       error?.message ||
       "Product not found or unavailable";
-    console.warn(`[fetchProductById] Notice for ID ${id}: ${errorMsg}`);
     return null;
   }
 };
@@ -139,7 +137,6 @@ export const fetchProductsByCategory = async ({
       .flat()
       .filter((product: Product) => Number(product._id) !== currentId) as Product[];
   } catch (error) {
-    console.log(error);
     throw new Error("Failed to fetch products by category");
   }
 };
@@ -164,7 +161,6 @@ export const addProduct = async (formData: FormData, onProgress?: (percent: numb
     });
     return response.data;
   } catch (error) {
-    console.error("Error adding product:", error);
     if (axios.isAxiosError(error) && error.response) {
       throw error.response.data;
     }
@@ -177,7 +173,6 @@ export const deleteProduct = async (productId: string | number) => {
     const response = await apiClient.delete(`/api/product/deleteProduct?productId=${productId}`);
     return response.data;
   } catch (error) {
-    console.error("Error deleting product:", error);
     if (axios.isAxiosError(error) && error.response) {
       throw error.response.data;
     }
@@ -239,7 +234,6 @@ export const editProduct = async (
     });
     return response.data;
   } catch (error) {
-    console.error("Error editing product:", error);
     if (axios.isAxiosError(error) && error.response) {
       throw error.response.data;
     }
@@ -261,7 +255,6 @@ export const applyDiscount = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error applying discount:", error);
     if (axios.isAxiosError(error) && error.response) {
       throw error.response.data;
     }
@@ -300,7 +293,6 @@ export const searchProducts = async (
 
     return data;
   } catch (error: unknown) {
-    console.error("Search products error:", error);
     const axiosError = error as {
       response?: {
         data?: {

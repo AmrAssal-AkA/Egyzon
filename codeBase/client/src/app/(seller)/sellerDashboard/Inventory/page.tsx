@@ -15,7 +15,7 @@ export const metadata = {
 
 export default function ProductsPage() {
   return (
-    <main className="min-h-screen p-4 flex flex-col gap-6 max-w-7xl mx-auto">
+    <main className="w-full min-w-0 flex flex-col gap-6">
       <ProductsContainer />
     </main>
   );

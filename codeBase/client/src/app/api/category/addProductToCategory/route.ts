@@ -48,7 +48,6 @@ export async function POST(req: NextRequest) {
       { status: status || 200 }
     );
   } catch (error: any) {
-    console.error("[addProductToCategory] API route error:", error);
 
     if (axios.isAxiosError(error) && error.response) {
       return NextResponse.json(

@@ -20,6 +20,7 @@ import {
 
 import { Product } from "@/types/product.type";
 import { useAllProducts } from "@/hooks/useProduct";
+import { useCategories } from "@/hooks/useCategory";
 import ProductsLoading from "@/app/(store)/products/loading";
 
 function ShopProductsClient({
@@ -27,6 +28,19 @@ function ShopProductsClient({
 }: { products?: Product[] } = {}) {
   const searchParams = useSearchParams();
   const { products: fetchedProducts, isLoading, error } = useAllProducts();
+  const { categories: allCategories } = useCategories();
+
+  const categoryIdToName = useMemo(() => {
+    const map = new Map<string, string>();
+    (allCategories || []).forEach((c) => {
+      const name = c.categoryName || c.categroyName || c.name || "";
+      if (name) {
+        if (c._id) map.set(c._id, name);
+        if (c.id) map.set(c.id, name);
+      }
+    });
+    return map;
+  }, [allCategories]);
 
   const searchQuery = useFilterStore((state) => state.searchQuery);
   const setSearchQuery = useFilterStore((state) => state.setSearchQuery);
@@ -76,17 +90,21 @@ function ShopProductsClient({
             .map((p) => {
               if (typeof p.category === "object" && p.category !== null) {
                 return (
-                  (p.category as any).categoryName ||
-                  (p.category as any).name ||
+                  p.category.categoryName ||
+                  p.category.categroyName ||
+                  p.category.name ||
                   ""
                 );
               }
-              return typeof p.category === "string" ? p.category : "";
+              if (typeof p.category === "string" && p.category) {
+                return categoryIdToName.get(p.category) || p.category;
+              }
+              return "";
             })
             .filter(Boolean) as string[],
         ),
       ).sort(),
-    [products],
+    [products, categoryIdToName],
   );
 
   const derivedBrands = useMemo(
@@ -150,20 +168,34 @@ function ShopProductsClient({
               })
             : true;
 
-        const prodCat =
-          typeof product.category === "object" && product.category !== null
-            ? (product.category as any).categoryName ||
-              (product.category as any).name ||
-              ""
-            : typeof product.category === "string"
-              ? product.category
-              : "";
+        let prodCategoryName = "";
+        let prodCategoryId = "";
+        if (typeof product.category === "object" && product.category !== null) {
+          prodCategoryName =
+            product.category.categoryName ||
+            product.category.categroyName ||
+            product.category.name ||
+            "";
+          prodCategoryId =
+            product.category._id ||
+            product.category.id ||
+            "";
+        } else if (typeof product.category === "string" && product.category) {
+          prodCategoryId = product.category;
+          prodCategoryName =
+            categoryIdToName.get(product.category) || product.category;
+        }
 
         const matchesCategory =
           selectedCategories.length > 0
-            ? prodCat
-              ? selectedCategories.includes(prodCat)
-              : false
+            ? selectedCategories.some((selected) => {
+                const selLower = selected.toLowerCase();
+                return (
+                  (prodCategoryName && selLower === prodCategoryName.toLowerCase()) ||
+                  (prodCategoryId && selLower === prodCategoryId.toLowerCase()) ||
+                  (categoryIdToName.get(selected)?.toLowerCase() === prodCategoryName.toLowerCase())
+                );
+              })
             : true;
 
         const matchesBrand =
@@ -190,6 +222,7 @@ function ShopProductsClient({
       }),
     [
       availability,
+      categoryIdToName,
       color,
       discount,
       maxPrice,

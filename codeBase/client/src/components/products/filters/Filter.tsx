@@ -15,22 +15,8 @@ import FilterAccordion from "./FilterAccordion";
 
 const DEFAULT_MAX_PRICE = 2000;
 
-const colors = [
-  { name: "Black", className: "bg-gray-950" },
-  { name: "White", className: "bg-white" },
-  { name: "Blue", className: "bg-blue-500" },
-  { name: "Green", className: "bg-green-500" },
-  { name: "Red", className: "bg-red-500" },
-  { name: "Yellow", className: "bg-yellow-400" },
-  { name: "Purple", className: "bg-purple-500" },
-];
 
-const ratingOptions = [
-  { label: "5★", value: 5 },
-  { label: "4★ & Up", value: 4 },
-  { label: "3★ & Up", value: 3 },
-  { label: "2★ & Up", value: 2 },
-];
+
 
 const availabilityOptions: { label: string; value: AvailabilityFilter }[] = [
   { label: "In Stock", value: "inStock" },
@@ -75,11 +61,16 @@ function CheckboxOption({ label, checked, onChange }: CheckboxOptionProps) {
   );
 }
 
+interface FilterContentProps extends Required<FilterfeatureProps> {
+  categoryIdToName?: Map<string, string>;
+}
+
 function FilterContent({
   categories,
   brands,
   maxPrice,
-}: Required<FilterfeatureProps>) {
+  categoryIdToName,
+}: FilterContentProps) {
   const [brandQuery, setBrandQuery] = useState("");
   const selectedCategories = useFilterStore((state) => state.category);
   const selectedBrands = useFilterStore((state) => state.brand);
@@ -88,14 +79,39 @@ function FilterContent({
   const selectedRating = useFilterStore((state) => state.rating);
   const availability = useFilterStore((state) => state.availability);
   const discount = useFilterStore((state) => state.discount);
-  const selectedColors = useFilterStore((state) => state.color);
   const setCategory = useFilterStore((state) => state.setCategory);
   const setBrand = useFilterStore((state) => state.setBrand);
   const setPriceRange = useFilterStore((state) => state.setPriceRange);
   const setRating = useFilterStore((state) => state.setRating);
   const setAvailability = useFilterStore((state) => state.setAvailability);
   const setDiscount = useFilterStore((state) => state.setDiscount);
-  const setColor = useFilterStore((state) => state.setColor);
+
+
+  const isCategoryChecked = (cat: string) => {
+    if (selectedCategories.includes(cat)) return true;
+    if (categoryIdToName) {
+      return selectedCategories.some((sel) => categoryIdToName.get(sel) === cat);
+    }
+    return false;
+  };
+
+  const handleCategoryToggle = (catName: string) => {
+    if (selectedCategories.includes(catName)) {
+      setCategory(catName);
+      return;
+    }
+    const matchingId = categoryIdToName
+      ? Array.from(categoryIdToName.entries()).find(
+          ([id, name]) => name === catName && selectedCategories.includes(id),
+        )?.[0]
+      : null;
+
+    if (matchingId) {
+      useFilterStore.getState().removeFilter("category", matchingId);
+    } else {
+      setCategory(catName);
+    }
+  };
 
   const filteredBrands = useMemo(
     () =>
@@ -114,8 +130,8 @@ function FilterContent({
             <CheckboxOption
               key={category}
               label={formatLabel(category)}
-              checked={selectedCategories.includes(category)}
-              onChange={() => setCategory(category)}
+              checked={isCategoryChecked(category)}
+              onChange={() => handleCategoryToggle(category)}
             />
           ))}
         </div>
@@ -228,42 +244,6 @@ function FilterContent({
         </div>
       </FilterAccordion>
 
-      <FilterAccordion title="Rating">
-        <div className="space-y-1">
-          {ratingOptions.map((option) => (
-            <label
-              key={option.value}
-              className="flex cursor-pointer items-center gap-3 rounded-md px-1 py-2 text-sm text-foreground transition-colors duration-300 ease-in-out hover:text-blue-600"
-            >
-              <input
-                type="radio"
-                name="rating-filter"
-                checked={selectedRating === option.value}
-                onChange={() =>
-                  setRating(
-                    selectedRating === option.value ? null : option.value,
-                  )
-                }
-                className="h-4 w-4 border-input text-blue-600 focus:ring-blue-500"
-              />
-              <span>{option.label}</span>
-            </label>
-          ))}
-        </div>
-      </FilterAccordion>
-
-      <FilterAccordion title="Availability">
-        <div className="space-y-1">
-          {availabilityOptions.map((option) => (
-            <CheckboxOption
-              key={option.value}
-              label={option.label}
-              checked={availability.includes(option.value)}
-              onChange={() => setAvailability(option.value)}
-            />
-          ))}
-        </div>
-      </FilterAccordion>
 
       <FilterAccordion title="Discount">
         <div className="space-y-1">
@@ -278,30 +258,6 @@ function FilterContent({
         </div>
       </FilterAccordion>
 
-      <FilterAccordion title="Color">
-        <div className="flex flex-wrap gap-3">
-          {colors.map((color) => {
-            const isSelected = selectedColors.includes(color.name);
-
-            return (
-              <button
-                key={color.name}
-                type="button"
-                onClick={() => setColor(color.name)}
-                className={cn(
-                  "h-9 w-9 rounded-full border border-border shadow-sm transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                  color.className,
-                  color.name === "White" && "border-muted-foreground",
-                  isSelected &&
-                    "ring-2 ring-blue-600 ring-offset-2 ring-offset-background",
-                )}
-                aria-pressed={isSelected}
-                aria-label={`Filter by ${color.name}`}
-              />
-            );
-          })}
-        </div>
-      </FilterAccordion>
     </div>
   );
 }
@@ -314,15 +270,33 @@ function Filterfeature({
   const { categories: fetchedCategories } = useCategories();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const resetFilters = useFilterStore((state) => state.resetFilters);
+
+  const categoryIdToName = useMemo(() => {
+    const map = new Map<string, string>();
+    (fetchedCategories || []).forEach((cat) => {
+      const name = cat.categoryName || cat.categroyName || cat.name || "";
+      if (name) {
+        if (cat._id) map.set(cat._id, name);
+        if (cat.id) map.set(cat.id, name);
+      }
+    });
+    return map;
+  }, [fetchedCategories]);
+
   const uniqueCategories = useMemo(() => {
     if (propCategories && propCategories.length > 0) {
-      return Array.from(new Set(propCategories)).filter(Boolean).sort();
+      const resolved = propCategories.map(
+        (cat) => categoryIdToName.get(cat) || cat,
+      );
+      return Array.from(new Set(resolved))
+        .filter((category): category is string => Boolean(category && category.trim()))
+        .sort();
     }
     const names = (fetchedCategories || [])
-      .map((cat) => cat.categoryName || cat.name || "")
-      .filter(Boolean);
+      .map((cat) => cat.categoryName || cat.categroyName || cat.name)
+      .filter((name): name is string => Boolean(name && name.trim()));
     return Array.from(new Set(names)).sort();
-  }, [propCategories, fetchedCategories]);
+  }, [propCategories, fetchedCategories, categoryIdToName]);
   const uniqueBrands = useMemo(
     () => Array.from(new Set(brands)).filter(Boolean).sort(),
     [brands],
@@ -349,6 +323,7 @@ function Filterfeature({
     categories: uniqueCategories,
     brands: uniqueBrands,
     maxPrice: resolvedMaxPrice,
+    categoryIdToName,
   };
 
   return (

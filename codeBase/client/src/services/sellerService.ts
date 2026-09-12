@@ -49,7 +49,6 @@ export const sellerService = {
         data: Array.isArray(data.data) ? data.data : [],
       };
     } catch (error: unknown) {
-      console.error("Fetch seller products error:", error);
       const axiosError = error as {
         response?: {
           data?: {
@@ -115,7 +114,6 @@ export const sellerService = {
         message: response.data?.message || "Successfully applied as seller",
       };
     } catch (error: unknown) {
-      console.error("Seller application error:", error);
       const axiosError = error as {
         response?: {
           data?: {
@@ -151,7 +149,6 @@ export const sellerService = {
         data: response.data?.data,
       };
     } catch (error: unknown) {
-      console.error("Seller delete product error:", error);
       const axiosError = error as {
         response?: {
           data?: {
@@ -197,7 +194,6 @@ export const sellerService = {
         data: response.data?.data,
       };
     } catch (error: unknown) {
-      console.error("Seller edit product error:", error);
       const axiosError = error as {
         response?: {
           data?: {
@@ -234,7 +230,6 @@ export const sellerService = {
         data: response.data?.data,
       };
     } catch (error: unknown) {
-      console.error("Seller apply discount error:", error);
       const axiosError = error as {
         response?: {
           data?: {
@@ -271,7 +266,6 @@ export const sellerService = {
         data: response.data?.data,
       };
     } catch (error: unknown) {
-      console.error("Seller edit stock error:", error);
       const axiosError = error as {
         response?: {
           data?: {
@@ -313,7 +307,6 @@ export const sellerService = {
         data: data.data || { totalProductCounts: 0 },
       };
     } catch (error: unknown) {
-      console.error("Get total products error:", error);
       const axiosError = error as {
         response?: {
           data?: {
@@ -355,7 +348,6 @@ export const sellerService = {
         data: data.data || { totalOrders: 0 },
       };
     } catch (error: unknown) {
-      console.error("Get total orders error:", error);
       const axiosError = error as {
         response?: {
           data?: {
@@ -397,7 +389,6 @@ export const sellerService = {
         data: data.data || { totalRevenue: 0 },
       };
     } catch (error: unknown) {
-      console.error("Get total revenue error:", error);
       const axiosError = error as {
         response?: {
           data?: {
@@ -439,7 +430,6 @@ export const sellerService = {
         data: Array.isArray(data.data) ? data.data : [],
       };
     } catch (error: unknown) {
-      console.error("Get top products error:", error);
       const axiosError = error as {
         response?: {
           data?: {
@@ -489,7 +479,6 @@ export const sellerService = {
         data: list,
       };
     } catch (error: unknown) {
-      console.error("Get all seller orders error:", error);
       const axiosError = error as {
         response?: {
           data?: {
@@ -531,7 +520,6 @@ export const sellerService = {
         data: data.data || { totalInventoryValue: 0 },
       };
     } catch (error: unknown) {
-      console.error("Get total inventory value error:", error);
       const axiosError = error as {
         response?: {
           data?: {
@@ -567,19 +555,12 @@ export const sellerService = {
         };
       }
 
-      console.log(
-        "[getWalletBalance] API response:",
-        data,
-        "Status:",
-        response.status,
-      );
       return {
         success: true,
         message: data.message || "Wallet balance retrieved successfully",
         data: data.data || { balance: 0 },
       };
     } catch (error: unknown) {
-      console.error("Get wallet balance error:", error);
       const axiosError = error as {
         response?: {
           data?: {
@@ -615,19 +596,13 @@ export const sellerService = {
         };
       }
 
-      console.log(
-        "[getSellerBankAccount] API response:",
-        data,
-        "Status:",
-        response.status,
-      );
       return {
         success: true,
         message: data.message || "Seller bank account retrieved successfully",
         data: data.data || null,
       };
     } catch (error: unknown) {
-      console.error("Get seller bank account error:", error);
+
       const axiosError = error as {
         response?: {
           data?: {
@@ -672,7 +647,6 @@ export const sellerService = {
         data: data.data,
       };
     } catch (error: unknown) {
-      console.error("Add seller bank account error");
       const axiosError = error as {
         response?: {
           data?: {
@@ -718,7 +692,6 @@ export const sellerService = {
         data: data.data,
       };
     } catch (error: unknown) {
-      console.error("Remove seller bank account error:", error);
       const axiosError = error as {
         response?: {
           data?: {
@@ -786,7 +759,6 @@ export const sellerService = {
         data: resData?.data,
       };
     } catch (error: unknown) {
-      console.error("Create store error:", error);
       const axiosError = error as {
         response?: {
           data?: {
@@ -837,7 +809,7 @@ export const sellerService = {
         data: data.data,
       };
     } catch (error: unknown) {
-      console.error("Get sales performance indicator error:", error);
+
       const axiosError = error as {
         response?: {
           data?: {
@@ -906,7 +878,6 @@ export const sellerService = {
         data: resultData,
       };
     } catch (error: unknown) {
-      console.error("Get average order value error:", error);
       const axiosError = error as {
         response?: {
           data?: {
@@ -952,7 +923,6 @@ export const sellerService = {
         data: data.data || {},
       };
     } catch (error: unknown) {
-      console.error("Get sales by category error:", error);
       const axiosError = error as {
         response?: {
           data?: {
@@ -1014,7 +984,6 @@ export const sellerService = {
         data: data.data,
       };
     } catch (error: unknown) {
-      console.error("Get store details error:", error);
       const axiosError = error as {
         response?: {
           data?: {
@@ -1067,7 +1036,6 @@ export const sellerService = {
         data: data.data,
       };
     } catch (error: unknown) {
-      console.error("Get seller transactions error:", error);
       const axiosError = error as {
         response?: {
           data?: {
@@ -1123,7 +1091,6 @@ export const sellerService = {
         data: data.data,
       };
     } catch (error: unknown) {
-      console.error("Withdraw balance error:", error);
       const axiosError = error as {
         response?: {
           data?: {

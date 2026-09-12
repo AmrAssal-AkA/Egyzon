@@ -86,7 +86,6 @@ export async function POST(req: NextRequest) {
       { status: backendRes.status || 200 },
     );
   } catch (error: unknown) {
-    console.error("Create store proxy error:", error);
 
     if (axios.isAxiosError(error) && error.response) {
       return NextResponse.json(

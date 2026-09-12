@@ -77,7 +77,7 @@ export default async function CategoryDetailPage({ params }: CategoryDetailPageP
         </nav>
 
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <section className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
             <Link
               href="/categories"
@@ -93,7 +93,7 @@ export default async function CategoryDetailPage({ params }: CategoryDetailPageP
               {categoryDescription}
             </p>
           </div>
-        </div>
+        </section>
 
         {/* Category Products Client Component */}
         <CategoryProductsClient

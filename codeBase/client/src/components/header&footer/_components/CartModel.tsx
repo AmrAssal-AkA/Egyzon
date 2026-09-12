@@ -66,8 +66,11 @@ export default function CartModel() {
 
   return (
     <Drawer swipeDirection="right">
-      <DrawerTrigger className="relative bg-secondary shadow-md text-secondary-foreground rounded-md px-4 py-2 cursor-pointer hover:bg-blue-600 hover:text-white transition-colors duration-300 ease-in-out">
-        <FiShoppingCart />
+      <DrawerTrigger
+        aria-label={`Shopping cart with ${cartQuantity} items`}
+        className="relative bg-secondary shadow-md text-secondary-foreground rounded-md px-3.5 sm:px-4 py-2 min-h-10 cursor-pointer hover:bg-blue-600 hover:text-white transition-colors duration-300 ease-in-out flex items-center justify-center"
+      >
+        <FiShoppingCart aria-hidden="true" />
         {cartQuantity > 0 && (
           <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
             {cartQuantity}
@@ -77,8 +80,11 @@ export default function CartModel() {
       <DrawerContent>
         <DrawerHeader className="border-b pb-4">
           <DrawerTitle>Shopping Cart</DrawerTitle>
-          <DrawerClose className="absolute right-4 top-4 rounded-sm text-muted-foreground opacity-70 transition-opacity hover:text-foreground hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-            <FiX className="h-5 w-5" />
+          <DrawerClose
+            aria-label="Close cart drawer"
+            className="absolute right-4 top-4 rounded-sm text-muted-foreground opacity-70 transition-opacity hover:text-foreground hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 min-h-9 min-w-9 flex items-center justify-center cursor-pointer"
+          >
+            <FiX className="h-5 w-5" aria-hidden="true" />
             <span className="sr-only">Close cart drawer</span>
           </DrawerClose>
         </DrawerHeader>
@@ -86,7 +92,7 @@ export default function CartModel() {
         <div className="flex-1 overflow-y-auto p-4">
           {cartItems.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-muted-foreground">
-              <FiShoppingCart className="mb-4 h-12 w-12 opacity-20" />
+              <FiShoppingCart className="mb-4 h-12 w-12 opacity-20" aria-hidden="true" />
               <p>Your cart is empty.</p>
             </div>
           ) : (
@@ -103,7 +109,7 @@ export default function CartModel() {
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center">
-                        <FiShoppingCart className="h-6 w-6 text-muted-foreground opacity-50" />
+                        <FiShoppingCart className="h-6 w-6 text-muted-foreground opacity-50" aria-hidden="true" />
                       </div>
                     )}
                   </div>
@@ -114,23 +120,27 @@ export default function CartModel() {
                     </span>
                     <div className="flex items-center gap-2 mt-1">
                       <button
+                        type="button"
                         onClick={() =>
                           handleQuantityChange(item.id, item.quantity - 1)
                         }
-                        className="rounded-md border border-border px-2 py-1 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                        aria-label={`Decrease quantity of ${item.title}`}
+                        className="rounded-md border border-border min-h-8 min-w-8 flex items-center justify-center text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer"
                       >
-                        <FiMinus />
+                        <FiMinus aria-hidden="true" />
                       </button>
                       <span className="mt-1 text-sm text-muted-foreground">
                         Qty: {item.quantity}
                       </span>
                       <button
+                        type="button"
                         onClick={() =>
                           handleQuantityChange(item.id, item.quantity + 1)
                         }
-                        className="rounded-md border border-border px-2 py-1 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                        aria-label={`Increase quantity of ${item.title}`}
+                        className="rounded-md border border-border min-h-8 min-w-8 flex items-center justify-center text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer"
                       >
-                        <FiPlus />
+                        <FiPlus aria-hidden="true" />
                       </button>
                     </div>
                   </div>
@@ -139,8 +149,9 @@ export default function CartModel() {
                       {(item.price * item.quantity).toFixed(2)} EGP
                     </span>
                     <button
+                      type="button"
                       onClick={() => removeFromCart(item.id)}
-                      className="text-sm font-medium text-red-500 transition-colors hover:text-red-700 focus:outline-none focus:underline"
+                      className="text-sm font-medium text-red-500 transition-colors hover:text-red-700 focus:outline-none focus:underline cursor-pointer"
                       aria-label={`Remove ${item.title} from cart`}
                     >
                       Remove
@@ -157,13 +168,20 @@ export default function CartModel() {
             <span>Subtotal</span>
             <span>{totalPrice.toFixed(2)} EGP</span>
           </div>
-          <button onClick={handleCartEmpty} className="bg-none text-red-600 cursor-pointer justify-end">
+          <button
+            type="button"
+            onClick={handleCartEmpty}
+            aria-label="Empty shopping cart"
+            className="bg-none text-red-600 hover:text-red-700 cursor-pointer justify-end text-sm transition-colors"
+          >
             Empty Cart
           </button>
           <button
+            type="button"
             onClick={handleCheckout}
             disabled={cartItems.length === 0 || isCheckoutLoading}
-            className="w-full rounded-md bg-blue-600 px-4 py-3 font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground flex items-center justify-center gap-2"
+            aria-label={isCheckoutLoading ? "Processing checkout..." : "Proceed to checkout"}
+            className="w-full rounded-md bg-blue-600 px-4 py-3 font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground flex items-center justify-center gap-2 cursor-pointer"
           >
             {isCheckoutLoading ? "Processing..." : "Checkout"}
           </button>

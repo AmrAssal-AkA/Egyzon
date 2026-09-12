@@ -6,7 +6,7 @@ export default function DashboardLoading() {
       
       {/* Side Menu Skeleton */}
       <div className="md:w-64 shrink-0">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 flex flex-col gap-2 h-[500px]">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 flex flex-col gap-2 h-125">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="h-12 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse w-full"></div>
           ))}
@@ -38,7 +38,7 @@ export default function DashboardLoading() {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
           {/* Recent Orders Skeleton */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 h-[400px] flex flex-col">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 h-100 flex flex-col">
             <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-6 animate-pulse"></div>
             <div className="flex-1 flex flex-col gap-4">
               {[...Array(3)].map((_, i) => (
@@ -48,7 +48,7 @@ export default function DashboardLoading() {
           </div>
           
           {/* Quick Actions Skeleton */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 h-[400px] flex flex-col">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 h-100 flex flex-col">
             <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-6 animate-pulse"></div>
             <div className="grid grid-cols-2 gap-4">
               {[...Array(4)].map((_, i) => (
@@ -59,7 +59,7 @@ export default function DashboardLoading() {
         </div>
         
         {/* Wishlist Preview Skeleton */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 h-[300px]">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 h-75">
           <div className="flex justify-between items-center mb-6">
             <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4 animate-pulse"></div>
             <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>

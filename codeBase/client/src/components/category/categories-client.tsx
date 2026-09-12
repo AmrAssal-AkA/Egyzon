@@ -5,7 +5,7 @@ import { Search, X, FolderTree, RefreshCw } from "lucide-react";
 import { useCategories } from "@/hooks/useCategory";
 import { Category } from "@/types/category.type";
 import CategoryGrid from "./category-grid";
-import Link from "next/link";
+
 
 interface CategoriesClientProps {
   initialCategories?: Category[];
@@ -83,6 +83,7 @@ export default function CategoriesClient({
           <button
             onClick={() => mutate()}
             className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors cursor-pointer"
+            aria-label="try Again"
           >
             Try Again
           </button>
@@ -110,7 +111,7 @@ export default function CategoriesClient({
       {!isLoading && filteredCategories.length === 0 && (
         <div className="w-full rounded-xl border border-dashed border-border bg-card/40 p-12 text-center flex flex-col items-center justify-center">
           <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
-            <FolderTree className="w-6 h-6 text-muted-foreground" />
+            <FolderTree className="w-6 h-6 text-muted-foreground" aria-hidden="true" />
           </div>
           <h3 className="text-lg font-semibold text-foreground mb-1">
             {searchQuery ? "No matching categories" : "No categories found"}
@@ -124,6 +125,7 @@ export default function CategoriesClient({
             <button
               onClick={() => setSearchQuery("")}
               className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg text-sm font-medium hover:bg-secondary/80 transition-colors cursor-pointer"
+              aria-label="Clear Search"
             >
               Clear Search
             </button>

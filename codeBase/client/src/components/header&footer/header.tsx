@@ -39,6 +39,7 @@ export default function Header() {
           <div className="flex items-center shrink-0">
             <Link
               href="/"
+              aria-label="Egyzon Homepage"
               className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground hover:opacity-90 transition-opacity flex items-center gap-0.5"
             >
               <span>Egy</span>
@@ -57,11 +58,12 @@ export default function Header() {
           <div className="flex items-center gap-1.5 sm:gap-2.5">
             {/* Mobile Search Toggle */}
             <button
+              type="button"
               onClick={toggleMobileSearch}
-              aria-label="Toggle search"
-              className="md:hidden p-2 text-foreground/80 hover:text-blue-600 hover:bg-muted rounded-xl transition-colors"
+              aria-label={isMobileSearchOpen ? "Close search bar" : "Open search bar"}
+              className="md:hidden p-2 text-foreground/80 hover:text-blue-600 hover:bg-muted rounded-xl transition-colors min-h-11 min-w-11 flex items-center justify-center cursor-pointer"
             >
-              <FiSearch className="w-5 h-5" />
+              <FiSearch className="w-5 h-5" aria-hidden="true" />
             </button>
 
             <ModeToggle />
@@ -75,11 +77,14 @@ export default function Header() {
             {/* User Account Button */}
             <div className="relative">
               <button
+                type="button"
                 onClick={toggleModel}
-                aria-label="User Account"
-                className="p-2 sm:p-2.5 bg-secondary hover:bg-blue-600 text-secondary-foreground hover:text-white rounded-xl transition-all duration-200 cursor-pointer shadow-2xs flex items-center justify-center"
+                aria-label="Open user account menu"
+                aria-expanded={isModelOpen}
+                aria-haspopup="dialog"
+                className="p-2 sm:p-2.5 min-h-10 min-w-10 bg-secondary hover:bg-blue-600 text-secondary-foreground hover:text-white rounded-xl transition-all duration-200 cursor-pointer shadow-2xs flex items-center justify-center"
               >
-                <FiUser className="w-4 h-4 sm:w-5 sm:h-5" />
+                <FiUser className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
               </button>
               {isModelOpen && <Model onClose={toggleModel} />}
             </div>
@@ -87,14 +92,16 @@ export default function Header() {
             {/* Mobile Menu Hamburger Toggle */}
             <div className="flex items-center md:hidden">
               <button
+                type="button"
                 onClick={toggleMenue}
-                aria-label="Toggle menu"
-                className="p-2 text-foreground hover:text-blue-600 hover:bg-muted rounded-xl transition-colors text-xl"
+                aria-label={isMenueOpen ? "Close navigation menu" : "Open navigation menu"}
+                aria-expanded={isMenueOpen}
+                className="p-2 min-h-11 min-w-11 flex items-center justify-center text-foreground hover:text-blue-600 hover:bg-muted rounded-xl transition-colors text-xl cursor-pointer"
               >
                 {isMenueOpen ? (
-                  <FiX className="w-6 h-6" />
+                  <FiX className="w-6 h-6" aria-hidden="true" />
                 ) : (
-                  <FiMenu className="w-6 h-6" />
+                  <FiMenu className="w-6 h-6" aria-hidden="true" />
                 )}
               </button>
             </div>

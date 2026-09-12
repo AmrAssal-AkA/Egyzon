@@ -27,7 +27,6 @@ export async function POST(req: NextRequest) {
         { status: error.response.status }
       );
     }
-    console.error("Forget password error:", error);
     return NextResponse.json(
       { success: false, message: "Failed to send reset email" },
       { status: 500 }

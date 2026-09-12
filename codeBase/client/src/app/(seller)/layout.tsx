@@ -23,11 +23,11 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
   return (
     <PrivateRoute allowedRoles={[Roles.SELLER]}>
       <NotificationListener />
-      <div className="min-h-screen flex flex-col md:flex-row gap-6 p-6 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
-        <SellerSideMenue  />
-        <div className="flex-1 flex flex-col gap-6 min-w-0">
+      <div className="min-h-screen flex flex-col md:flex-row gap-4 md:gap-6 p-3.5 sm:p-5 lg:p-6 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+        <SellerSideMenue />
+        <div className="flex-1 flex flex-col gap-4 sm:gap-6 min-w-0">
           <SellerHeader />
-          <section className="flex-1">{children}</section>
+          <section className="flex-1 min-w-0">{children}</section>
           <ToastContainer />
           <SellerFooter />
         </div>

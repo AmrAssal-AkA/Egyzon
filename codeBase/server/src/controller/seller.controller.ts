@@ -37,7 +37,6 @@ export const SellerController = {
       const sellerId = req.user?.userId || (process.env.NODE_ENV !== "production" ? req.body.sellerId as string : undefined);
       const seller = req.user?.role
       if (!sellerId || seller !== "seller") return sendErrorResponse(res, 403, "Forbidden", "You are not authorized to access this resource");
-      console.log("sellerId:", sellerId);
       const totalRevenue = await SellerServices.getTotalRevenue(sellerId);
       sendSuccessResponse(res, 200, "Total revenue fetched successfully", totalRevenue);
     }catch(error){
