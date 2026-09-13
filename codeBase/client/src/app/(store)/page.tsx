@@ -31,10 +31,11 @@ export const metadata = {
 };
 
 export default async function Home() {
-  // Fetch products and categories from the server
-  const productsResponse = await fetchProducts(1, 4);
-  const products = productsResponse.data.products;
-  const categories = await fetchCategories();
+  const [productsResponse, categories] = await Promise.all([
+    fetchProducts(1, 4),
+    fetchCategories(),
+  ]);
+  const products = productsResponse?.data?.products || [];
   const categoriesList = Array.isArray(categories) ? categories : [];
   const limitedCategories = categoriesList.slice(0, 4);
 

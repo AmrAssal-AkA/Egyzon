@@ -7,9 +7,14 @@ import { cn } from "@/lib/utils";
 interface HeroSlideProps {
   slide: HeroSlideItem;
   isActive: boolean;
+  isPriority?: boolean;
 }
 
-export const HeroSlide: React.FC<HeroSlideProps> = ({ slide, isActive }) => {
+export const HeroSlide: React.FC<HeroSlideProps> = ({
+  slide,
+  isActive,
+  isPriority = false,
+}) => {
   return (
     <div
       className={cn(
@@ -77,10 +82,11 @@ export const HeroSlide: React.FC<HeroSlideProps> = ({ slide, isActive }) => {
             src={slide.imageUrl}
             alt={`${slide.headline} ${slide.headlineItalic || ""}`}
             fill
-            sizes="(max-width: 768px) 100vw, 40vw"
-            priority
+            sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 500px"
+            priority={isPriority}
+            loading={isPriority ? undefined : "lazy"}
+            fetchPriority={isPriority ? "high" : "low"}
             quality={75}
-            fetchPriority="auto"
             className="object-cover transition-transform duration-8000 ease-out hover:scale-105"
           />
         </div>

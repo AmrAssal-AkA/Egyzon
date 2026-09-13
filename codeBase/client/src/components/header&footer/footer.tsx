@@ -147,7 +147,7 @@ export default function Footer() {
                   type="email"
                   placeholder="Enter your email"
                   aria-label="Email address for newsletter"
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all flex-1"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all flex-1"
                   required
                 />
                 <button
@@ -159,7 +159,7 @@ export default function Footer() {
                   <FiSend className="w-3.5 h-3.5" aria-hidden="true" />
                 </button>
               </div>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-slate-400">
                 We value your privacy. Unsubscribe at any time.
               </p>
             </form>
@@ -168,7 +168,7 @@ export default function Footer() {
         </div>
 
         {/* Footer Bottom Section */}
-        <div className="mt-12 lg:mt-16 pt-8 border-t border-white/10 text-center text-gray-600">
+        <div className="mt-12 lg:mt-16 pt-8 border-t border-white/10 text-center text-slate-400 text-xs sm:text-sm">
           <p>© {new Date().getFullYear()} Egyzon Marketplace. All rights reserved.</p>
         </div>
 

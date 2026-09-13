@@ -12,9 +12,10 @@ import { useAuth } from "@/hooks/useAuth";
 
 interface ProductCardProps {
   product: Product;
+  priority?: boolean;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, priority = false }: ProductCardProps) {
   const title = product.productName || product.name || "Product";
   const description = product.productDescription || product.description || "";
   const price = typeof product.price === "number" ? product.price : Number(product.price) || 0;
@@ -104,7 +105,8 @@ export default function ProductCard({ product }: ProductCardProps) {
             src={image}
             alt={title}
             fill
-            priority
+            priority={priority}
+            loading={priority ? undefined : "lazy"}
             quality={75}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
             className="object-cover transition-transform duration-300 group-hover:scale-105"

@@ -20,6 +20,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { sendContact } from "@/services/contact.services";
+import { useAuth } from "@/hooks/useAuth";
 
 export function ContactFormSection() {
   const [submitted, setSubmitted] = useState(false);
@@ -30,6 +31,7 @@ export function ContactFormSection() {
     subject: "",
     message: "",
   });
+  const {user} = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +56,7 @@ export function ContactFormSection() {
       setLoading(false);
     }
   };
-
+  const FullName = user?.FirstName && user?.LastName ? `${user.FirstName} ${user.LastName}` : user?.FirstName || user?.LastName || "";
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
       {/* Contact Info Sidebar */}
@@ -196,6 +198,7 @@ export function ContactFormSection() {
                       onChange={(e) =>
                         setFormData({ ...formData, name: e.target.value })
                       }
+                      defaultValue={FullName}
                       className="w-full px-3.5 py-2.5 rounded-lg bg-background border border-input text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -216,6 +219,7 @@ export function ContactFormSection() {
                       onChange={(e) =>
                         setFormData({ ...formData, email: e.target.value })
                       }
+                      defaultValue={user?.email}
                       className="w-full px-3.5 py-2.5 rounded-lg bg-background border border-input text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>

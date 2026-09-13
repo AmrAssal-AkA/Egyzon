@@ -107,7 +107,11 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
               inert={index !== currentIndex}
               className="absolute inset-0 w-full h-full"
             >
-              <HeroSlide slide={slide} isActive={index === currentIndex} />
+              <HeroSlide
+                slide={slide}
+                isActive={index === currentIndex}
+                isPriority={index === 0}
+              />
             </div>
           ))}
         </div>

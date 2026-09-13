@@ -11,7 +11,7 @@ import logger from "../utils/logger";
 const paymobBaseUrl = process.env.PAYMOB_BASE_URL;
 const paymobApiKey = process.env.PAYMOB_API_KEY;
 const paymobIntegrationId = process.env.PAYMOB_INTEGRATION_ID;
-const PaymobHmackey = process.env.PAYMOB_HMAC_KEY?.trim();
+const PaymobHmackey = process.env.PAYMOB_HMAC_KEY;
 const IframeId = process.env.PAYMOB_IFRAME_ID;
 
 const HMAC_FIELD_ORDERS = [
@@ -23,7 +23,7 @@ const HMAC_FIELD_ORDERS = [
   "id",
   "integration_id",
   "is_3d_secure",
-  "is_auction",
+  "is_auth",
   "is_capture",
   "is_refunded",
   "is_standalone_payment",
@@ -156,7 +156,7 @@ const handlePaymobWebhook = async (req: Request, res: Response) => {
   try {
     const hmac = req.query.hmac as string;
     const transaction = req.body.obj;
-    logger.warn(`RAW PAYLOAD: ${JSON.stringify(transaction)}`);
+    
     if(!hmac || !verifypaymobHMAC(transaction, hmac)) {
       return sendErrorResponse(res, 400, "Invalid HMAC signature");
     }

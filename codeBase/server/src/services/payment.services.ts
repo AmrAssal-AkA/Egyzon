@@ -77,6 +77,11 @@ export class PaymentService {
         "Payment not found for the given Paymob order ID",
       );
     }
+    if (payment.transactionId === String(transaction.id)) {
+      logger.info(`Transaction with ID ${transaction.id} has already been processed for payment with Paymob order ID ${paymobOrderId}`);
+      const order = await Order.findOne({ payment: payment._id });
+      return { payment, order };
+    }
     logger.info(`Handling Paymob transaction for order: ${paymobOrderId}`);
     payment.transactionId = transaction.id;
     payment.paymentStatus = isSuccess
