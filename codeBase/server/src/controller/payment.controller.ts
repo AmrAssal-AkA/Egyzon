@@ -41,9 +41,8 @@ function getNestedValue(obj: any, path: string): any {
      return path.split('.').reduce((acc, key) => (acc == null ? undefined : acc[key]), obj)
 }
 function verifypaymobHMAC(data: any, hmac: string): boolean {
-  const patched = {...data, owner: data?.data?.owner};
   const connected = HMAC_FIELD_ORDERS.map(field => {
-    const value = getNestedValue(patched, field);
+    const value = getNestedValue(data, field);
     return value === undefined || value === null ? '' : String(value);
   }).join('');
   const computedHmac = crypto.createHmac('sha512', PaymobHmackey!).update(connected).digest('hex');

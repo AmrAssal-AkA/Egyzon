@@ -23,15 +23,27 @@ import { sendContact } from "@/services/contact.services";
 import { useAuth } from "@/hooks/useAuth";
 
 export function ContactFormSection() {
+  const { user } = useAuth();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
+  const [formData, setFormData] = useState<{
+    name?: string;
+    email?: string;
+    subject: string;
+    message: string;
+  }>({
     subject: "",
     message: "",
   });
-  const {user} = useAuth();
+
+  const defaultFullName =
+    user?.FirstName && user?.LastName
+      ? `${user.FirstName} ${user.LastName}`
+      : user?.FirstName || user?.LastName || "";
+  const defaultEmail = user?.email || "";
+
+  const name = formData.name !== undefined ? formData.name : defaultFullName;
+  const email = formData.email !== undefined ? formData.email : defaultEmail;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,8 +51,8 @@ export function ContactFormSection() {
 
     try {
       const res = await sendContact({
-        fullName: formData.name,
-        email: formData.email,
+        fullName: name,
+        email: email,
         topic: formData.subject,
         message: formData.message,
       });
@@ -56,7 +68,6 @@ export function ContactFormSection() {
       setLoading(false);
     }
   };
-  const FullName = user?.FirstName && user?.LastName ? `${user.FirstName} ${user.LastName}` : user?.FirstName || user?.LastName || "";
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
       {/* Contact Info Sidebar */}
@@ -167,9 +178,7 @@ export function ContactFormSection() {
                   onClick={() => {
                     setSubmitted(false);
                     setFormData({
-                      name: "",
-                      email: "",
-                      subject: "general",
+                      subject: "",
                       message: "",
                     });
                   }}
@@ -194,11 +203,10 @@ export function ContactFormSection() {
                       type="text"
                       required
                       placeholder="e.g. Ahmed Hassan"
-                      value={formData.name}
+                      value={name}
                       onChange={(e) =>
                         setFormData({ ...formData, name: e.target.value })
                       }
-                      defaultValue={FullName}
                       className="w-full px-3.5 py-2.5 rounded-lg bg-background border border-input text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -215,11 +223,10 @@ export function ContactFormSection() {
                       type="email"
                       required
                       placeholder="ahmed@example.com"
-                      value={formData.email}
+                      value={email}
                       onChange={(e) =>
                         setFormData({ ...formData, email: e.target.value })
                       }
-                      defaultValue={user?.email}
                       className="w-full px-3.5 py-2.5 rounded-lg bg-background border border-input text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
