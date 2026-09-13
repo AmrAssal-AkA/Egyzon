@@ -42,7 +42,6 @@ export function useSocket() {
     return () => {
       cancelled = true;
       disconnect();
-      console.log("Socket disconnected and cleanup done.");
     };
   }, [connect, disconnect, initialNotifications, setLoading, user]);
 

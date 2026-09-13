@@ -9,9 +9,9 @@ export const DEFAULT_SLIDES: HeroSlideItem[] = [
     description:
       "Curated essentials from world-renowned independent vendors. Experience craftsmanship redefined for the modern explorer.",
     primaryCtaText: "Shop Collection",
-    primaryCtaLink: "/collections/spring-2026",
-    secondaryCtaText: "View Lookbook",
-    secondaryCtaLink: "/lookbooks/spring-2026",
+    primaryCtaLink: "/products",
+    secondaryCtaText: "Browse Categories",
+    secondaryCtaLink: "/categories",
     imageUrl: "/images/alexandria_edit.png",
   },
   {
@@ -22,9 +22,9 @@ export const DEFAULT_SLIDES: HeroSlideItem[] = [
     description:
       "Elevate your productivity with our curated collection of sleek mechanical keyboards, studio headphones, and desktop organizers.",
     primaryCtaText: "Explore Tech",
-    primaryCtaLink: "/collections/tech-essentials",
-    secondaryCtaText: "Learn More",
-    secondaryCtaLink: "/articles/workspace-guide",
+    primaryCtaLink: "/products",
+    secondaryCtaText: "About Us",
+    secondaryCtaLink: "/about",
     imageUrl: "/images/tech_essentials.png",
   },
   {
@@ -35,7 +35,7 @@ export const DEFAULT_SLIDES: HeroSlideItem[] = [
     description:
       "Handcrafted ceramics, minimalist lighting, and organic textiles designed to bring serenity and elegance to your home.",
     primaryCtaText: "Shop Home",
-    primaryCtaLink: "/collections/curated-living",
+    primaryCtaLink: "/products",
     imageUrl: "/images/curated_living.png",
   },
 ];

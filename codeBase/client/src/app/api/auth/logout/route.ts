@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { serverClient } from "@/lib/serverClient";
 import { cookies } from "next/headers";
 
+
 export async function POST() {
   try {
     const cookieStore = await cookies();
@@ -22,7 +23,6 @@ export async function POST() {
     res.cookies.delete("refreshToken");
     return res;
   } catch (error) {
-    // Still clear cookies on the client even if the server request fails
     const res = NextResponse.json(
       { success: true, message: "Logged out" },
       { status: 200 },

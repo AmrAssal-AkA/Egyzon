@@ -9,7 +9,11 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import NotificationListener from '@/components/seller/common/NotificationListener'
 import {ToastContainer} from "@/components/toast/ToastContainer";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Egyzon",
@@ -38,8 +42,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({children} : Readonly<{children: React.ReactNode;}>) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)} suppressHydrationWarning >
-      
+    <html lang="en" className={cn("font-sans", geist.variable)} suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+      </head>
       <body className="min-h-full flex flex-col">
           <ThemeProvider
             attribute="class"

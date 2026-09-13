@@ -6,7 +6,7 @@ export async function POST(){
   const cookieStore = await cookies();
   const refreshToken = cookieStore.get("refresh_token")?.value || cookieStore.get("refreshToken")?.value;
   if (!refreshToken) {
-    return NextResponse.json({ success: false, message: "No refresh token found" }, { status: 401 });
+    return NextResponse.json({ success: false, message: "No refresh token found" }, { status: 200 });
   }
   try {
     const response = await serverClient.post("/api/auth/refresh", {}, {
@@ -50,9 +50,13 @@ export async function POST(){
       });
     }
 
-    return res;
-  }catch(error) {
+  } catch (error) {
     console.error("Token refresh error:", error);
-    return NextResponse.json({ success: false, message: "Token refresh failed" }, { status: 500 });
+    const res = NextResponse.json({ success: false, message: "Token refresh failed" }, { status: 200 });
+    res.cookies.delete("Access_token");
+    res.cookies.delete("refresh_token");
+    res.cookies.delete("token");
+    res.cookies.delete("refreshToken");
+    return res;
   }
 }

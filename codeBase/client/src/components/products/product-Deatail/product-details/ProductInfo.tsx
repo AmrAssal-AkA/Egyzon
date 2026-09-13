@@ -98,17 +98,17 @@ export default function ProductInfo({
           <span className="w-1.5 h-1.5 rounded-full bg-border shrink-0" />
           {isAvailable ? (
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full">
+              <span className="inline-flex items-center text-xs font-semibold uppercase tracking-wider text-emerald-900 dark:text-emerald-200 bg-emerald-500/10 px-2.5 py-0.5 rounded-full">
                 In Stock
               </span>
               {typeof stock === "number" && stock > 0 && stock <= 5 && (
-                <span className="inline-flex items-center text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full">
+                <span className="inline-flex items-center text-xs font-medium text-amber-900 dark:text-amber-200 bg-amber-500/10 px-2.5 py-0.5 rounded-full">
                   Only {stock} left!
                 </span>
               )}
             </div>
           ) : (
-            <span className="inline-flex items-center text-xs font-semibold uppercase tracking-wider text-red-600 dark:text-red-450 bg-red-500/10 px-2.5 py-0.5 rounded-full">
+            <span className="inline-flex items-center text-xs font-semibold uppercase tracking-wider text-rose-900 dark:text-rose-200 bg-rose-500/10 px-2.5 py-0.5 rounded-full">
               Out of Stock
             </span>
           )}

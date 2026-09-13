@@ -39,14 +39,14 @@ export interface StorefrontDetails {
   aboutStory?: string;
   logo: string;
   banner: string;
-  storeType: StoreType; // "physical" | "online"
+  storeType: StoreType;
   isVerified: boolean;
   address?: StoreAddress;
   rating: number;
   reviewCount: number;
-  positiveFeedbackRate?: number; // e.g. 98%
-  responseTime?: string; // e.g. "within an hour"
-  joinedDate: string; // e.g. "Joined March 2024"
+  positiveFeedbackRate?: number;
+  responseTime?: string;
+  joinedDate: string;
   phone?: string;
   email?: string;
   openingHours?: StoreOpeningHours[];

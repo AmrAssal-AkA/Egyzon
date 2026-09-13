@@ -185,10 +185,10 @@ export default function StoreProductCard({ product }: StoreProductCardProps) {
           <span
             className={`text-[10px] sm:text-[11px] font-medium px-2 py-0.5 rounded-full ${
               isOutOfStock
-                ? "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+                ? "bg-rose-500/10 text-rose-900 dark:text-rose-200"
                 : isLowStock
-                  ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                  : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  ? "bg-amber-500/10 text-amber-900 dark:text-amber-200"
+                  : "bg-emerald-500/10 text-emerald-900 dark:text-emerald-200"
             }`}
           >
             {isOutOfStock

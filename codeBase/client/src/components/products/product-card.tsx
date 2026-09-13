@@ -126,17 +126,17 @@ export default function ProductCard({ product }: ProductCardProps) {
           )}
 
           <div className="mt-auto pt-3 flex items-center justify-between gap-2">
-            <div className="inline-flex items-center gap-1 bg-amber-500/15 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400 px-2 py-0.5 rounded text-xs font-semibold shrink-0">
+            <div className="inline-flex items-center gap-1 bg-amber-500/15 text-amber-900 dark:bg-amber-500/20 dark:text-amber-200 px-2 py-0.5 rounded text-xs font-semibold shrink-0">
               <span>{rating > 0 ? Number(rating).toFixed(1) : "0.0"}</span>
-              <span className="text-amber-500">★</span>
+              <span className="text-amber-600 dark:text-amber-400" aria-hidden="true">★</span>
             </div>
             <span
               className={`text-[11px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full font-medium whitespace-nowrap ${
                 stockStatus === "in"
-                  ? "bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400"
+                  ? "bg-emerald-500/15 text-emerald-900 dark:bg-emerald-500/20 dark:text-emerald-200"
                   : stockStatus === "low"
-                    ? "bg-amber-500/15 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400"
-                    : "bg-rose-500/15 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400"
+                    ? "bg-amber-500/15 text-amber-900 dark:bg-amber-500/20 dark:text-amber-200"
+                    : "bg-rose-500/15 text-rose-900 dark:bg-rose-500/20 dark:text-rose-200"
               }`}
             >
               {stockStatus === "in"

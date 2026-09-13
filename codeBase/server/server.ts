@@ -28,6 +28,7 @@ import morganMiddleware from "./src/middleware/requestLogger";
 import walletRoute from "./src/routes/wallet.route";
 import logger from "./src/utils/logger";
 import newletterRoute from "./src/routes/newsletter.routes";
+import contactRoute from "./src/routes/contact.routes";
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -58,18 +59,20 @@ app.set("trust proxy", 1);
 
 //routes
 app.use("/api/auth", AuthentaicatingRoute);
-app.use("/api/product", generalLimiter, productRoute);
-app.use("/api/wishlist", generalLimiter, wishlistRoute);
-app.use("/api/seller", generalLimiter, sellerRoute);
-app.use("/api/cart", generalLimiter, cartRoute);
-app.use("/api/category", generalLimiter, CategoryRoute);
-app.use("/api/customer", generalLimiter, customerRoute);
+app.use("/api/", generalLimiter);
+app.use("/api/product", productRoute);
+app.use("/api/wishlist", wishlistRoute);
+app.use("/api/seller", sellerRoute);
+app.use("/api/cart", cartRoute);
+app.use("/api/category", CategoryRoute);
+app.use("/api/customer", customerRoute);
 app.use("/api/admin", adminRoute);
-app.use("/api/order", generalLimiter, orderRoute);
+app.use("/api/order", orderRoute);
 app.use("/api/notifications", NotificationRoute);
 app.use("/api/payment", PaymentRoute);
 app.use("/api/wallet", walletRoute);
 app.use("/api/newsletter", newletterRoute);
+app.use("/api/contact", contactRoute);
 //swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

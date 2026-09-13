@@ -60,45 +60,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshSession = useCallback(async (): Promise<boolean> => {
     try {
-      const meRes = await authServices.me();
-      if (meRes.success && meRes.data) {
-        const cookieToken = readAccessTokenFromCookies();
-        const nextToken = cookieToken ?? token ?? null;
-        setToken(nextToken);
-        setUser({ ...meRes.data, token: nextToken, Access_token: nextToken });
-        syncUserBuyerStores(meRes.data.role);
-        return true;
-      }
-
       type RefreshResponse = { success: boolean; data?: unknown; message?: string };
       const res = await ApiCall.post<RefreshResponse>("/auth/refresh");
       if (res.data?.success) {
-        const meRes2 = await authServices.me();
-        if (meRes2.success && meRes2.data) {
+        const meRes = await authServices.me();
+        if (meRes.success && meRes.data) {
           const cookieToken = readAccessTokenFromCookies();
-          const nextToken = cookieToken ?? token ?? null;
+          const nextToken = cookieToken ?? null;
           setToken(nextToken);
-          setUser({ ...meRes2.data, token: nextToken, Access_token: nextToken });
-          syncUserBuyerStores(meRes2.data.role);
+          setUser({ ...meRes.data, token: nextToken, Access_token: nextToken });
+          syncUserBuyerStores(meRes.data.role);
           return true;
         }
       }
       setUser(null);
       setToken(null);
-      useCartStore.getState().clearLocalCart();
-      useWishlistStore.getState().clearWishlist();
       return false;
-    } catch (error) {
+    } catch {
       setUser(null);
       setToken(null);
-      useCartStore.getState().clearLocalCart();
-      useWishlistStore.getState().clearWishlist();
       return false;
     }
-  }, [token]);
+  }, []);
 
   const loadSession = useCallback(async () => {
-    setLoading(true);
     const cookieToken = readAccessTokenFromCookies();
     if (cookieToken) {
       setToken(cookieToken);
@@ -106,14 +91,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const res = await authServices.me();
     if (res.success && res.data) {
-      const nextToken = cookieToken ?? token ?? null;
+      const nextToken = cookieToken ?? null;
       setUser({ ...res.data, token: nextToken, Access_token: nextToken });
       syncUserBuyerStores(res.data.role);
     } else {
-      await refreshSession();
+      setUser(null);
+      setToken(null);
     }
     setLoading(false);
-  }, [refreshSession, token]);
+  }, []);
   useEffect(() => {
     void loadSession();
 

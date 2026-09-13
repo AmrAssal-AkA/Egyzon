@@ -66,7 +66,7 @@ router.patch(
 router.post("/refresh", RefreshToken);
 
 // Logout route
-router.post("/logout",async (req: Request, res: Response) => {
+router.post("/logout",authLimiter,async (req: Request, res: Response) => {
   const refreshToken = req.cookies["refresh_token"];
 
   if (!refreshToken) {
@@ -109,10 +109,11 @@ router.get("/verify-email",  verifyEmail);
 
 router.get(
   "/continue-with-google",
+  authLimiter,
   passport.authenticate("google", { scope: ["profile", "email"] }),
 );
-router.get( "/google/callback", passportAuthMW, googleCallback);
-router.post('/forget-password', validate(forgetPasswordSchema),RequestForgetPassword);
-router.patch('/reset-password', validate(resetPasswordSchema), ForgetPassword);
+router.get( "/google/callback",authLimiter, passportAuthMW, googleCallback);
+router.post('/forget-password',authLimiter, validate(forgetPasswordSchema),RequestForgetPassword);
+router.patch('/reset-password', authLimiter, validate(resetPasswordSchema), ForgetPassword);
 
 export default router;

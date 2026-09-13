@@ -29,7 +29,9 @@ export const fetchCategories = async (): Promise<Category[]> => {
 
     return list.map(normalizeCategory);
   } catch (error) {
-    console.error("Failed to fetch categories:", error);
+   if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data.message || "Failed to fetch categories");
+    }
     return [];
   }
 };
@@ -49,14 +51,17 @@ export const fetchProductsByCategoryId = async (
     if (resData && typeof resData === "object" && "data" in resData && Array.isArray(resData.data)) {
       return resData.data as Product[];
     }
-    if (Array.isArray((resData as any)?.products)) {
-      return (resData as any).products as Product[];
+    if (Array.isArray(resData?.products)) {
+      return resData.products as Product[];
     }
 
     return [];
   } catch (error) {
-    console.error(`Failed to fetch products for category ${categoryId}:`, error);
-    return [];
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data.message || "Failed to fetch products by category ID");
+    } else {
+      throw new Error("Failed to fetch products by category ID");
+    }
   }
 };
 
@@ -67,7 +72,6 @@ export const addCategory = async (formData: FormData) => {
     const response = await apiClient.post("/api/category/addCategory", formData);
     return response.data;
   } catch (error) {
-    console.error("Error adding category:", error);
     if (axios.isAxiosError(error) && error.response) {
       throw error.response.data;
     }
@@ -89,7 +93,6 @@ export const addProductToCategory = async ({
     });
     return response.data;
   } catch (error) {
-    console.error("Error adding product to category:", error);
     if (axios.isAxiosError(error) && error.response) {
       throw error.response.data;
     }

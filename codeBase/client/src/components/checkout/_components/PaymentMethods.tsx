@@ -45,7 +45,7 @@ export function PaymentMethods({ payment }: PaymentMethodsProps) {
     }
 
     return (
-      <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">
+      <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-900 dark:text-amber-200 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">
         <Clock className="w-3 h-3" />
         {payment.status || "Pending"}
       </span>
