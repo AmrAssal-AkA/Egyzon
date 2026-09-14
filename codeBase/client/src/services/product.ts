@@ -24,7 +24,7 @@ export {
   addProductToCategory,
 };
 
-const mapDummyJsonProduct = (product: Products): Product => ({
+const mapProductData= (product: Products): Product => ({
   _id: String(product.id),
   productName: product.title,
   productDescription: product.description,
@@ -45,7 +45,7 @@ const mapDummyJsonProduct = (product: Products): Product => ({
   brand: product.brand,
 });
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8080";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export const fetchProducts = async (page: number = 1, limit: number = 10): Promise<productListResponse> => {
   try {
@@ -68,19 +68,35 @@ export const fetchProducts = async (page: number = 1, limit: number = 10): Promi
 
     return data as productListResponse;
   } catch (error) {
-    return {
-      success: false,
-      message: "Failed to fetch products",
-      data: {
-        products: [],
-        page,
-        limit,
-        total: 0,
-        length: 0,
-      },
-    };
+    if (axios.isAxiosError(error)) {
+      return {
+        success: false,
+        message: "An unexpected error occurred",
+        data: {
+            products: [],
+            page,
+            limit,
+            total: 0,
+            length: 0,
+          },
+        };
+      }
+
+      const errorMsg = error instanceof Error ? error.message : "Failed to fetch products";
+      return {
+        success: false,
+        message: errorMsg,
+        data: {
+          products: [],
+          page,
+          limit,
+          total: 0,
+          length: 0,
+        },
+      };
+    }
   }
-};
+
 
 export const fetchProductById = async (id: string | number): Promise<Product | null> => {
   if (!id) return null;
@@ -98,16 +114,16 @@ export const fetchProductById = async (id: string | number): Promise<Product | n
     if (!productData || typeof productData !== "object") return null;
 
     if (productData.title && !productData.productName) {
-      return mapDummyJsonProduct(productData);
+      return mapProductData(productData);
     }
 
     return productData as Product;
-  } catch (error: any) {
-    const errorMsg =
-      error?.response?.data?.message ||
-      error?.message ||
-      "Product not found or unavailable";
-    return null;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw error.response.data;
+    } else {
+      throw new Error("Failed to fetch product by ID");
+    }
   }
 };
 
@@ -129,7 +145,7 @@ export const fetchProductsByCategory = async ({
           `${BACKEND_URL}/api/product/category/${categorySlug}`,
         );
         const data = await response.json();
-        return (data.products as Products[]).map(mapDummyJsonProduct);
+        return (data.products as Products[]).map(mapProductData);
       }),
     );
 
@@ -137,7 +153,9 @@ export const fetchProductsByCategory = async ({
       .flat()
       .filter((product: Product) => Number(product._id) !== currentId) as Product[];
   } catch (error) {
-    throw new Error("Failed to fetch products by category");
+    if (axios.isAxiosError(error) && error.response) {
+      throw error.response.data;
+    }
   }
 };
 
@@ -201,7 +219,7 @@ export const editProduct = async (
 ) => {
   try {
     let productId: string | number | undefined;
-    let payload: any;
+    let payload: unknown;
 
     if (typeof productIdOrData === "string" || typeof productIdOrData === "number") {
       productId = productIdOrData;

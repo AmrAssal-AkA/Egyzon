@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { productListResponse } from "@/types/product.type";
 import { serverClient } from "@/lib/serverClient";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
     const page = searchParams.get("page") || "1";

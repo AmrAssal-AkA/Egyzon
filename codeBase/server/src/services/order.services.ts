@@ -117,6 +117,7 @@ export class OrderService {
         const product = await this.product
           .findById(i.productId)
           .session(session);
+          // Check if the product exists and has sufficient stock
         if (!product)
           throw new AppError(404, `Product with ID ${i.productId} not found`);
         if (product.stock < i.quantity || product.stock <= 0){
@@ -125,6 +126,8 @@ export class OrderService {
             `out of stock for product ${product.productName}`,
           );
         }
+        // Check if the product price is valid
+        if (product.price <= 0) throw new AppError(400, `Invalid price for product ${product.productName}`);
 
         const unitPrice = product.price;
         const itemSubtotal = unitPrice * i.quantity;
@@ -149,7 +152,7 @@ export class OrderService {
           quantity: i.quantity,
           description: product.productDescription || "",
         });
-
+        // Adjust stock and save product
         for (const item of orderItems) {
           await InventoryServices.adjustStock(item.product.toString(), -item.quantity);
         }
@@ -188,7 +191,6 @@ export class OrderService {
       await session.commitTransaction();
     } catch (error) {
       await session.abortTransaction();
-      console.error("Error placing order:", error);
       if (error instanceof AppError) throw error;
       throw new AppError(500, "Internal Server Error");
     } finally {

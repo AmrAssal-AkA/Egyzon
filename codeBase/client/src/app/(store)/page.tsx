@@ -6,6 +6,9 @@ import { fetchCategories } from "@/services/product";
 import { fetchProducts } from "@/services/product";
 import NewsLetterForm from "@/components/home/newsletter/newsletterform";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata = {
   title: "egyzon - Your One-Stop Destination for Products",
   description:
@@ -33,7 +36,7 @@ export const metadata = {
 export default async function Home() {
   const [productsResponse, categories] = await Promise.all([
     fetchProducts(1, 4),
-    fetchCategories(),
+    fetchCategories().catch(() => []),
   ]);
   const products = productsResponse?.data?.products || [];
   const categoriesList = Array.isArray(categories) ? categories : [];
