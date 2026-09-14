@@ -5,7 +5,6 @@ import Order from "../models/orderModel";
 import { AdminService } from "./admin.services";
 import { AppError } from "../utils/AppError";
 import type { OrderStatus } from "../types/order.type";
-import { SellerApplyApplicantTemplate } from "../templates/SellerApplyApplicant";
 import type {AvgOrderValueResponse} from "../types/seller.typs";
 import { PaymentStatus } from "../types/payment.type";
 import { encrypt , dycrypt} from "../utils/encryption";
@@ -16,6 +15,7 @@ import logger from "../utils/logger";
 
 export const SellerServices = {
   ApplyAsPartner: async (sellerData: any, userId: string)=> {
+    try {
     const userModel = Seller.db.model("User");
     const user = await userModel.findById(userId);
 
@@ -36,16 +36,12 @@ export const SellerServices = {
       },
       { returnDocument: "after" },
     );
-    try {
-       SellerApplyApplicantTemplate(
-        user.email,
-        user.FirstName,
-        sellerData.storeName,
-      );
-    } catch (err) {
-      logger.error("Error sending email to applicant:", err);
-    }
+    logger.info(`Seller application submitted for user ${userId}`);
     return SaveSellerData;
+  }catch(error){
+      if (error instanceof AppError) logger.error(`error in applying as a seller ${error.message}`)
+        logger.error(`Unexpected error in applying as a seller: ${error}`);
+  }
   },
   checkExistingSeller: async (userId: string) => {
     const user = await User.findById(userId);
