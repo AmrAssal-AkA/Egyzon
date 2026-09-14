@@ -20,8 +20,6 @@ export const SellerServices = {
     const user = await userModel.findById(userId);
 
     if (!user) return;
-    if (user.role === "seller") return;
-
     const SaveSellerData = await userModel.collection.findOneAndUpdate(
       { _id: user._id },
       {
@@ -39,8 +37,12 @@ export const SellerServices = {
     logger.info(`Seller application submitted for user ${userId}`);
     return SaveSellerData;
   }catch(error){
-      if (error instanceof AppError) logger.error(`error in applying as a seller ${error.message}`)
-        logger.error(`Unexpected error in applying as a seller: ${error}`);
+      if (error instanceof AppError) {
+        logger.error(`error in applying as a seller ${error.message}`);
+        throw error;
+      }
+      logger.error(`Unexpected error in applying as a seller: ${error}`);
+      throw new AppError(500, "Internal Server Error");
   }
   },
   checkExistingSeller: async (userId: string) => {
@@ -54,8 +56,9 @@ export const SellerServices = {
   setupStore: async (storeData: any, sellerId: string) => {
     try {
       const seller = await Seller.findById(sellerId);
-      if (!seller) return;
-      if (seller.applicantStatus !== "approved") return;
+      if (!seller) throw new AppError(404, "Seller not found");
+      if (seller.applicantStatus !== "approved")
+        throw new AppError(403, "Your application has not been approved yet");
       const updatedSeller = await Seller.findByIdAndUpdate(
         sellerId,
         {
