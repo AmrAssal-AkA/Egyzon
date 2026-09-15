@@ -1,5 +1,0 @@
-FROM clamav/clamav:stable
-
-ENV CLAMAV_STARTUP_TIMEOUT=1800
-
-EXPOSE 3310

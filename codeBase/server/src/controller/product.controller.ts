@@ -4,7 +4,6 @@ import { ProductServices } from "../services/product.services";
 import { NotificationServices } from "../services/notification.services";
 import { sendErrorResponse, sendSuccessResponse } from "../utils/Responses";
 import uploadImage from "../config/cloudainry.config";
-import { scanFile } from "../utils/virusScan";
 import logger from "../utils/logger";
 import { sentizeRichText , sentizePlainText} from "../utils/senitize";
 import { AppError } from "../utils/AppError";
@@ -46,20 +45,7 @@ export const ProductController = {
     if (!images || images.length === 0 || !images[0]?.buffer) {
       return sendErrorResponse(res, 400, "Image file is required");
     }
-    for (const image of images) {
-      const { isInfected, viruses } = await scanFile(image.buffer);
-      if (isInfected) {
-        logger.warn(
-          `Product Image is infected with viruses: ${viruses.join(", ")}`,
-        );
-        return sendErrorResponse(
-          res,
-          400,
-          "Bad Request",
-          `Product Image is infected with viruses: ${viruses.join(", ")}`,
-        );
-      }
-    }
+
     const imageUrl = await Promise.all(
       images.map((image) => uploadImage(image.buffer, "Egyzon/Products")),
     );
