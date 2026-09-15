@@ -26,7 +26,7 @@ export const SellerServices = {
       { _id: user._id },
       {
         $set: {
-          role: "seller",
+          role: "customer",
           storeName: sellerData.storeName,
           commercialRegisterNumber: sellerData.commercialRegisterNumber,
           taxCardNumber: sellerData.taxCardNumber,

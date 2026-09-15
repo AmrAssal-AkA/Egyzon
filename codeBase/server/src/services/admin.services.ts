@@ -159,7 +159,7 @@ export const AdminService = {
   },
   getAllPendingSellerApplications: async () => {
     try {
-      const applications = await Seller.find({
+      const applications = await User.find({
         applicantStatus: "pending",
       }).populate("user", "name email");
       return applications;
@@ -172,19 +172,20 @@ export const AdminService = {
   },
   approveSeller: async (sellerId: string): Promise<ISeller> => {
     try {
-      const seller = await Seller.findOne({
+      const userfound = await User.findOne({
         _id: sellerId,
         applicantStatus: "pending",
-      });
-      if (!seller) throw new AppError(404, "Pending seller not found");
-      const approvedSeller = await Seller.findOneAndUpdate(
+      })
+      if (!userfound) throw new AppError(404, "Pending seller not found");
+      const approveSeller = await Seller.findOneAndUpdate(
         { _id: sellerId, applicantStatus: "pending" },
-        { applicantStatus: "approved" },
+        { applicantStatus: "approved", role: "seller" },
         { returnDocument: "after" },
       );
-      if (!approvedSeller)
+      if (!approveSeller)
         throw new AppError(409, "Seller could not be approved");
-      return approvedSeller;
+      return approveSeller;
+        
     } catch (error) {
       if (error instanceof AppError)
         throw new AppError(error.statusCode, error.message);
