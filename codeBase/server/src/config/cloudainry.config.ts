@@ -39,7 +39,7 @@ const uploadImage = async (file: Buffer | string, folder: string) => {
             stream.end(file);
         });
     }
-    logger.info(`Uploading image to Cloudinary: ${file}`);
+
     return await cloudinary.uploader.upload(file, getUploadOptions(folder));
 }
 

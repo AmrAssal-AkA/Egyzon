@@ -159,12 +159,8 @@ export const AdminService = {
   },
   getAllPendingSellerApplications: async () => {
     try {
-      const pendingApplications = await User.find({
-        applicantStatus: "pending",
-      }).select(
-        "-password -refreshToken -resetPasswordToken -resetPasswordTokenExpiration -emailVerificationToken -emailVerificationTokenExpiration -forgetPasswordToken -forgetPasswordTokenExpiration",
-      );
-      return pendingApplications;
+      const pendingSellers = await User.find({ applicantStatus: "pending" });
+      return pendingSellers;
     } catch (error) {
       if (error instanceof AppError) {
         throw new AppError(error.statusCode, error.message);
