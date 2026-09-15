@@ -839,12 +839,13 @@ export const swaggerSpec = {
         type: "object",
         properties: {
           _id: { type: "string" },
-          commercialRegisterNumber: { type: "string" },
-          taxCardNumber: { type: "string" },
-          storeName: { type: "string" },
           FirstName: { type: "string", example: "Mohamed" },
           LastName: { type: "string", example: "Hassan" },
-          email: { type: "string", format: "email", example: "mohamed@example.com" },
+          email: {
+            type: "string",
+            format: "email",
+            example: "mohamed@example.com",
+          },
           role: { type: "string", example: "customer" },
           phoneNumber: { type: "string", nullable: true },
           isBlocked: { type: "boolean", example: false },
@@ -855,8 +856,14 @@ export const swaggerSpec = {
           sellerDocuments: {
             type: "object",
             properties: {
-              commercialRegisterUrl: { type: "string", example: "https://res.cloudinary.com/.../cr.jpg" },
-              taxCardUrl: { type: "string", example: "https://res.cloudinary.com/.../tax.jpg" },
+              commercialRegisterUrl: {
+                type: "string",
+                example: "https://res.cloudinary.com/.../cr.jpg",
+              },
+              taxCardUrl: {
+                type: "string",
+                example: "https://res.cloudinary.com/.../tax.jpg",
+              },
             },
           },
           applicantStatus: {
@@ -869,16 +876,6 @@ export const swaggerSpec = {
               "rejected",
             ],
             example: "pending",
-          },
-          notes: { type: "string" },
-          user: {
-            type: "object",
-            properties: {
-              _id: { type: "string" },
-              FirstName: { type: "string" },
-              LastName: { type: "string" },
-              email: { type: "string", format: "email" },
-            },
           },
           notes: { type: "string", example: "" },
           createdAt: { type: "string", format: "date-time" },
@@ -915,12 +912,13 @@ export const swaggerSpec = {
         type: "object",
         properties: {
           _id: { type: "string" },
-          commercialRegisterNumber: { type: "string" },
-          taxCardNumber: { type: "string" },
-          storeName: { type: "string" },
           FirstName: { type: "string", example: "Mohamed" },
           LastName: { type: "string", example: "Hassan" },
-          email: { type: "string", format: "email", example: "seller@example.com" },
+          email: {
+            type: "string",
+            format: "email",
+            example: "seller@example.com",
+          },
           role: { type: "string", example: "seller" },
           commercialRegisterNumber: { type: "string", example: "CR-123456" },
           taxCardNumber: { type: "string", example: "TC-987654" },
@@ -3016,7 +3014,6 @@ export const swaggerSpec = {
             },
           },
           400: {
-            description: "All fields and images are required",
             description:
               "Bad Request - Missing required fields/images, user is already a seller, or user already has a pending application",
             content: {
@@ -5206,7 +5203,6 @@ export const swaggerSpec = {
             description: "Seller approved successfully",
             content: {
               "application/json": {
-                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
                 schema: {
                   allOf: [
                     { $ref: "#/components/schemas/ApiSuccessResponse" },
@@ -5248,7 +5244,6 @@ export const swaggerSpec = {
             },
           },
           404: {
-            description: "User not found or no pending application found",
             description: "Seller application not found or already processed",
             content: {
               "application/json": {
@@ -5289,7 +5284,6 @@ export const swaggerSpec = {
             description: "Request for additional documents sent successfully",
             content: {
               "application/json": {
-                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
                 schema: {
                   allOf: [
                     { $ref: "#/components/schemas/ApiSuccessResponse" },
@@ -5331,7 +5325,6 @@ export const swaggerSpec = {
             },
           },
           404: {
-            description: "No pending seller application found",
             description: "Seller application not found or already processed",
             content: {
               "application/json": {
@@ -5362,7 +5355,6 @@ export const swaggerSpec = {
             description: "Seller rejected successfully",
             content: {
               "application/json": {
-                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
                 schema: {
                   allOf: [
                     { $ref: "#/components/schemas/ApiSuccessResponse" },
@@ -5404,7 +5396,6 @@ export const swaggerSpec = {
             },
           },
           404: {
-            description: "User not found or no pending application found",
             description: "Seller application not found or already processed",
             content: {
               "application/json": {
@@ -6325,8 +6316,7 @@ export const swaggerSpec = {
                     summary: "Already subscribed",
                     value: {
                       success: false,
-                      message:
-                        "Email is already subscribed to the newsletter.",
+                      message: "Email is already subscribed to the newsletter.",
                     },
                   },
                   validationError: {

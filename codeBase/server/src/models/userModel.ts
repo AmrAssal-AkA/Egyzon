@@ -94,7 +94,13 @@ const UserSchema = new Schema<IUser>(
     // Seller application fields (populated when a customer applies as a seller)
     applicantStatus: {
       type: String,
-      enum: ["pending", "under-review", "additional_docs_requested", "approved", "rejected"],
+      enum: [
+        "pending",
+        "under-review",
+        "additional_docs_requested",
+        "approved",
+        "rejected",
+      ],
       default: null,
     },
     storeName: {

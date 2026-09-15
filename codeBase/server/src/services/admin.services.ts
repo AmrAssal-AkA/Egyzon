@@ -163,10 +163,14 @@ export const AdminService = {
       const pageSize = Number.isFinite(limit) && limit > 0 ? limit : 10;
 
       const [applications, total] = await Promise.all([
-        User.find({ applicantStatus: "pending" }).select(
-          "-password -refreshToken -resetPasswordToken -resetPasswordTokenExpiration -emailVerificationToken -emailVerificationTokenExpiration -forgetPasswordToken -forgetPasswordTokenExpiration",
-        ).sort({createdAt: -1}).skip((currentPage - 1) * pageSize).limit(pageSize),
-        User.countDocuments({applicantStatus: "pending"})
+        User.find({ applicantStatus: "pending" })
+          .select(
+            "-password -refreshToken -resetPasswordToken -resetPasswordTokenExpiration -emailVerificationToken -emailVerificationTokenExpiration -forgetPasswordToken -forgetPasswordTokenExpiration",
+          )
+          .sort({ createdAt: -1 })
+          .skip((currentPage - 1) * pageSize)
+          .limit(pageSize),
+        User.countDocuments({ applicantStatus: "pending" }),
       ]);
 
       return {
@@ -176,9 +180,8 @@ export const AdminService = {
           limit: pageSize,
           total,
           totalPages: Math.ceil(total / pageSize),
-        }
-      }
-
+        },
+      };
     } catch (error) {
       if (error instanceof AppError) {
         throw new AppError(error.statusCode, error.message);
@@ -225,15 +228,11 @@ export const AdminService = {
   requestAdditionalDocuments: async (
     sellerId: string,
     message: string,
-  ): Promise<ISeller> => {
-    const seller = await User.findById(sellerId);
   ): Promise<IUser> => {
     try {
-      const getSellerApplicationById = await Seller.findById(sellerId);
       const getSellerApplicationById = await User.findById(sellerId);
       if (!getSellerApplicationById)
         throw new AppError(404, "Seller application not found");
-      const requestAdditionalDocuments = await Seller.findOneAndUpdate(
       const requestAdditionalDocuments = await User.findOneAndUpdate(
         { _id: sellerId, applicantStatus: "pending" },
         { applicantStatus: "additional_docs_requested", notes: message },
@@ -246,8 +245,6 @@ export const AdminService = {
         );
       return requestAdditionalDocuments;
     } catch (error) {
-      if (error instanceof AppError)
-        throw new AppError(error.statusCode, error.message);
       if (error instanceof AppError) throw error;
       throw new AppError(500, "Internal Server Error");
     }
