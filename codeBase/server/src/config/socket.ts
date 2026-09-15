@@ -33,7 +33,7 @@ export function initSocket(server: HttpServer) {
             logger.info(`Raw cookie received: ${rawCookie}`);
             const parsedCookie = cookie.parseCookie(rawCookie);
             const accessToken = parsedCookie['Access_token'];
-            const refreshToken = parsedCookie['Refresh_token'];
+            const refreshToken = parsedCookie['refresh_token'];
             if (!accessToken || !refreshToken) return next(new Error("Authentication error"));
 
             const accessTokenPayload = verifyAccessToken(accessToken);

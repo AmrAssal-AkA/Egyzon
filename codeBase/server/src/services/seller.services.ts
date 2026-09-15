@@ -19,7 +19,9 @@ export const SellerServices = {
     const userModel = Seller.db.model("User");
     const user = await userModel.findById(userId);
 
-    if (!user) return;
+    if (!user) return null;
+    if(user.role === "seller") throw new AppError(400, "User is already a seller");
+
     const SaveSellerData = await userModel.collection.findOneAndUpdate(
       { _id: user._id },
       {
@@ -34,15 +36,18 @@ export const SellerServices = {
       },
       { returnDocument: "after" },
     );
-    logger.info(`Seller application submitted for user ${userId}`);
     return SaveSellerData;
   }catch(error){
       if (error instanceof AppError) {
         logger.error(`error in applying as a seller ${error.message}`);
         throw error;
       }
-      logger.error(`Unexpected error in applying as a seller: ${error}`);
-      throw new AppError(500, "Internal Server Error");
+      if((error as any).code === 11000){
+        logger.warn(`Duplicate key error while applying as a seller: ${JSON.stringify((error as any).keyValue)}`);
+        throw new AppError(409, "his Commercial Register or Tax Card number is already registered");
+      }
+    logger.error(`Unexpected error in applying as a seller: ${error}`);
+    throw new AppError(500, "Internal Server Error");
   }
   },
   checkExistingSeller: async (userId: string) => {

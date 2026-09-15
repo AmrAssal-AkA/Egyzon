@@ -62,7 +62,6 @@ export const createRequestToJoin = async (req: Request, res: Response) => {
         "Bad Request",
         "Invalid image format. Only JPEG and PNG are allowed",
       );
-
     await SellerServices.checkExistingSeller(userId);
 
     for (const file of files.commercialRegisterImage ?? []) {
@@ -111,16 +110,21 @@ export const createRequestToJoin = async (req: Request, res: Response) => {
         taxCardUrl: taxUpload.secure_url,
       },
     };
+
     await SellerServices.ApplyAsPartner(sellerData, userId);
-    await NotificationServices.notifyPartenerApplicantsToAdmin({
+    try {
+      NotificationServices.notifyPartenerApplicantsToAdmin({
       applicantId: userId,
       applicationId: new Date().toISOString(),
       applicantName: storeName,
       shopName: storeName,
     });
-
+  }catch(error){
+    logger.warn(`An Error occured while sending notification to the user: ${error}`)
+  }
     return sendSuccessResponse(res, 200, "Request sent successfully");
   } catch (error) {
+    console.log("Error in createRequestToJoin: ", error);
     if (error instanceof AppError) {
       return sendErrorResponse(
         res,

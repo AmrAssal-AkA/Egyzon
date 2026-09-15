@@ -14,7 +14,7 @@ interface NotificationState {
 
     unreadCount: () => number;
 
-    connect: () => void;
+    connect: (token?: string | null) => void;
     disconnect: () => void;
     markAsRead: (id: string) => Promise<void> | void;
     markAllAsRead: () => Promise<void> | void;
@@ -23,7 +23,7 @@ interface NotificationState {
     setLoading: (loading: boolean) => void;
 }
 
-const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
+const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL ;
 
 export const useNotificationStore = create<NotificationState>((set, get) => ({
    socket: null,
@@ -33,13 +33,13 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
     unreadCount: () => get().notifications.filter((n) => !n.isRead).length,
 
-    connect: () => {
+    connect: (token?: string | null) => {
         if (get().socket) return;
 
         const socket = io(socketUrl, {
             withCredentials: true,
             transports: ["websocket", "polling"],
-          
+            auth: token ? { token } : undefined,
         });
 
         socket.on("connect", () => set({ isConnected: true }));

@@ -11,7 +11,7 @@ export function useSocket() {
   const disconnect = useNotificationStore((state) => state.disconnect);
   const initialNotifications = useNotificationStore((state) => state.setInitialNotifications);
   const setLoading = useNotificationStore((state) => state.setLoading);
-  const { user } = useAuth();
+  const { user, Access_token } = useAuth();
   
   const notifications = useNotificationStore((state) => state.notifications);
   const isConnected = useNotificationStore((state) => state.isConnected);
@@ -38,12 +38,12 @@ export function useSocket() {
       }
     }
     fetchInitialNotifications();
-    connect();
+    connect(Access_token);
     return () => {
       cancelled = true;
       disconnect();
     };
-  }, [connect, disconnect, initialNotifications, setLoading, user]);
+  }, [connect, disconnect, initialNotifications, setLoading, user, Access_token]);
 
   useEffect(() => {
     if (isConnected && socket && user?.role === "seller") {

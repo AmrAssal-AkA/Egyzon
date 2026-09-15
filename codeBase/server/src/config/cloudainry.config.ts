@@ -1,5 +1,6 @@
 import {v2 as cloudinary, type UploadApiResponse} from "cloudinary";
 import dotenv from "dotenv";
+import logger from "../utils/logger";
 
 dotenv.config();
 
@@ -38,7 +39,7 @@ const uploadImage = async (file: Buffer | string, folder: string) => {
             stream.end(file);
         });
     }
-
+    logger.info(`Uploading image to Cloudinary: ${file}`);
     return await cloudinary.uploader.upload(file, getUploadOptions(folder));
 }
 
