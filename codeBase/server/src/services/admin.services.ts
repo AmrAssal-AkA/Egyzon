@@ -85,7 +85,7 @@ export const AdminService = {
       throw new AppError(500, "Internal Server Error");
     }
   },
-  blockUser: async (userId: string)=> {
+  blockUser: async (userId: string) => {
     try {
       const user = await User.findById(userId);
       if (!user) return;
@@ -159,12 +159,12 @@ export const AdminService = {
   },
   getAllPendingSellerApplications: async () => {
     try {
-      const applications = await User.find({
+      const pendingApplications = await User.find({
         applicantStatus: "pending",
       }).select(
         "-password -refreshToken -resetPasswordToken -resetPasswordTokenExpiration -emailVerificationToken -emailVerificationTokenExpiration -forgetPasswordToken -forgetPasswordTokenExpiration",
       );
-      return applications;
+      return pendingApplications;
     } catch (error) {
       if (error instanceof AppError) {
         throw new AppError(error.statusCode, error.message);
@@ -175,31 +175,36 @@ export const AdminService = {
   approveSeller: async (sellerId: string): Promise<IUser> => {
     try {
       const approveSeller = await User.findOneAndUpdate(
-        {_id: sellerId, applicantStatus: "pending"},
-        {$set: {applicantStatus: "approved", role: "seller"}},
+        { _id: sellerId, applicantStatus: "pending" },
+        { $set: { applicantStatus: "approved", role: "seller" } },
         { returnDocument: "after" },
       );
       if (!approveSeller)
-        throw new AppError(409, "Seller could not be approved");
+        throw new AppError(
+          404,
+          "Seller application not found or already processed",
+        );
       return approveSeller;
     } catch (error) {
-      if (error instanceof AppError)
-        throw new AppError(error.statusCode, error.message);
+      if (error instanceof AppError) throw error;
       throw new AppError(500, "Internal Server Error");
     }
   },
   rejectSeller: async (sellerId: string): Promise<IUser> => {
     try {
       const rejectSeller = await User.findOneAndUpdate(
-      { _id: sellerId, applicantStatus: "pending" },
-      { $set: { applicantStatus: "rejected" } },
-      { new: true },
-      )
-      if (!rejectSeller) throw new AppError(409, "Seller could not be rejected");
+        { _id: sellerId, applicantStatus: "pending" },
+        { $set: { applicantStatus: "rejected" } },
+        { new: true },
+      );
+      if (!rejectSeller)
+        throw new AppError(
+          404,
+          "Seller application not found or already processed",
+        );
       return rejectSeller;
     } catch (error) {
-      if (error instanceof AppError)
-        throw new AppError(error.statusCode, error.message);
+      if (error instanceof AppError) throw error;
       throw new AppError(500, "Internal Server Error");
     }
   },
@@ -210,13 +215,18 @@ export const AdminService = {
     const seller = await User.findById(sellerId);
     try {
       const getSellerApplicationById = await Seller.findById(sellerId);
-      if (!getSellerApplicationById) throw new AppError(404, "Seller application not found");
+      if (!getSellerApplicationById)
+        throw new AppError(404, "Seller application not found");
       const requestAdditionalDocuments = await Seller.findOneAndUpdate(
         { _id: sellerId, applicantStatus: "pending" },
         { applicantStatus: "additional_docs_requested", notes: message },
         { returnDocument: "after" },
       );
-      if (!requestAdditionalDocuments) throw new AppError(409, "Request for additional documents could not be sent");
+      if (!requestAdditionalDocuments)
+        throw new AppError(
+          409,
+          "Request for additional documents could not be sent",
+        );
       return requestAdditionalDocuments;
     } catch (error) {
       if (error instanceof AppError)
@@ -341,7 +351,7 @@ export const AdminService = {
   },
   getAllSellerPendingCounts: async () => {
     try {
-      const totalSellersPending = await Seller.countDocuments({
+      const totalSellersPending = await User.countDocuments({
         applicantStatus: "pending",
       });
       return { totalSellersPending };

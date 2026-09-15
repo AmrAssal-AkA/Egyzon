@@ -91,6 +91,30 @@ const UserSchema = new Schema<IUser>(
         return today;
       },
     },
+    // Seller application fields (populated when a customer applies as a seller)
+    applicantStatus: {
+      type: String,
+      enum: ["pending", "under-review", "additional_docs_requested", "approved", "rejected"],
+      default: null,
+    },
+    storeName: {
+      type: String,
+      default: null,
+    },
+    commercialRegisterNumber: {
+      type: String,
+      sparse: true,
+      default: null,
+    },
+    taxCardNumber: {
+      type: String,
+      sparse: true,
+      default: null,
+    },
+    sellerDocuments: {
+      commercialRegisterUrl: { type: String, default: "" },
+      taxCardUrl: { type: String, default: "" },
+    },
   },
   options,
 );

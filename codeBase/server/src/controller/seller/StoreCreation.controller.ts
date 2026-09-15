@@ -85,17 +85,19 @@ export const createRequestToJoin = async (req: Request, res: Response) => {
     await SellerServices.ApplyAsPartner(sellerData, userId);
     try {
       NotificationServices.notifyPartenerApplicantsToAdmin({
-      applicantId: userId,
-      applicationId: new Date().toISOString(),
-      applicantName: storeName,
-      shopName: storeName,
-    });
-  }catch(error){
-    logger.warn(`An Error occured while sending notification to the user: ${error}`)
-  }
+        applicantId: userId,
+        applicationId: new Date().toISOString(),
+        applicantName: storeName,
+        shopName: storeName,
+      });
+    } catch (error) {
+      logger.warn(
+        `An Error occured while sending notification to the user: ${error}`,
+      );
+    }
     return sendSuccessResponse(res, 200, "Request sent successfully");
   } catch (error) {
-    console.log("Error in createRequestToJoin: ", error);
+    logger.error(`Error in createRequestToJoin: `, error);
     if (error instanceof AppError) {
       return sendErrorResponse(
         res,
@@ -104,7 +106,19 @@ export const createRequestToJoin = async (req: Request, res: Response) => {
         error.message,
       );
     }
-
+    if (
+      error &&
+      typeof error === "object" &&
+      "http_code" in error &&
+      (error as any).http_code === 499
+    ) {
+      return sendErrorResponse(
+        res,
+        503,
+        "Service Unavailable",
+        "File upload timed out. Please try again with a smaller image.",
+      );
+    }
     return sendErrorResponse(
       res,
       500,
