@@ -157,10 +157,28 @@ export const AdminService = {
       throw new AppError(500, "Internal Server Error");
     }
   },
-  getAllPendingSellerApplications: async () => {
+  getAllPendingSellerApplications: async (page: number, limit: number) => {
     try {
-      const pendingSellers = await User.find({ applicantStatus: "pending" });
-      return pendingSellers;
+      const currentPage = Number.isFinite(page) && page > 0 ? page : 1;
+      const pageSize = Number.isFinite(limit) && limit > 0 ? limit : 10;
+
+      const [applications, total] = await Promise.all([
+        User.find({ applicantStatus: "pending" }).select(
+          "-password -refreshToken -resetPasswordToken -resetPasswordTokenExpiration -emailVerificationToken -emailVerificationTokenExpiration -forgetPasswordToken -forgetPasswordTokenExpiration",
+        ).sort({createdAt: -1}).skip((currentPage - 1) * pageSize).limit(pageSize),
+        User.countDocuments({applicantStatus: "pending"})
+      ]);
+
+      return {
+        applications,
+        pagination: {
+          page: currentPage,
+          limit: pageSize,
+          total,
+          totalPages: Math.ceil(total / pageSize),
+        }
+      }
+
     } catch (error) {
       if (error instanceof AppError) {
         throw new AppError(error.statusCode, error.message);
@@ -209,11 +227,14 @@ export const AdminService = {
     message: string,
   ): Promise<ISeller> => {
     const seller = await User.findById(sellerId);
+  ): Promise<IUser> => {
     try {
       const getSellerApplicationById = await Seller.findById(sellerId);
+      const getSellerApplicationById = await User.findById(sellerId);
       if (!getSellerApplicationById)
         throw new AppError(404, "Seller application not found");
       const requestAdditionalDocuments = await Seller.findOneAndUpdate(
+      const requestAdditionalDocuments = await User.findOneAndUpdate(
         { _id: sellerId, applicantStatus: "pending" },
         { applicantStatus: "additional_docs_requested", notes: message },
         { returnDocument: "after" },
@@ -227,6 +248,7 @@ export const AdminService = {
     } catch (error) {
       if (error instanceof AppError)
         throw new AppError(error.statusCode, error.message);
+      if (error instanceof AppError) throw error;
       throw new AppError(500, "Internal Server Error");
     }
   },

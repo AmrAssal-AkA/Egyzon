@@ -115,6 +115,10 @@ const UserSchema = new Schema<IUser>(
       commercialRegisterUrl: { type: String, default: "" },
       taxCardUrl: { type: String, default: "" },
     },
+    notes: {
+      type: String,
+      default: "",
+    },
   },
   options,
 );

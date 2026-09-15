@@ -184,6 +184,29 @@ export const swaggerSpec = {
           email: { type: "string", format: "email" },
           role: { type: "string", enum: ["customer", "seller", "admin"] },
           isBlocked: { type: "boolean" },
+          applicantStatus: {
+            type: "string",
+            enum: [
+              "pending",
+              "under-review",
+              "additional_docs_requested",
+              "approved",
+              "rejected",
+            ],
+            nullable: true,
+          },
+          storeName: { type: "string", nullable: true },
+          commercialRegisterNumber: { type: "string", nullable: true },
+          taxCardNumber: { type: "string", nullable: true },
+          sellerDocuments: {
+            type: "object",
+            nullable: true,
+            properties: {
+              commercialRegisterUrl: { type: "string" },
+              taxCardUrl: { type: "string" },
+            },
+          },
+          notes: { type: "string", nullable: true },
         },
       },
       OnboardingRequest: {
@@ -819,6 +842,23 @@ export const swaggerSpec = {
           commercialRegisterNumber: { type: "string" },
           taxCardNumber: { type: "string" },
           storeName: { type: "string" },
+          FirstName: { type: "string", example: "Mohamed" },
+          LastName: { type: "string", example: "Hassan" },
+          email: { type: "string", format: "email", example: "mohamed@example.com" },
+          role: { type: "string", example: "customer" },
+          phoneNumber: { type: "string", nullable: true },
+          isBlocked: { type: "boolean", example: false },
+          isVerified: { type: "boolean", example: true },
+          storeName: { type: "string", example: "Egyzon Store" },
+          commercialRegisterNumber: { type: "string", example: "CR-123456" },
+          taxCardNumber: { type: "string", example: "TC-987654" },
+          sellerDocuments: {
+            type: "object",
+            properties: {
+              commercialRegisterUrl: { type: "string", example: "https://res.cloudinary.com/.../cr.jpg" },
+              taxCardUrl: { type: "string", example: "https://res.cloudinary.com/.../tax.jpg" },
+            },
+          },
           applicantStatus: {
             type: "string",
             enum: [
@@ -828,6 +868,7 @@ export const swaggerSpec = {
               "approved",
               "rejected",
             ],
+            example: "pending",
           },
           notes: { type: "string" },
           user: {
@@ -839,6 +880,9 @@ export const swaggerSpec = {
               email: { type: "string", format: "email" },
             },
           },
+          notes: { type: "string", example: "" },
+          createdAt: { type: "string", format: "date-time" },
+          updatedAt: { type: "string", format: "date-time" },
         },
       },
       SellerApplicationListResponse: {
@@ -874,6 +918,13 @@ export const swaggerSpec = {
           commercialRegisterNumber: { type: "string" },
           taxCardNumber: { type: "string" },
           storeName: { type: "string" },
+          FirstName: { type: "string", example: "Mohamed" },
+          LastName: { type: "string", example: "Hassan" },
+          email: { type: "string", format: "email", example: "seller@example.com" },
+          role: { type: "string", example: "seller" },
+          commercialRegisterNumber: { type: "string", example: "CR-123456" },
+          taxCardNumber: { type: "string", example: "TC-987654" },
+          storeName: { type: "string", example: "Egyzon Store" },
           applicantStatus: {
             type: "string",
             enum: [
@@ -883,6 +934,14 @@ export const swaggerSpec = {
               "approved",
               "rejected",
             ],
+            example: "approved",
+          },
+          sellerDocuments: {
+            type: "object",
+            properties: {
+              commercialRegisterUrl: { type: "string" },
+              taxCardUrl: { type: "string" },
+            },
           },
           notes: { type: "string" },
           storeManagement: {
@@ -2917,6 +2976,8 @@ export const swaggerSpec = {
       post: {
         tags: ["Seller"],
         summary: "Apply to become a seller",
+        description:
+          "Submit an application to become a seller with commercial register and tax card details. The applicant's role remains 'customer' with applicantStatus 'pending' until an administrator reviews and approves the application.",
         security: [{ cookieAuth: [] }, { bearerAuth: [] }],
         requestBody: {
           required: true,
@@ -2956,6 +3017,8 @@ export const swaggerSpec = {
           },
           400: {
             description: "All fields and images are required",
+            description:
+              "Bad Request - Missing required fields/images, user is already a seller, or user already has a pending application",
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ApiErrorResponse" },
@@ -2964,6 +3027,15 @@ export const swaggerSpec = {
           },
           401: {
             description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          409: {
+            description:
+              "Conflict - Commercial Register or Tax Card number is already registered",
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ApiErrorResponse" },
@@ -5012,6 +5084,8 @@ export const swaggerSpec = {
       get: {
         tags: ["Admin"],
         summary: "List pending seller applications",
+        description:
+          "Retrieves all users who have applied to become sellers and are currently in 'pending' status. Note that pending applicants maintain their 'customer' role until an admin approves their application.",
         security: [{ cookieAuth: [] }, { bearerAuth: [] }],
         responses: {
           200: {
@@ -5116,6 +5190,8 @@ export const swaggerSpec = {
       post: {
         tags: ["Admin"],
         summary: "Approve a seller application",
+        description:
+          "Approves a pending seller application. Promotes the user role from 'customer' to 'seller' and updates applicantStatus to 'approved'.",
         security: [{ cookieAuth: [] }, { bearerAuth: [] }],
         parameters: [
           {
@@ -5131,6 +5207,19 @@ export const swaggerSpec = {
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/UserSummary",
+                        },
+                      },
+                    },
+                  ],
+                },
               },
             },
           },
@@ -5160,6 +5249,7 @@ export const swaggerSpec = {
           },
           404: {
             description: "User not found or no pending application found",
+            description: "Seller application not found or already processed",
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ApiErrorResponse" },
@@ -5173,6 +5263,8 @@ export const swaggerSpec = {
       post: {
         tags: ["Admin"],
         summary: "Request additional documents from a seller",
+        description:
+          "Requests additional documentation from a pending seller applicant. Updates applicantStatus to 'additional_docs_requested' and records admin notes.",
         security: [{ cookieAuth: [] }, { bearerAuth: [] }],
         parameters: [
           {
@@ -5198,6 +5290,19 @@ export const swaggerSpec = {
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/UserSummary",
+                        },
+                      },
+                    },
+                  ],
+                },
               },
             },
           },
@@ -5227,6 +5332,7 @@ export const swaggerSpec = {
           },
           404: {
             description: "No pending seller application found",
+            description: "Seller application not found or already processed",
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ApiErrorResponse" },
@@ -5240,6 +5346,8 @@ export const swaggerSpec = {
       post: {
         tags: ["Admin"],
         summary: "Reject a seller application",
+        description:
+          "Rejects a pending seller application. Updates applicantStatus to 'rejected'.",
         security: [{ cookieAuth: [] }, { bearerAuth: [] }],
         parameters: [
           {
@@ -5255,6 +5363,19 @@ export const swaggerSpec = {
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/UserSummary",
+                        },
+                      },
+                    },
+                  ],
+                },
               },
             },
           },
@@ -5284,6 +5405,7 @@ export const swaggerSpec = {
           },
           404: {
             description: "User not found or no pending application found",
+            description: "Seller application not found or already processed",
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ApiErrorResponse" },

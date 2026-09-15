@@ -23,7 +23,11 @@ export const ManageSellerApplicationsController = {
   },
   getAllPendingSellerApplications: async (req: Request, res: Response) => {
     try {
-      const applications = await AdminService.getAllPendingSellerApplications();
+      const { page = 1, limit = 5 } = req.query;
+      const applications = await AdminService.getAllPendingSellerApplications(
+        Number(page),
+        Number(limit),
+      );
       return sendSuccessResponse(
         res,
         200,

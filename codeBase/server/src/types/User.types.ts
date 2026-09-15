@@ -39,6 +39,7 @@ export interface IUser extends Document {
     commercialRegisterUrl: string;
     taxCardUrl: string;
   } | null;
+  notes?: string;
 }
 
 export type UserDocument = HydratedDocument<IUser>;
