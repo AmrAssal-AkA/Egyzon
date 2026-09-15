@@ -19,14 +19,13 @@ export const SellerServices = {
     const userModel = Seller.db.model("User");
     const user = await userModel.findById(userId);
 
-    if (!user) return null;
+    if (!user) throw new AppError(404, "user not found");
     if(user.role === "seller") throw new AppError(400, "User is already a seller");
 
-    const SaveSellerData = await userModel.collection.findOneAndUpdate(
+    const SaveSellerData = await User.findOneAndUpdate(
       { _id: user._id },
       {
         $set: {
-          role: "customer",
           storeName: sellerData.storeName,
           commercialRegisterNumber: sellerData.commercialRegisterNumber,
           taxCardNumber: sellerData.taxCardNumber,

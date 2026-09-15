@@ -161,7 +161,9 @@ export const AdminService = {
     try {
       const applications = await User.find({
         applicantStatus: "pending",
-      }).populate("user", "name email");
+      }).select(
+        "-password -refreshToken -resetPasswordToken -resetPasswordTokenExpiration -emailVerificationToken -emailVerificationTokenExpiration -forgetPasswordToken -forgetPasswordTokenExpiration",
+      );
       return applications;
     } catch (error) {
       if (error instanceof AppError) {
@@ -170,42 +172,30 @@ export const AdminService = {
       throw new AppError(500, "Internal Server Error");
     }
   },
-  approveSeller: async (sellerId: string): Promise<ISeller> => {
+  approveSeller: async (sellerId: string): Promise<IUser> => {
     try {
-      const userfound = await User.findOne({
-        _id: sellerId,
-        applicantStatus: "pending",
-      })
-      if (!userfound) throw new AppError(404, "Pending seller not found");
-      const approveSeller = await Seller.findOneAndUpdate(
-        { _id: sellerId, applicantStatus: "pending" },
-        { applicantStatus: "approved", role: "seller" },
+      const approveSeller = await User.findOneAndUpdate(
+        {_id: sellerId, applicantStatus: "pending"},
+        {$set: {applicantStatus: "approved", role: "seller"}},
         { returnDocument: "after" },
       );
       if (!approveSeller)
         throw new AppError(409, "Seller could not be approved");
       return approveSeller;
-        
     } catch (error) {
       if (error instanceof AppError)
         throw new AppError(error.statusCode, error.message);
       throw new AppError(500, "Internal Server Error");
     }
   },
-  rejectSeller: async (sellerId: string): Promise<ISeller> => {
+  rejectSeller: async (sellerId: string): Promise<IUser> => {
     try {
-      const seller = await Seller.findOne({
-        _id: sellerId,
-        applicantStatus: "pending",
-      });
-      if (!seller) throw new AppError(404, "Pending seller not found");
-      const rejectSeller = await Seller.findOneAndUpdate(
-        { _id: sellerId, applicantStatus: "pending" },
-        { applicantStatus: "rejected" },
-        { returnDocument: "after" },
-      );
-      if (!rejectSeller)
-        throw new AppError(409, "Seller could not be rejected");
+      const rejectSeller = await User.findOneAndUpdate(
+      { _id: sellerId, applicantStatus: "pending" },
+      { $set: { applicantStatus: "rejected" } },
+      { new: true },
+      )
+      if (!rejectSeller) throw new AppError(409, "Seller could not be rejected");
       return rejectSeller;
     } catch (error) {
       if (error instanceof AppError)
@@ -217,9 +207,6 @@ export const AdminService = {
     sellerId: string,
     message: string,
   ): Promise<ISeller> => {
-    logger.info(
-      `Admin requesting additional documents for seller: ${sellerId}`,
-    );
     const seller = await User.findById(sellerId);
     try {
       const getSellerApplicationById = await Seller.findById(sellerId);
