@@ -29,7 +29,7 @@ export interface SellerBankAccount {
 
 export interface Seller {
   id: string;
-  businessName: string;
+  storeName: string;
   businessId: string;
   ownerName: string;
   ownerEmail: string;
@@ -45,6 +45,11 @@ export interface Seller {
   storeManagement?: ApiStoreManagement;
   notes?: string;
   bankAccount?: SellerBankAccount;
+  phoneNumber?: string;
+  role?: string;
+  isBlocked?: boolean;
+  isVerified?: boolean;
+  createdAt?: string;
 }
 
 export interface ApiSellerApplicationUser {
@@ -56,15 +61,26 @@ export interface ApiSellerApplicationUser {
 
 export interface ApiSellerApplication {
   _id: string;
+  firstName?: string;
+  lastName?: string;
+  FirstName?: string;
+  LastName?: string;
+  email: string;
+  role?: string;
+  phoneNumber?: string;
+  isBlocked?: boolean;
+  isVerified?: boolean;
+  storeName: string;
   commercialRegisterNumber: string;
   taxCardNumber: string;
   sellerDocuments?: ApiSellerDocuments;
   commercialRegisterImage?: string;
   taxCardImage?: string;
-  storeName: string;
   applicantStatus: string;
-  notes: string;
-  user: ApiSellerApplicationUser;
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  user?: ApiSellerApplicationUser;
   bankAccount?: SellerBankAccount;
 }
 
@@ -106,6 +122,24 @@ export interface SellersPagination {
 
 export interface ApiAllSellersData {
   sellers: ApiSeller[];
+  pagination: SellersPagination;
+}
+
+export interface GetPendingSellerApplicationsParams {
+  page?: number;
+  limit?: number;
+}
+
+export interface ApiPendingSellerApplicationsData {
+  applications: ApiSellerApplication[];
+  pagination?: SellersPagination;
+  total?: number;
+  totalPages?: number;
+}
+
+export interface PendingSellerApplicationsResult {
+  sellers: Seller[];
+  applications: Seller[];
   pagination: SellersPagination;
 }
 

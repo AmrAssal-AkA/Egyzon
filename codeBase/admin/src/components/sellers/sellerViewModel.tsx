@@ -28,8 +28,7 @@ import {
   rejectSellerBankAccount,
 } from "../../services/seller.services";
 import type { Seller } from "../../types/seller";
-import { BusinessAvatar } from "./_components/BusinessAvatar";
-import { StatusBadge } from "./_components/StatusBadge";
+import { SellerStatusBadge } from "./_components/StatusBadge";
 
 /// *** Model Context ****///
 export interface SellerViewModelProps {
@@ -57,7 +56,7 @@ export function SellerViewModel({
 }: SellerViewModelProps): React.ReactElement | null {
   const [activeTab, setActiveTab] = useState<ModalTab>("overview");
   const [requestMessage, setRequestMessage] = useState<string>(
-    "Please upload a clearer tax card image and add your business address."
+    "Please upload a clearer tax card image and add your business address.",
   );
   const [submittingAction, setSubmittingAction] = useState<
     "approve" | "reject" | "request" | "approve_bank" | "reject_bank" | null
@@ -141,21 +140,19 @@ export function SellerViewModel({
   };
 
   const openCommercialRegisterImage = (): void => {
-    const imageUrl =
-      seller.sellerDocuments?.commercialRegisterUrl!
+    const imageUrl = seller.sellerDocuments?.commercialRegisterUrl!;
 
     setPreviewDocument({
-      title: `${seller.businessName} - Commercial Registration Certificate`,
+      title: `${seller.storeName} - Commercial Registration Certificate`,
       imageUrl,
     });
   };
 
   const openTaxCardImage = (): void => {
-    const imageUrl =
-      seller.sellerDocuments?.taxCardUrl!
-      
+    const imageUrl = seller.sellerDocuments?.taxCardUrl!;
+
     setPreviewDocument({
-      title: `${seller.businessName} - Tax Registration Card`,
+      title: `${seller.storeName} - Tax Registration Card`,
       imageUrl,
     });
   };
@@ -228,16 +225,25 @@ export function SellerViewModel({
   };
 
   const bankAccount = seller.bankAccount;
-  const currentBankStatus =
-    localBankStatus ||
-    bankAccount?.status ||
-    bankAccount?.verificationStatus ||
-    (bankAccount?.isVerified ? "verified" : "pending");
+  const hasBankAccount = Boolean(
+    bankAccount &&
+    (bankAccount.bankName ||
+      bankAccount.accountNumber ||
+      bankAccount.iban ||
+      bankAccount.accountHolderName),
+  );
+  const currentBankStatus = hasBankAccount
+    ? localBankStatus ||
+      bankAccount?.status ||
+      bankAccount?.verificationStatus ||
+      (bankAccount?.isVerified ? "verified" : "pending")
+    : null;
   const isBankVerified =
-    currentBankStatus === "verified" ||
-    currentBankStatus === "active" ||
-    bankAccount?.isVerified === true;
-  const isBankRejected = currentBankStatus === "rejected";
+    hasBankAccount &&
+    (currentBankStatus === "verified" ||
+      currentBankStatus === "active" ||
+      bankAccount?.isVerified === true);
+  const isBankRejected = hasBankAccount && currentBankStatus === "rejected";
 
   const storeManagement = seller.storeManagement;
 
@@ -248,32 +254,30 @@ export function SellerViewModel({
       aria-modal="true"
       aria-labelledby="seller-view-modal-title"
     >
-      <div
-        className="fixed inset-0"
-        onClick={onClose}
-        aria-hidden="true"
-      />
+      <div className="fixed inset-0" onClick={onClose} aria-hidden="true" />
 
       <div className="relative z-10 flex flex-col w-full max-w-3xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200">
         {/* Header */}
         <div className="flex items-start justify-between p-6 border-b border-gray-100 bg-gray-50/50">
           <div className="flex items-center gap-4">
-            <BusinessAvatar name={seller.businessName} />
+            <SellerStatusBadge status={seller.status} />
             <div>
               <div className="flex items-center gap-3">
                 <h2
                   id="seller-view-modal-title"
                   className="text-xl font-bold text-gray-900"
                 >
-                  {seller.businessName}
+                  {seller.storeName}
                 </h2>
-                <StatusBadge status={seller.status} />
+                <SellerStatusBadge status={seller.status} />
               </div>
               <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
                 <span>
                   CR / Business ID:{" "}
                   <strong className="text-gray-700 font-mono">
-                    {seller.businessId || seller.commercialRegisterNumber || "N/A"}
+                    {seller.businessId ||
+                      seller.commercialRegisterNumber ||
+                      "N/A"}
                   </strong>
                 </span>
                 <span>•</span>
@@ -365,7 +369,9 @@ export function SellerViewModel({
                       </span>
                     </div>
                     <p className="text-base font-semibold font-mono text-gray-900">
-                      {seller.commercialRegisterNumber || seller.businessId || "Not Provided"}
+                      {seller.commercialRegisterNumber ||
+                        seller.businessId ||
+                        "Not Provided"}
                     </p>
                   </div>
                   <button
@@ -405,42 +411,49 @@ export function SellerViewModel({
                         <Landmark className="w-4 h-4 text-indigo-500" />
                         Linked Bank Account
                       </div>
-                      <p className="text-base font-semibold text-gray-900">
-                        {bankAccount?.bankName || "Commercial International Bank (CIB)"}
-                      </p>
-                      <p className="text-xs font-mono text-gray-500 mt-0.5">
-                        {bankAccount?.iban
-                          ? `IBAN: ${bankAccount.iban}`
-                          : bankAccount?.accountNumber
-                          ? `Account: ${bankAccount.accountNumber}`
-                          : `Account Holder: ${bankAccount?.accountHolderName || seller.ownerName}`}
-                      </p>
+                      {hasBankAccount ? (
+                        <p className="text-base font-semibold text-gray-900">
+                          {bankAccount?.bankName || "Linked Bank Account"}
+                        </p>
+                      ) : (
+                        <p className="text-sm font-medium text-gray-500">
+                          No Bank Account Added right now
+                        </p>
+                      )}
                     </div>
 
-                    <div className="flex items-center gap-3 self-start sm:self-center">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
-                          isBankVerified
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                    {hasBankAccount ? (
+                      <div className="flex items-center gap-3 self-start sm:self-center">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                            isBankVerified
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                              : isBankRejected
+                                ? "bg-red-50 text-red-700 border-red-200"
+                                : "bg-amber-50 text-amber-700 border-amber-200"
+                          }`}
+                        >
+                          {isBankVerified
+                            ? "Verified"
                             : isBankRejected
-                            ? "bg-red-50 text-red-700 border-red-200"
-                            : "bg-amber-50 text-amber-700 border-amber-200"
-                        }`}
-                      >
-                        {isBankVerified
-                          ? "Verified"
-                          : isBankRejected
-                          ? "Rejected"
-                          : "Verification Pending"}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setActiveTab("bank")}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
-                      >
-                        Manage &rarr;
-                      </button>
-                    </div>
+                              ? "Rejected"
+                              : "Verification Pending"}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("bank")}
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
+                        >
+                          Manage &rarr;
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-3 self-start sm:self-center">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-gray-100 text-gray-500 border-gray-200">
+                          Not Provided
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -453,25 +466,35 @@ export function SellerViewModel({
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 text-sm">
                   <div>
-                    <span className="text-xs text-gray-400 block">Full Name</span>
-                    <span className="font-medium text-gray-800">{seller.ownerName}</span>
+                    <span className="text-xs text-gray-400 block">
+                      Full Name
+                    </span>
+                    <span className="font-medium text-gray-800">
+                      {seller.ownerName}
+                    </span>
                   </div>
                   <div>
-                    <span className="text-xs text-gray-400 block">Contact Email</span>
+                    <span className="text-xs text-gray-400 block">
+                      Contact Email
+                    </span>
                     <span className="font-medium text-gray-800 flex items-center gap-1.5 mt-0.5">
                       <Mail className="w-3.5 h-3.5 text-gray-400" />
                       {seller.ownerEmail}
                     </span>
                   </div>
                   <div>
-                    <span className="text-xs text-gray-400 block">Submitted Date</span>
+                    <span className="text-xs text-gray-400 block">
+                      Submitted Date
+                    </span>
                     <span className="font-medium text-gray-800 flex items-center gap-1.5 mt-0.5">
                       <Calendar className="w-3.5 h-3.5 text-gray-400" />
                       {seller.submittedAt} ({seller.submittedRelative})
                     </span>
                   </div>
                   <div>
-                    <span className="text-xs text-gray-400 block">Risk Assessment</span>
+                    <span className="text-xs text-gray-400 block">
+                      Risk Assessment
+                    </span>
                     <div className="flex items-center gap-2 mt-0.5">
                       <div className="w-20 h-2 rounded-full bg-gray-100 overflow-hidden">
                         <div
@@ -479,8 +502,8 @@ export function SellerViewModel({
                             seller.riskScore >= 80
                               ? "bg-emerald-500"
                               : seller.riskScore >= 50
-                              ? "bg-amber-500"
-                              : "bg-red-500"
+                                ? "bg-amber-500"
+                                : "bg-red-500"
                           }`}
                           style={{ width: `${seller.riskScore || 100}%` }}
                         />
@@ -518,12 +541,18 @@ export function SellerViewModel({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-xs text-gray-400 block">Store Name</span>
-                    <span className="font-semibold text-gray-900">{seller.businessName}</span>
+                    <span className="text-xs text-gray-400 block">
+                      Store Name
+                    </span>
+                    <span className="font-semibold text-gray-900">
+                      {seller.storeName}
+                    </span>
                   </div>
 
                   <div>
-                    <span className="text-xs text-gray-400 block">Store Type</span>
+                    <span className="text-xs text-gray-400 block">
+                      Store Type
+                    </span>
                     <span className="font-medium capitalize text-gray-800">
                       {storeManagement?.storeType || "Online & Physical"}
                     </span>
@@ -531,7 +560,9 @@ export function SellerViewModel({
 
                   {storeManagement?.storephysicalAddress && (
                     <div className="col-span-full">
-                      <span className="text-xs text-gray-400 block">Physical Address</span>
+                      <span className="text-xs text-gray-400 block">
+                        Physical Address
+                      </span>
                       <span className="font-medium text-gray-800 flex items-start gap-1.5 mt-0.5">
                         <MapPin className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
                         {storeManagement.storephysicalAddress}
@@ -541,7 +572,9 @@ export function SellerViewModel({
 
                   {storeManagement?.storeOnlineAddress && (
                     <div className="col-span-full">
-                      <span className="text-xs text-gray-400 block">Online Store URL</span>
+                      <span className="text-xs text-gray-400 block">
+                        Online Store URL
+                      </span>
                       <a
                         href={storeManagement.storeOnlineAddress}
                         target="_blank"
@@ -557,7 +590,9 @@ export function SellerViewModel({
 
                 {storeManagement?.storeDescription && (
                   <div className="pt-2 border-t border-gray-100">
-                    <span className="text-xs text-gray-400 block mb-1">Store Description</span>
+                    <span className="text-xs text-gray-400 block mb-1">
+                      Store Description
+                    </span>
                     <p className="text-xs text-gray-700 leading-relaxed bg-gray-50 p-3 rounded-lg">
                       {storeManagement.storeDescription}
                     </p>
@@ -605,206 +640,247 @@ export function SellerViewModel({
             </div>
           )}
 
-          {activeTab === "bank" && (
-            <div className="space-y-6">
-              {/* Bank Verification Status Banner */}
-              <div
-                className={`p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
-                  isBankVerified
-                    ? "bg-emerald-50/60 border-emerald-200 text-emerald-900"
-                    : isBankRejected
-                    ? "bg-red-50/60 border-red-200 text-red-900"
-                    : "bg-amber-50/60 border-amber-200 text-amber-900"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`p-2.5 rounded-xl border shrink-0 ${
+          {activeTab === "bank" &&
+            (!hasBankAccount ? (
+              <div className="p-8 text-center rounded-xl border border-dashed border-gray-200 bg-gray-50/60 space-y-3">
+                <div className="w-12 h-12 mx-auto rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                  <Landmark className="w-6 h-6" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-sm font-semibold text-gray-900">
+                    No Bank Account Linked
+                  </h3>
+                  <p className="text-xs text-gray-500 max-w-sm mx-auto">
+                    No Bank Account Added right now
+                  </p>
+                </div>
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("request")}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-blue-600 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    Request Bank Details
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* Bank Verification Status Banner */}
+                <div
+                  className={`p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                    isBankVerified
+                      ? "bg-emerald-50/60 border-emerald-200 text-emerald-900"
+                      : isBankRejected
+                        ? "bg-red-50/60 border-red-200 text-red-900"
+                        : "bg-amber-50/60 border-amber-200 text-amber-900"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`p-2.5 rounded-xl border shrink-0 ${
+                        isBankVerified
+                          ? "bg-emerald-100 text-emerald-700 border-emerald-300"
+                          : isBankRejected
+                            ? "bg-red-100 text-red-700 border-red-300"
+                            : "bg-amber-100 text-amber-700 border-amber-300"
+                      }`}
+                    >
+                      <Landmark className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold">
+                        {isBankVerified
+                          ? "Verified Bank Account"
+                          : isBankRejected
+                            ? "Bank Account Rejected"
+                            : "Bank Account Verification Pending"}
+                      </h3>
+                      <p className="text-xs opacity-85 mt-0.5">
+                        {isBankVerified
+                          ? "This seller's bank account has been verified and approved for payout disbursements."
+                          : isBankRejected
+                            ? "This bank account was rejected. The seller must provide corrected banking credentials."
+                            : "Review linked banking details below and approve or reject this payout account."}
+                      </p>
+                    </div>
+                  </div>
+
+                  <span
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border shrink-0 self-start sm:self-center ${
                       isBankVerified
-                        ? "bg-emerald-100 text-emerald-700 border-emerald-300"
+                        ? "bg-emerald-100 text-emerald-800 border-emerald-300"
                         : isBankRejected
-                        ? "bg-red-100 text-red-700 border-red-300"
-                        : "bg-amber-100 text-amber-700 border-amber-300"
+                          ? "bg-red-100 text-red-800 border-red-300"
+                          : "bg-amber-100 text-amber-800 border-amber-300"
                     }`}
                   >
-                    <Landmark className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold">
-                      {isBankVerified
-                        ? "Verified Bank Account"
-                        : isBankRejected
-                        ? "Bank Account Rejected"
-                        : "Bank Account Verification Pending"}
-                    </h3>
-                    <p className="text-xs opacity-85 mt-0.5">
-                      {isBankVerified
-                        ? "This seller's bank account has been verified and approved for payout disbursements."
-                        : isBankRejected
-                        ? "This bank account was rejected. The seller must provide corrected banking credentials."
-                        : "Review linked banking details below and approve or reject this payout account."}
-                    </p>
-                  </div>
-                </div>
-
-                <span
-                  className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border shrink-0 self-start sm:self-center ${
-                    isBankVerified
-                      ? "bg-emerald-100 text-emerald-800 border-emerald-300"
+                    {isBankVerified
+                      ? "Verified"
                       : isBankRejected
-                      ? "bg-red-100 text-red-800 border-red-300"
-                      : "bg-amber-100 text-amber-800 border-amber-300"
-                  }`}
-                >
-                  {isBankVerified
-                    ? "Verified"
-                    : isBankRejected
-                    ? "Rejected"
-                    : "Pending Verification"}
-                </span>
-              </div>
-
-              {/* Bank Action Message Alert */}
-              {bankActionMessage && (
-                <div
-                  className={`p-3.5 rounded-xl border text-xs flex items-center gap-2 ${
-                    bankActionMessage.type === "success"
-                      ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                      : "bg-red-50 text-red-800 border-red-200"
-                  }`}
-                >
-                  {bankActionMessage.type === "success" ? (
-                    <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
-                  ) : (
-                    <AlertTriangle className="w-4 h-4 shrink-0 text-red-600" />
-                  )}
-                  <span className="font-medium">{bankActionMessage.text}</span>
+                        ? "Rejected"
+                        : "Pending Verification"}
+                  </span>
                 </div>
-              )}
 
-              {/* Bank Account Details Card */}
-              <div className="p-4 rounded-xl border border-gray-200 space-y-4 bg-white">
-                <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                  <Landmark className="w-4 h-4 text-gray-500" />
-                  Banking Credentials & Payout Information
-                </h3>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                    <span className="text-xs text-gray-400 block font-medium">Bank Name</span>
-                    <span className="font-semibold text-gray-900 mt-0.5 block">
-                      {bankAccount?.bankName || "Commercial International Bank (CIB)"}
+                {/* Bank Action Message Alert */}
+                {bankActionMessage && (
+                  <div
+                    className={`p-3.5 rounded-xl border text-xs flex items-center gap-2 ${
+                      bankActionMessage.type === "success"
+                        ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                        : "bg-red-50 text-red-800 border-red-200"
+                    }`}
+                  >
+                    {bankActionMessage.type === "success" ? (
+                      <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+                    ) : (
+                      <AlertTriangle className="w-4 h-4 shrink-0 text-red-600" />
+                    )}
+                    <span className="font-medium">
+                      {bankActionMessage.text}
                     </span>
                   </div>
+                )}
 
-                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                    <span className="text-xs text-gray-400 block font-medium">Account Holder Name</span>
-                    <span className="font-semibold text-gray-900 mt-0.5 block">
-                      {bankAccount?.accountHolderName || seller.ownerName || "—"}
-                    </span>
-                  </div>
+                {/* Bank Account Details Card */}
+                <div className="p-4 rounded-xl border border-gray-200 space-y-4 bg-white">
+                  <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                    <Landmark className="w-4 h-4 text-gray-500" />
+                    Banking Credentials & Payout Information
+                  </h3>
 
-                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                    <span className="text-xs text-gray-400 block font-medium">Account Number</span>
-                    <span className="font-mono font-semibold text-gray-900 mt-0.5 block">
-                      {bankAccount?.accountNumber || "—"}
-                    </span>
-                  </div>
-
-                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                    <span className="text-xs text-gray-400 block font-medium">IBAN</span>
-                    <span className="font-mono font-semibold text-gray-900 mt-0.5 block break-all">
-                      {bankAccount?.iban || "—"}
-                    </span>
-                  </div>
-
-                  {bankAccount?.swiftCode && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                      <span className="text-xs text-gray-400 block font-medium">SWIFT / BIC</span>
-                      <span className="font-mono font-semibold text-gray-900 mt-0.5 block">
-                        {bankAccount.swiftCode}
+                      <span className="text-xs text-gray-400 block font-medium">
+                        Bank Name
+                      </span>
+                      <span className="font-semibold text-gray-900 mt-0.5 block">
+                        {bankAccount?.bankName}
                       </span>
                     </div>
-                  )}
 
-                  {bankAccount?.routingNumber && (
                     <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                      <span className="text-xs text-gray-400 block font-medium">Routing Number</span>
-                      <span className="font-mono font-semibold text-gray-900 mt-0.5 block">
-                        {bankAccount.routingNumber}
+                      <span className="text-xs text-gray-400 block font-medium">
+                        Account Holder Name
+                      </span>
+                      <span className="font-semibold text-gray-900 mt-0.5 block">
+                        {bankAccount?.accountHolderName || seller.ownerName}
                       </span>
                     </div>
-                  )}
-                </div>
-              </div>
 
-              {/* Bank Account Verification Actions Card */}
-              <div className="p-4 rounded-xl border border-gray-200 bg-gray-50/60 space-y-3">
-                <h3 className="text-xs font-semibold uppercase text-gray-500">
-                  Bank Account Decision Actions
-                </h3>
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  Admins can verify or reject linked banking credentials for this seller. Approving allows platform payout disbursements to be processed to this account.
-                </p>
-
-                <div className="flex flex-wrap items-center gap-3 pt-2">
-                  {!isBankVerified && (
-                    <button
-                      type="button"
-                      onClick={handleApproveBankClick}
-                      disabled={submittingAction !== null}
-                      className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 transition-colors shadow-sm"
-                    >
-                      {submittingAction === "approve_bank" ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <CheckCircle2 className="w-4 h-4" />
-                      )}
-                      Approve Bank Account
-                    </button>
-                  )}
-
-                  {showRejectBankConfirm ? (
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-red-600 font-semibold">
-                        Reject this bank account?
+                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                      <span className="text-xs text-gray-400 block font-medium">
+                        Account Number
                       </span>
+                      <span className="font-mono font-semibold text-gray-900 mt-0.5 block">
+                        {bankAccount?.accountNumber}
+                      </span>
+                    </div>
+
+                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                      <span className="text-xs text-gray-400 block font-medium">
+                        IBAN
+                      </span>
+                      <span className="font-mono font-semibold text-gray-900 mt-0.5 block break-all">
+                        {bankAccount?.iban}
+                      </span>
+                    </div>
+
+                    {bankAccount?.swiftCode && (
+                      <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                        <span className="text-xs text-gray-400 block font-medium">
+                          SWIFT / BIC
+                        </span>
+                        <span className="font-mono font-semibold text-gray-900 mt-0.5 block">
+                          {bankAccount.swiftCode}
+                        </span>
+                      </div>
+                    )}
+
+                    {bankAccount?.routingNumber && (
+                      <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                        <span className="text-xs text-gray-400 block font-medium">
+                          Routing Number
+                        </span>
+                        <span className="font-mono font-semibold text-gray-900 mt-0.5 block">
+                          {bankAccount.routingNumber}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Bank Account Verification Actions Card */}
+                <div className="p-4 rounded-xl border border-gray-200 bg-gray-50/60 space-y-3">
+                  <h3 className="text-xs font-semibold uppercase text-gray-500">
+                    Bank Account Decision Actions
+                  </h3>
+                  <p className="text-xs text-gray-500 leading-relaxed">
+                    Admins can verify or reject linked banking credentials for
+                    this seller. Approving allows platform payout disbursements
+                    to be processed to this account.
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-3 pt-2">
+                    {!isBankVerified && (
                       <button
                         type="button"
-                        onClick={handleRejectBankClick}
+                        onClick={handleApproveBankClick}
                         disabled={submittingAction !== null}
-                        className="px-3.5 py-2 text-xs font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center gap-1.5"
+                        className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 transition-colors shadow-sm"
                       >
-                        {submittingAction === "reject_bank" && (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        {submittingAction === "approve_bank" ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <CheckCircle2 className="w-4 h-4" />
                         )}
-                        Yes, Reject Account
+                        Approve Bank Account
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowRejectBankConfirm(false)}
-                        className="px-3.5 py-2 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  ) : (
-                    !isBankRejected && (
-                      <button
-                        type="button"
-                        onClick={() => setShowRejectBankConfirm(true)}
-                        disabled={submittingAction !== null}
-                        className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 disabled:opacity-50 transition-colors"
-                      >
-                        <XCircle className="w-4 h-4" />
-                        Reject Bank Account
-                      </button>
-                    )
-                  )}
+                    )}
+
+                    {showRejectBankConfirm ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-red-600 font-semibold">
+                          Reject this bank account?
+                        </span>
+                        <button
+                          type="button"
+                          onClick={handleRejectBankClick}
+                          disabled={submittingAction !== null}
+                          className="px-3.5 py-2 text-xs font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center gap-1.5"
+                        >
+                          {submittingAction === "reject_bank" && (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          )}
+                          Yes, Reject Account
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowRejectBankConfirm(false)}
+                          className="px-3.5 py-2 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      !isBankRejected && (
+                        <button
+                          type="button"
+                          onClick={() => setShowRejectBankConfirm(true)}
+                          disabled={submittingAction !== null}
+                          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 disabled:opacity-50 transition-colors"
+                        >
+                          <XCircle className="w-4 h-4" />
+                          Reject Bank Account
+                        </button>
+                      )
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            ))}
 
           {activeTab === "request" && (
             <div className="space-y-4">
@@ -812,7 +888,9 @@ export function SellerViewModel({
                 <p className="font-semibold text-blue-900 mb-1">
                   Request Additional Documents
                 </p>
-                Specify what documents or details the seller needs to clarify or re-upload. This will notify the seller applicant and transition their application status.
+                Specify what documents or details the seller needs to clarify or
+                re-upload. This will notify the seller applicant and transition
+                their application status.
               </div>
 
               <div className="space-y-2">
@@ -864,14 +942,18 @@ export function SellerViewModel({
           <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
             {showRejectConfirm ? (
               <div className="flex items-center gap-2">
-                <span className="text-xs text-red-600 font-semibold">Confirm Reject?</span>
+                <span className="text-xs text-red-600 font-semibold">
+                  Confirm Reject?
+                </span>
                 <button
                   type="button"
                   onClick={handleRejectClick}
                   disabled={submittingAction !== null}
                   className="px-3 py-1.5 text-xs font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center gap-1.5"
                 >
-                  {submittingAction === "reject" && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  {submittingAction === "reject" && (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  )}
                   Yes, Reject
                 </button>
                 <button
@@ -976,9 +1058,8 @@ export function SellerViewModel({
         </div>
       )}
     </div>,
-    document.body
+    document.body,
   );
 }
 
 export default SellerViewModel;
-

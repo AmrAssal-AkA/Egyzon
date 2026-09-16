@@ -4,9 +4,12 @@ import { serverClient } from "../lib/serverClient";
 import type { ApiResponse } from "../types/auth";
 import type {
   ApiAllSellersData,
+  ApiPendingSellerApplicationsData,
   ApiSeller,
   ApiSellerApplication,
   BankAccountDecision,
+  GetPendingSellerApplicationsParams,
+  PendingSellerApplicationsResult,
   Seller,
   SellerStatus,
   SellersPagination,
@@ -94,7 +97,7 @@ export function mapApiSellerToSeller(apiSeller: ApiSeller): Seller {
 
   return {
     id: apiSeller._id,
-    businessName: apiSeller.storeName,
+    storeName: apiSeller.storeName,
     businessId: apiSeller.commercialRegisterNumber,
     ownerName: ownerName || apiSeller.email || "—",
     ownerEmail: apiSeller.email ?? "—",
@@ -116,7 +119,29 @@ export function mapApiSellerToSeller(apiSeller: ApiSeller): Seller {
 export function mapApiSellerApplicationToSeller(
   application: ApiSellerApplication
 ): Seller {
-  const ownerName = `${application.user.firstName} ${application.user.lastName}`.trim();
+  const firstName =
+    application.firstName ??
+    application.FirstName ??
+    application.user?.firstName ??
+    "";
+  const lastName =
+    application.lastName ??
+    application.LastName ??
+    application.user?.lastName ??
+    "";
+  const ownerName = `${firstName} ${lastName}`.trim();
+  const ownerEmail = application.email ?? application.user?.email ?? "—";
+
+  const { submittedAt, submittedRelative } = application.createdAt
+    ? formatSubmittedDate(application.createdAt)
+    : { submittedAt: "—", submittedRelative: "—" };
+
+  let status = toSellerStatus(application.applicantStatus || "pending");
+
+  if (application.isBlocked) {
+    status = "suspended";
+  }
+
   const commercialRegisterImage =
     application.sellerDocuments?.commercialRegisterUrl ??
     application.commercialRegisterImage;
@@ -125,14 +150,19 @@ export function mapApiSellerApplicationToSeller(
 
   return {
     id: application._id,
-    businessName: application.storeName,
-    businessId: application.commercialRegisterNumber,
-    ownerName: ownerName || application.user.email,
-    ownerEmail: application.user.email,
-    submittedAt: "—",
-    submittedRelative: "—",
+    storeName: application.storeName || "—",
+    businessId: application.commercialRegisterNumber || "—",
+    ownerName: ownerName || ownerEmail,
+    ownerEmail,
+    phoneNumber: application.phoneNumber,
+    role: application.role,
+    isBlocked: application.isBlocked,
+    isVerified: application.isVerified,
+    createdAt: application.createdAt,
+    submittedAt,
+    submittedRelative,
     riskScore: 0,
-    status: toSellerStatus(application.applicantStatus),
+    status,
     commercialRegisterNumber: application.commercialRegisterNumber,
     taxCardNumber: application.taxCardNumber,
     sellerDocuments: application.sellerDocuments,
@@ -192,30 +222,74 @@ export async function getAllSellers(
   }
 }
 
-export async function getPendingSellerApplications(): Promise<
-  ApiResponse<Seller[]>
-> {
+export async function getPendingSellerApplications(
+  params: GetPendingSellerApplicationsParams = {}
+): Promise<ApiResponse<PendingSellerApplicationsResult>> {
+  const { page = 1, limit = 5 } = params;
+  const emptyResult: PendingSellerApplicationsResult = {
+    sellers: [],
+    applications: [],
+    pagination: { page, limit, total: 0, totalPages: 1 },
+  };
+
   try {
-    const { data } = await serverClient.get<ApiResponse<ApiSellerApplication[]>>(
-      "/seller-applications/pending"
-    );
+    const { data } = await serverClient.get<
+      ApiResponse<ApiPendingSellerApplicationsData | ApiSellerApplication[]>
+    >("/seller-applications/pending", {
+      params: { page, limit },
+    });
 
     if (data.success && data.data) {
+      const rawList: ApiSellerApplication[] = Array.isArray(
+        (data.data as ApiPendingSellerApplicationsData).applications
+      )
+        ? (data.data as ApiPendingSellerApplicationsData).applications
+        : Array.isArray(data.data)
+        ? (data.data as ApiSellerApplication[])
+        : [];
+
+      const sellers = rawList.map(mapApiSellerApplicationToSeller);
+      const apiPagination = (data.data as ApiPendingSellerApplicationsData)
+        .pagination;
+      const total =
+        apiPagination?.total ??
+        (data.data as any).total ??
+        sellers.length;
+      const totalPages =
+        apiPagination?.totalPages ??
+        (data.data as any).totalPages ??
+        Math.max(1, Math.ceil(total / limit));
+
+      const pagination: SellersPagination = apiPagination ?? {
+        page,
+        limit,
+        total,
+        totalPages,
+      };
+
       return {
         ...data,
-        data: data.data.map(mapApiSellerApplicationToSeller),
+        data: {
+          sellers,
+          applications: sellers,
+          pagination,
+        },
       };
     }
 
     return {
       success: data.success,
       message: data.message,
-      data: [],
+      data: emptyResult,
     };
   } catch (error: unknown) {
     return {
       success: false,
-      message: getErrorMessage(error, "Failed to fetch pending seller applications"),
+      message: getErrorMessage(
+        error,
+        "Failed to fetch pending seller applications"
+      ),
+      data: emptyResult,
     };
   }
 }

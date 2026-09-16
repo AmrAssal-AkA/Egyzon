@@ -46,6 +46,10 @@ export const swaggerSpec = {
       name: "Newsletter",
       description: "Newsletter subscription and updates",
     },
+    {
+      name: "Contact",
+      description: "Contact form inquiries and messages",
+    },
   ],
   components: {
     securitySchemes: {
@@ -883,8 +887,22 @@ export const swaggerSpec = {
         },
       },
       SellerApplicationListResponse: {
-        type: "array",
-        items: { $ref: "#/components/schemas/SellerApplicationSummary" },
+        type: "object",
+        properties: {
+          applications: {
+            type: "array",
+            items: { $ref: "#/components/schemas/SellerApplicationSummary" },
+          },
+          pagination: {
+            type: "object",
+            properties: {
+              page: { type: "integer", example: 1 },
+              limit: { type: "integer", example: 5 },
+              total: { type: "integer", example: 10 },
+              totalPages: { type: "integer", example: 2 },
+            },
+          },
+        },
       },
       NotificationItem: {
         type: "object",
@@ -1500,6 +1518,52 @@ export const swaggerSpec = {
             description: "Email address to subscribe to the newsletter",
           },
         },
+      },
+      ContactRequest: {
+        type: "object",
+        required: ["fullName", "email", "topic", "message"],
+        properties: {
+          fullName: { type: "string", example: "John Doe" },
+          email: {
+            type: "string",
+            format: "email",
+            example: "john@example.com",
+          },
+          topic: {
+            type: "string",
+            example: "Order inquiry",
+          },
+          message: {
+            type: "string",
+            example: "I would like to inquire about bulk ordering options.",
+          },
+        },
+      },
+      ContactItem: {
+        type: "object",
+        properties: {
+          _id: { type: "string", example: "66e74f8c9b1d2e3f4a5b6c7d" },
+          fullName: { type: "string", example: "John Doe" },
+          email: {
+            type: "string",
+            format: "email",
+            example: "john@example.com",
+          },
+          topic: {
+            type: "string",
+            example: "Order inquiry",
+          },
+          message: {
+            type: "string",
+            example: "I would like to inquire about bulk ordering options.",
+          },
+          createdAt: { type: "string", format: "date-time" },
+          updatedAt: { type: "string", format: "date-time" },
+        },
+      },
+      ContactListResponse: {
+        type: "array",
+        items: { $ref: "#/components/schemas/ContactItem" },
       },
     },
   },
@@ -5080,10 +5144,26 @@ export const swaggerSpec = {
     "/api/admin/seller-applications/pending": {
       get: {
         tags: ["Admin"],
-        summary: "List pending seller applications",
+        summary: "List pending seller applications with pagination",
         description:
-          "Retrieves all users who have applied to become sellers and are currently in 'pending' status. Note that pending applicants maintain their 'customer' role until an admin approves their application.",
+          "Retrieves all users who have applied to become sellers and are currently in 'pending' status with pagination support. Note that pending applicants maintain their 'customer' role until an admin approves their application.",
         security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        parameters: [
+          {
+            name: "page",
+            in: "query",
+            required: false,
+            schema: { type: "integer", minimum: 1, default: 1 },
+            description: "Page number for pagination (defaults to 1)",
+          },
+          {
+            name: "limit",
+            in: "query",
+            required: false,
+            schema: { type: "integer", minimum: 1, default: 5 },
+            description: "Number of applications per page (defaults to 5)",
+          },
+        ],
         responses: {
           200: {
             description: "Pending seller applications retrieved successfully",
@@ -5115,6 +5195,14 @@ export const swaggerSpec = {
           },
           403: {
             description: "Forbidden",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ApiErrorResponse" },
@@ -6340,6 +6428,113 @@ export const swaggerSpec = {
                   message:
                     "An error occurred while subscribing to the newsletter.",
                 },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/contact/send": {
+      post: {
+        tags: ["Contact"],
+        summary: "Submit contact form",
+        description: "Submit a new contact or inquiry message.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/ContactRequest" },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description: "Contact created successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: { $ref: "#/components/schemas/ContactItem" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          400: {
+            description: "Validation error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/contact/all": {
+      get: {
+        tags: ["Contact"],
+        summary: "Retrieve all contact submissions",
+        description:
+          "Admin endpoint to retrieve all submitted contact messages. Requires admin privileges.",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Contacts retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/ContactListResponse",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description:
+              "Forbidden: You are not authorized to access this resource",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
               },
             },
           },

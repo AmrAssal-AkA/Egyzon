@@ -5,6 +5,7 @@ import SellerTable, { SellerRowAction } from "../../components/sellers/SellerTab
 import {SellerViewModel} from "../../components/sellers/sellerViewModel";
 import { useAlert } from "../../hooks/useAlert";
 import { useAllSellers } from "../../hooks/useAllSellers";
+import { usePendingSellerApplications } from "../../hooks/usePendingSellerApplications";
 import {
   approveSellerApplication,
   approveSellerBankAccount,
@@ -28,10 +29,7 @@ const STATUS_FILTERS: { id: SellerFilterId; name: string }[] = [
   { id: 5, name: "under review" },
 ];
 
-function filterSellers(sellers: Seller[], filterId: SellerFilterId): Seller[] {
-  const status = SELLER_FILTER_STATUS[filterId];
-  return sellers.filter((seller) => seller.status === status);
-}
+const PENDING_FILTER_ID: SellerFilterId = 2;
 
 function SellerManagement(): React.ReactElement {
   const [activeFilter, setActiveFilter] = useState<SellerFilterId>(2);
@@ -39,22 +37,53 @@ function SellerManagement(): React.ReactElement {
   const [selectedSeller, setSelectedSeller] = useState<Seller | null>(null);
   const [isViewModelOpen, setIsViewModelOpen] = useState(false);
 
-  const { sellers, pagination, isLoading, error, refresh } = useAllSellers({
+  const isPendingTab = activeFilter === PENDING_FILTER_ID;
+
+  const {
+    sellers: allSellers,
+    pagination: allPagination,
+    isLoading: allLoading,
+    error: allError,
+    refresh: refreshAll,
+  } = useAllSellers({
     page: currentPage,
     limit: PAGE_SIZE,
   });
+
+  const {
+    sellers: pendingSellers,
+    pagination: pendingPagination,
+    isLoading: pendingLoading,
+    error: pendingError,
+    refresh: refreshPending,
+  } = usePendingSellerApplications({
+    page: currentPage,
+    limit: PAGE_SIZE,
+  });
+
   const { showError, showSuccess } = useAlert();
 
-  const filteredSellers = useMemo(
-    () => filterSellers(sellers, activeFilter),
-    [sellers, activeFilter]
-  );
+  const isLoading = isPendingTab ? pendingLoading : allLoading;
+  const error = isPendingTab ? pendingError : allError;
+  const refresh = isPendingTab ? refreshPending : refreshAll;
 
+  const filteredSellers = useMemo(() => {
+    if (isPendingTab) {
+      return pendingSellers;
+    }
+
+    return allSellers.filter(
+      (seller) => seller.status === SELLER_FILTER_STATUS[activeFilter]
+    );
+  }, [isPendingTab, pendingSellers, allSellers, activeFilter]);
+
+  const pagination = isPendingTab ? pendingPagination : allPagination;
   const totalPages = Math.max(1, pagination.totalPages);
 
   const pageStart =
     pagination.total === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
   const pageEnd = Math.min(currentPage * PAGE_SIZE, pagination.total);
+
 
   const paginationItems = useMemo(() => {
     if (totalPages <= 5) {
@@ -95,7 +124,7 @@ function SellerManagement(): React.ReactElement {
       }
 
       await refresh();
-      showSuccess(`${seller.businessName} has been approved successfully.`);
+      showSuccess(`${seller.storeName} has been approved successfully.`);
     } catch {
       showError("Something went wrong while approving the seller.");
     }
@@ -111,7 +140,7 @@ function SellerManagement(): React.ReactElement {
       }
 
       await refresh();
-      showSuccess(`${seller.businessName} application has been rejected.`);
+      showSuccess(`${seller.storeName} application has been rejected.`);
     } catch {
       showError("Something went wrong while rejecting the seller application.");
     }
@@ -133,7 +162,7 @@ function SellerManagement(): React.ReactElement {
 
       await refresh();
       showSuccess(
-        `Request for additional documents sent to ${seller.businessName}.`
+        `Request for additional documents sent to ${seller.storeName}.`
       );
     } catch {
       showError("Something went wrong while requesting additional documents.");
@@ -151,7 +180,7 @@ function SellerManagement(): React.ReactElement {
 
       await refresh();
       showSuccess(
-        `${seller.businessName}'s bank account has been approved and verified.`
+        `${seller.storeName}'s bank account has been approved and verified.`
       );
     } catch {
       showError("Something went wrong while approving the bank account.");
@@ -169,7 +198,7 @@ function SellerManagement(): React.ReactElement {
 
       await refresh();
       showSuccess(
-        `${seller.businessName}'s bank account has been rejected.`
+        `${seller.storeName}'s bank account has been rejected.`
       );
     } catch {
       showError("Something went wrong while rejecting the bank account.");

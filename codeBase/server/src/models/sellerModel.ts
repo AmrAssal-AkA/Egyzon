@@ -5,7 +5,7 @@ import { paymobIssuar, paymobBankCode } from "../types/wallet.types";
 
 const bankAccountSchema = new Schema(
   {
-    issuer: {
+    issuer: { 
       type: String,
       enum: Object.values(paymobIssuar),
       default: paymobIssuar.BANK_CARD,

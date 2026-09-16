@@ -25,6 +25,7 @@ const routeFiles = [
   { prefix: "/api/payment", file: "src/routes/payment.route.ts" },
   { prefix: "/api/wallet", file: "src/routes/wallet.route.ts" },
   { prefix: "/api/newsletter", file: "src/routes/newsletter.routes.ts" },
+  { prefix: "/api/contact", file: "src/routes/contact.routes.ts" },
 ];
 
 const foundRoutes: RouteEntry[] = [];

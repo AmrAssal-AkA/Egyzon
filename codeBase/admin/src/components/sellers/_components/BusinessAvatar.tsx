@@ -12,21 +12,22 @@ const avatarColors = [
 
 
 export function BusinessAvatar({ name }: { name: string }): React.ReactElement {
-  const initials = name
+  const safeName = (name || "").trim() || "Egyzon";
+  const initials = safeName
     .split(" ")
     .filter((part) => part.length > 0)
     .map((part) => part[0])
     .join("")
-    .slice(0, 2)
+    .slice(0, 2) 
     .toUpperCase();
 
   const colorIndex =
-    name.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0) %
+    safeName.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0) %
     avatarColors.length;
 
   return (
     <div
-      className={`w-12 h-12 rounded-xl flex items-center justify-center text-sm font-bold border shrink-0 ${avatarColors[colorIndex]}`}
+      className={`w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${avatarColors[colorIndex]}`}
       aria-hidden="true"
     >
       {initials || "SE"}

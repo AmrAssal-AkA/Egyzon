@@ -16,7 +16,7 @@ jest.mock("../../services/seller.services", () => ({
 describe("SellerViewModel Component - Bank Account Integration", () => {
   const mockSellerWithBank: Seller = {
     id: "seller-123",
-    businessName: "Tech Hub Store",
+    storeName: "Tech Hub Store",
     businessId: "CR-98765",
     ownerName: "Amr Assal",
     ownerEmail: "amr@egyzon.com",
@@ -46,24 +46,34 @@ describe("SellerViewModel Component - Bank Account Integration", () => {
         seller={mockSellerWithBank}
         isOpen={true}
         onClose={jest.fn()}
-      />
+      />,
     );
 
     // Overview shows linked bank account card
     expect(screen.getByText("Linked Bank Account")).toBeInTheDocument();
-    expect(screen.getByText("Commercial International Bank (CIB)")).toBeInTheDocument();
+    expect(
+      screen.getByText("Commercial International Bank (CIB)"),
+    ).toBeInTheDocument();
 
     // Switch to Bank Account tab
     const bankTabButton = screen.getByRole("button", { name: /Bank Account/i });
     fireEvent.click(bankTabButton);
 
     // Verifies credentials are shown
-    expect(screen.getByText("Banking Credentials & Payout Information")).toBeInTheDocument();
+    expect(
+      screen.getByText("Banking Credentials & Payout Information"),
+    ).toBeInTheDocument();
     expect(screen.getByText("100029384756")).toBeInTheDocument();
-    expect(screen.getByText("EG380010002938475600000000000")).toBeInTheDocument();
+    expect(
+      screen.getByText("EG380010002938475600000000000"),
+    ).toBeInTheDocument();
     expect(screen.getByText("CIBEEGCA")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Approve Bank Account/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Reject Bank Account/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Approve Bank Account/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Reject Bank Account/i }),
+    ).toBeInTheDocument();
   });
 
   it("calls onApproveBankAccount prop when provided", async () => {
@@ -75,19 +85,23 @@ describe("SellerViewModel Component - Bank Account Integration", () => {
         isOpen={true}
         onClose={jest.fn()}
         onApproveBankAccount={handleApproveBank}
-      />
+      />,
     );
 
     const bankTabButton = screen.getByRole("button", { name: /Bank Account/i });
     fireEvent.click(bankTabButton);
 
-    const approveButton = screen.getByRole("button", { name: /Approve Bank Account/i });
+    const approveButton = screen.getByRole("button", {
+      name: /Approve Bank Account/i,
+    });
     fireEvent.click(approveButton);
 
     await waitFor(() => {
       expect(handleApproveBank).toHaveBeenCalledWith(mockSellerWithBank);
       expect(
-        screen.getByText("Seller bank account verified and approved successfully.")
+        screen.getByText(
+          "Seller bank account verified and approved successfully.",
+        ),
       ).toBeInTheDocument();
     });
   });
@@ -103,19 +117,23 @@ describe("SellerViewModel Component - Bank Account Integration", () => {
         seller={mockSellerWithBank}
         isOpen={true}
         onClose={jest.fn()}
-      />
+      />,
     );
 
     const bankTabButton = screen.getByRole("button", { name: /Bank Account/i });
     fireEvent.click(bankTabButton);
 
-    const approveButton = screen.getByRole("button", { name: /Approve Bank Account/i });
+    const approveButton = screen.getByRole("button", {
+      name: /Approve Bank Account/i,
+    });
     fireEvent.click(approveButton);
 
     await waitFor(() => {
       expect(approveSellerBankAccount).toHaveBeenCalledWith("seller-123");
       expect(
-        screen.getByText("Seller bank account verified and approved successfully.")
+        screen.getByText(
+          "Seller bank account verified and approved successfully.",
+        ),
       ).toBeInTheDocument();
     });
   });
@@ -131,13 +149,15 @@ describe("SellerViewModel Component - Bank Account Integration", () => {
         seller={mockSellerWithBank}
         isOpen={true}
         onClose={jest.fn()}
-      />
+      />,
     );
 
     const bankTabButton = screen.getByRole("button", { name: /Bank Account/i });
     fireEvent.click(bankTabButton);
 
-    const rejectButton = screen.getByRole("button", { name: /Reject Bank Account/i });
+    const rejectButton = screen.getByRole("button", {
+      name: /Reject Bank Account/i,
+    });
     fireEvent.click(rejectButton);
 
     // Confirm prompt is displayed
@@ -150,8 +170,49 @@ describe("SellerViewModel Component - Bank Account Integration", () => {
     await waitFor(() => {
       expect(rejectSellerBankAccount).toHaveBeenCalledWith("seller-123");
       expect(
-        screen.getByText("Seller bank account has been rejected.")
+        screen.getByText("Seller bank account has been rejected."),
       ).toBeInTheDocument();
     });
+  });
+
+  it("does not show dummy data when seller has no bank account", () => {
+    const mockSellerWithoutBank: Seller = {
+      ...mockSellerWithBank,
+      id: "seller-no-bank",
+      bankAccount: undefined,
+    };
+
+    render(
+      <SellerViewModel
+        seller={mockSellerWithoutBank}
+        isOpen={true}
+        onClose={jest.fn()}
+      />,
+    );
+
+    // Overview shows fallback message instead of dummy bank data
+    expect(screen.getByText("Linked Bank Account")).toBeInTheDocument();
+    expect(
+      screen.getByText("No Bank Account Added right now"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("Commercial International Bank (CIB)"),
+    ).not.toBeInTheDocument();
+
+    // Switch to Bank Account tab
+    const bankTabButton = screen.getByRole("button", { name: /Bank Account/i });
+    fireEvent.click(bankTabButton);
+
+    // Verifies empty state is shown and no dummy actions/data appear
+    expect(screen.getByText("No Bank Account Linked")).toBeInTheDocument();
+    expect(
+      screen.queryByText("Commercial International Bank (CIB)"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Approve Bank Account/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Reject Bank Account/i }),
+    ).not.toBeInTheDocument();
   });
 });
