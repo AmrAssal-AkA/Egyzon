@@ -191,18 +191,25 @@ export const AdminService = {
   },
   approveSeller: async (sellerId: string): Promise<IUser> => {
     try {
-      const approveSeller = await User.findOneAndUpdate(
-        { _id: sellerId, applicantStatus: "pending" },
-        { $set: { applicantStatus: "approved", role: "seller" } },
-        { returnDocument: "after" },
-      );
-      if (!approveSeller)
+      const applicant = await User.findOne({
+        _id: sellerId,
+        applicantStatus: "pending",
+      });
+      if (!applicant)
         throw new AppError(
           404,
           "Seller application not found or already processed",
         );
-      return approveSeller;
+      await User.collection.updateOne(
+        { _id: applicant._id },
+        { $set: { applicantStatus: "approved", role: "seller" } },
+      );
+      const approvedSeller = await User.findById(sellerId);
+      if (!approvedSeller)
+        throw new AppError(500, "Failed to approve seller application");
+      return approvedSeller;
     } catch (error) {
+      console.log("error", error);
       if (error instanceof AppError) throw error;
       throw new AppError(500, "Internal Server Error");
     }
