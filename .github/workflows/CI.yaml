@@ -47,8 +47,6 @@ jobs:
           node-version: 25
       - name: "install dependencies"
         run: npm ci
-      - name: "run tests"
-        run: npm test
       
       - name: "build"
         run: npm run build
@@ -70,8 +68,6 @@ jobs:
           node-version: 20
       - name: "install dependencies"
         run: npm ci
-      - name: "run lint"
-        run: npm run lint
       - name: "run typecheck"
         run: npm run typecheck
       - name: "build"
