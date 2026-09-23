@@ -37,14 +37,14 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: /codeBase/server
+        working-directory: ./codeBase/server
     
     steps:
       - uses: actions/checkout@v7
       - name: "setup node"
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 25
       - name: "install dependencies"
         run: npm ci
       - name: "run tests"
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: /codeBase/client
+        working-directory: ./codeBase/client
     
     steps:
       - uses: actions/checkout@v7
@@ -83,7 +83,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: /codeBase/admin
+        working-directory: ./codeBase/admin
       
     steps:
       - uses: actions/checkout@v7
