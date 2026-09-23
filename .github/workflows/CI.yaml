@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./server
+        working-directory: /codeBase/server
     
     steps:
       - uses: actions/checkout@v7
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./client
+        working-directory: /codeBase/client
     
     steps:
       - uses: actions/checkout@v7
@@ -83,7 +83,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./admin
+        working-directory: /codeBase/admin
       
     steps:
       - uses: actions/checkout@v7
