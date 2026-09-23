@@ -1,0 +1,98 @@
+name: "Continuous Integration"
+
+on: 
+  push:
+    branches:
+      - main
+  
+  pull_request:
+     branches:
+       - main
+
+jobs:
+  changes:
+    name: "check for changes"
+    runs-on: ubuntu-latest
+    outputs:
+      server: ${{ steps.check.outputs.server }}
+      client: ${{ steps.check.outputs.client }}
+      admin: ${{ steps.check.outputs.admin }}
+    
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            server:
+              - 'server/**'
+            client:
+              - 'client/**'
+            admin:
+              - 'admin/**'
+
+  server:
+    name: "server"
+    needs: changes
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./server
+    
+    steps:
+      - uses: actions/checkout@v7
+      - name: "setup node"
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - name: "install dependencies"
+        run: npm ci
+      - name: "run tests"
+        run: npm test
+      
+      - name: "build"
+        run: npm run build
+    
+
+  client:
+    name: "client"
+    needs: changes
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./client
+    
+    steps:
+      - uses: actions/checkout@v7
+      - name: "setup node"
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - name: "install dependencies"
+        run: npm ci
+      - name: "run lint"
+        run: npm run lint
+      - name: "run typecheck"
+        run: npm run typecheck
+      - name: "build"
+        run: npm run build
+      
+  admin:
+    name: "admin"
+    needs: changes
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./admin
+      
+    steps:
+      - uses: actions/checkout@v7
+      - name: "setup node"
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - name: "install dependencies"
+        run: npm ci
+      
+      - name: "run build"
+        run: npm run build
