@@ -152,7 +152,8 @@ export default function ProductsContainer() {
         const targetId = editingProduct.id ?? editingProduct._id;
         const displayName = savedData.name || savedData.productName || editingProduct.name || editingProduct.productName;
         const displayDesc = savedData.description || savedData.productDescription || editingProduct.description || editingProduct.productDescription;
-        const displayImg = savedData.imageUrl || savedData.image || editingProduct.imageUrl || editingProduct.image;
+        const rawImg = savedData.imageUrl || savedData.image || editingProduct.imageUrl || editingProduct.image;
+        const displayImg = Array.isArray(rawImg) ? rawImg[0] : rawImg;
         setProducts((prev) =>
           prev.map((p) =>
             (p.id ?? p._id) === targetId
