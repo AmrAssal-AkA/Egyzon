@@ -1,13 +1,17 @@
 "use client";
+
 import React from "react";
 
 import { Package, Heart, DollarSign } from "lucide-react";
+
 import { useAuth } from "@/hooks/useAuth";
+import { useCustomerTotalSpend } from "@/hooks/useCustomer";
 import { useWishlistCount } from "@/stores/buyer/wishlist";
 
 export default function DashboardStats() {
   const { user } = useAuth();
   const wishlistCount = useWishlistCount();
+  const { totalSpend, isLoading: isSpendLoading } = useCustomerTotalSpend();
 
   if (!user) {
     return (
@@ -54,8 +58,6 @@ export default function DashboardStats() {
         </div>
       </div>
 
-
-
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 flex items-center gap-4">
         <div className="p-3 bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300 rounded-full">
           <DollarSign className="w-6 h-6" />
@@ -65,8 +67,11 @@ export default function DashboardStats() {
             Total Spent
           </p>
           <p className="text-xl font-bold text-gray-900 dark:text-white">
-            {/* totalSpend: requires a separate orders API call */}
-            {(0).toFixed(2)} EGP
+            {isSpendLoading ? (
+              <span className="animate-pulse">Loading...</span>
+            ) : (
+              `${Number(totalSpend || 0).toFixed(2)} EGP`
+            )}
           </p>
         </div>
       </div>

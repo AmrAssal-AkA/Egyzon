@@ -52,3 +52,27 @@ export interface CustomerOrderHistoryResponse {
   message: string;
   data: CustomerOrderHistoryData;
 }
+
+export interface ChangePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword?: string;
+  confirmNewPassword?: string;
+}
+
+export interface ChangePasswordResponse {
+  success: boolean;
+  message: string;
+  data?: string | null;
+  error?: string;
+}
+
+export interface CustomerTotalSpendData {
+  totalAmountSpent: number;
+}
+
+export interface CustomerTotalSpendResponse {
+  success: boolean;
+  message: string;
+  data: CustomerTotalSpendData;
+}

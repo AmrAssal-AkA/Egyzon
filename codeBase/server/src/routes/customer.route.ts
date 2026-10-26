@@ -11,6 +11,8 @@ const router = express.Router();
 
 router.put("/change-password", isAuthenticated, Authorize(userRole.Customer), validate(resetPasswordSchema), CustomerController.changePassword);
 router.get("/order-history", isAuthenticated, Authorize(userRole.Customer), CustomerController.getCustomerOrderHistory);
+router.get("/total-spend",isAuthenticated, Authorize(userRole.Customer), CustomerController.getTotalSpend);
+router.get("/total-orders",isAuthenticated, Authorize(userRole.Customer), CustomerController.getTotalOrders);
 
 
 export default router;

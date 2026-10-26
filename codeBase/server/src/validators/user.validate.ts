@@ -57,10 +57,11 @@ export const forgetPasswordSchema = z.object({
 })
 export const resetPasswordSchema = z.object({
     body: z.object({
+        currentPassword: PasswordSchema.optional(),
         newPassword: PasswordSchema,
-        confirmNewPassword: PasswordSchema,
-    })
-})
+        confirmPassword: PasswordSchema.optional(),
+    }),
+});
 
 export const adminLoginSchema = z.object({
     body: z.object({

@@ -315,7 +315,7 @@ export default function StoreAddressSection({
       {/* Modern Map Preview Card */}
       <div className="relative rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-850 h-36 flex items-center justify-center">
         {/* Subtle map pattern background */}
-        <div className="absolute inset-0 opacity-40 dark:opacity-20 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:16px_16px]" />
+        <div className="absolute inset-0 opacity-40 dark:opacity-20 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] bg-size-[16px_16px]" />
         
         {/* Simulated map route lines */}
         <svg className="absolute inset-0 w-full h-full opacity-30 stroke-slate-400 dark:stroke-slate-600" fill="none">
@@ -332,7 +332,7 @@ export default function StoreAddressSection({
             <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-1.5 bg-blue-900/30 rounded-full blur-xs" />
           </div>
 
-          <div className="mt-2 px-3 py-1 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 text-[11px] font-semibold text-slate-800 dark:text-slate-200 shadow-sm flex items-center gap-1.5 max-w-[280px] truncate">
+          <div className="mt-2 px-3 py-1 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 text-[11px] font-semibold text-slate-800 dark:text-slate-200 shadow-sm flex items-center gap-1.5 max-w-70 truncate">
             <Compass className="w-3.5 h-3.5 text-blue-500 shrink-0" />
             <span className="truncate">
               {address ? address : "Cairo / Egyptian Commercial Zone"}

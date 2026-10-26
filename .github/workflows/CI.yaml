@@ -1,94 +1,81 @@
 name: "Continuous Integration"
 
-on: 
+on:
   push:
     branches:
       - main
-  
   pull_request:
-     branches:
-       - main
+    branches:
+      - main
 
 jobs:
-  changes:
-    name: "check for changes"
-    runs-on: ubuntu-latest
-    outputs:
-      server: ${{ steps.check.outputs.server }}
-      client: ${{ steps.check.outputs.client }}
-      admin: ${{ steps.check.outputs.admin }}
-    
-    steps:
-      - uses: actions/checkout@v7
-      - uses: dorny/paths-filter@v2
-        id: filter
-        with:
-          filters: |
-            server:
-              - 'server/**'
-            client:
-              - 'client/**'
-            admin:
-              - 'admin/**'
-
-  server:
-    name: "server"
-    needs: changes
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./codeBase/server
-    
-    steps:
-      - uses: actions/checkout@v7
-      - name: "setup node"
-        uses: actions/setup-node@v3
-        with:
-          node-version: 25
-      - name: "install dependencies"
-        run: npm ci
-      
-      - name: "build"
-        run: npm run build
-    
-
-  client:
-    name: "client"
-    needs: changes
-    runs-on: ubuntu-latest
+  client-app-tests:
+    name: "client App Tests"
+    runs-on: ubuntu-latest,
     defaults:
       run:
         working-directory: ./codeBase/client
-    
     steps:
-      - uses: actions/checkout@v7
-      - name: "setup node"
-        uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v7
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
-      - name: "install dependencies"
-        run: npm ci
-      - name: "run typecheck"
+          node-version: 25,
+          cache: "npm"
+          cache-dependency-path: ./codeBase/client/package-lock.json
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run typecheck
         run: npm run typecheck
-      - name: "build"
+
+      - name: Run build
         run: npm run build
-      
-  admin:
-    name: "admin"
-    needs: changes
+
+  server-test:
+    name: "server Tests"
     runs-on: ubuntu-latest
+    needs: client-app-tests
+    defaults:
+      run:
+        working-directory: ./codeBase/server
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 25,
+          cache: "npm"
+          cache-dependency-path: ./codeBase/server/package-lock.json
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run build
+        run: npm run build
+
+  Admin-app-tests:
+    name: "Admin App Tests"
+    runs-on: ubuntu-latest
+    needs: server-test
     defaults:
       run:
         working-directory: ./codeBase/admin
-      
     steps:
-      - uses: actions/checkout@v7
-      - name: "setup node"
-        uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v7
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
-      - name: "install dependencies"
-        run: npm ci
-      
-      - name: "run build"
+          node-version: 25,
+          cache: "npm"
+          cache-dependency-path: ./codeBase/admin/package-lock.json
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run build
         run: npm run build

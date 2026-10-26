@@ -5,7 +5,7 @@ import { IPlatformConfig } from "../types/platformConfig.types";
 import { IAdmin, ISeller, IUser } from "../types/User.types";
 import refreshTokenModel from "../models/refreshToken";
 import { AppError } from "../utils/AppError";
-import { comparePasswords } from "../utils//password.ustils";
+import { comparePasswords } from "../utils/password.ustils";
 import { signAccessToken, signRefreshToken } from "../utils/jwt.util";
 import logger from "../utils/logger";
 import Order from "../models/orderModel";
