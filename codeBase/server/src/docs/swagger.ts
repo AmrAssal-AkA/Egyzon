@@ -32,7 +32,10 @@ export const swaggerSpec = {
     },
     { name: "Seller", description: "Seller onboarding and store setup" },
     { name: "Categories", description: "Category management" },
-    { name: "Customer", description: "Customer account settings" },
+    {
+      name: "Customer",
+      description: "Customer account settings, orders, and metrics",
+    },
     { name: "Admin", description: "Admin login and seller application review" },
     {
       name: "Payment",
@@ -254,6 +257,76 @@ export const swaggerSpec = {
             type: "string",
             format: "password",
             example: "Password_123",
+          },
+        },
+      },
+      CustomerChangePasswordRequest: {
+        type: "object",
+        required: ["currentPassword", "newPassword", "confirmPassword"],
+        properties: {
+          currentPassword: {
+            type: "string",
+            format: "password",
+            example: "OldPassword123!",
+          },
+          newPassword: {
+            type: "string",
+            format: "password",
+            example: "NewPassword123!",
+          },
+          confirmPassword: {
+            type: "string",
+            format: "password",
+            example: "NewPassword123!",
+          },
+          confirmNewPassword: {
+            type: "string",
+            format: "password",
+            example: "NewPassword123!",
+          },
+        },
+      },
+      CustomerTotalOrdersResponseData: {
+        type: "object",
+        properties: {
+          totalOrders: { type: "number", example: 8 },
+        },
+      },
+      CustomerTotalSpendResponseData: {
+        type: "object",
+        properties: {
+          totalAmountSpent: { type: "number", example: 1250 },
+        },
+      },
+      CustomerChangeNameRequest: {
+        type: "object",
+        required: ["FirstName", "LastName"],
+        properties: {
+          FirstName: {
+            type: "string",
+            example: "John",
+          },
+          LastName: {
+            type: "string",
+            example: "Doe",
+          },
+        },
+      },
+      CustomerChangeNameResponseData: {
+        type: "object",
+        properties: {
+          FirstName: { type: "string", example: "John" },
+          LastName: { type: "string", example: "Doe" },
+        },
+      },
+      CustomerDeleteAccountRequest: {
+        type: "object",
+        required: ["email"],
+        properties: {
+          email: {
+            type: "string",
+            format: "email",
+            example: "customer@example.com",
           },
         },
       },
@@ -4594,7 +4667,7 @@ export const swaggerSpec = {
           required: true,
           content: {
             "application/json": {
-              schema: { $ref: "#/components/schemas/ResetPasswordRequest" },
+              schema: { $ref: "#/components/schemas/CustomerChangePasswordRequest" },
             },
           },
         },
@@ -4608,7 +4681,7 @@ export const swaggerSpec = {
             },
           },
           400: {
-            description: "Validation failed or passwords do not match",
+            description: "Validation failed, passwords do not match, or current password is incorrect",
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ApiErrorResponse" },
@@ -4617,6 +4690,22 @@ export const swaggerSpec = {
           },
           401: {
             description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          404: {
+            description: "User not found",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ApiErrorResponse" },
@@ -4662,6 +4751,270 @@ export const swaggerSpec = {
           },
           404: {
             description: "Customer not found",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/customer/total-spend": {
+      get: {
+        tags: ["Customer"],
+        summary: "Get total amount spent by the authenticated customer",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Total amount spent retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/CustomerTotalSpendResponseData",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Customer role required",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/customer/total-orders": {
+      get: {
+        tags: ["Customer"],
+        summary: "Get total orders count of the authenticated customer",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Total orders retrieved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/CustomerTotalOrdersResponseData",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Customer role required",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          404: {
+            description: "Customer not found",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/customer/change-customer-name": {
+      patch: {
+        tags: ["Customer"],
+        summary: "Change customer name",
+        description:
+          "Updates the first name and last name of the authenticated customer.",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/CustomerChangeNameRequest",
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Customer name changed successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiSuccessResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          $ref: "#/components/schemas/CustomerChangeNameResponseData",
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          400: {
+            description: "Validation failed",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Customer role required",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          404: {
+            description: "User not found",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/customer/delete-customer": {
+      delete: {
+        tags: ["Customer"],
+        summary: "Delete customer account",
+        description:
+          "Permanently deletes the customer account, user record, and customer orders upon confirming the email address.",
+        security: [{ cookieAuth: [] }, { bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/CustomerDeleteAccountRequest",
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Customer account deleted successfully",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+              },
+            },
+          },
+          400: {
+            description: "Validation failed or email does not match",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden - Customer role required",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiErrorResponse" },
+              },
+            },
+          },
+          404: {
+            description: "User not found",
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ApiErrorResponse" },

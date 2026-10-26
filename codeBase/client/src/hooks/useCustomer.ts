@@ -3,7 +3,11 @@
 import useSWR from "swr";
 
 import { customerService } from "@/services/customer.services";
-import { CustomerOrderHistoryResponse } from "@/types/customer";
+import {
+  CustomerOrderHistoryResponse,
+  CustomerTotalSpendResponse,
+  CustomerTotalOrdersResponse,
+} from "@/types/customer";
 
 export const useCustomerOrderHistory = () => {
   const { data, error, isLoading, mutate } =
@@ -23,3 +27,41 @@ export const useCustomerOrderHistory = () => {
     mutate,
   };
 };
+
+export const useCustomerTotalSpend = () => {
+  const { data, error, isLoading, mutate } =
+    useSWR<CustomerTotalSpendResponse>(
+      "/api/customer/totalSpend",
+      () => customerService.getTotalSpend(),
+      {
+        revalidateOnFocus: true,
+      }
+    );
+
+  return {
+    totalSpend: data?.data?.totalAmountSpent ?? 0,
+    isLoading,
+    error,
+    mutate,
+  };
+};
+
+export const useCustomerTotalOrders = () => {
+  const { data, error, isLoading, mutate } =
+    useSWR<CustomerTotalOrdersResponse>(
+      "/api/customer/totalOrders",
+      () => customerService.getTotalOrders(),
+      {
+        revalidateOnFocus: true,
+      }
+    );
+
+  return {
+    totalOrders: data?.data?.totalOrders ?? 0,
+    isLoading,
+    error,
+    mutate,
+  };
+};
+
+
