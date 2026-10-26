@@ -3,7 +3,6 @@ import React from "react";
 
 import { MapPin, Phone, User } from "lucide-react";
 import { AddressSectionProps } from "@/types/cart.type";
-import { useAuth } from "@/hooks/useAuth";
 
 export function AddressSection({
   address,

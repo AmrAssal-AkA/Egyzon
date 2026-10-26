@@ -52,8 +52,8 @@ export default function StoreProductsSection({
         // Category filter
         const prodCat =
           typeof product.category === "object" && product.category !== null
-            ? (product.category as any).name ||
-              (product.category as any).categoryName ||
+            ? product.category.name ||
+              product.category.categoryName ||
               ""
             : typeof product.category === "string"
               ? product.category
@@ -294,13 +294,13 @@ export default function StoreProductsSection({
         />
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
-          {filteredProducts.map((product) => (
+          {filteredProducts.map((product, index) => (
             <StoreProductCard
               key={
                 product._id ||
                 product.id ||
-                (product as any).productId ||
-                Math.random()
+                product.productId ||
+                index
               }
               product={product}
             />

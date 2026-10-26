@@ -1,3 +1,5 @@
+import type { Product } from "./product.type";
+
 export type StoreType = "physical" | "online";
 
 export interface Seller {
@@ -80,7 +82,7 @@ export interface BackendStoreDetails {
   storeManagement?: BackendStoreManagement;
   createdAt?: string;
   updatedAt?: string;
-  products?: any[];
+  products?: Product[];
   rating?: number;
   reviewCount?: number;
 }

@@ -23,9 +23,11 @@ export default function SideMenu() {
   const { user } = useAuth();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-  useEffect(() => {
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
     setIsMobileOpen(false);
-  }, [pathname]);
+  }
 
   useEffect(() => {
     if (!isMobileOpen) return;

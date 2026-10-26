@@ -118,7 +118,14 @@ export const useCartStore = create<CartState>()(
           const response = await getCart();
           const serverItems = response?.data?.items;
           if (response?.success && Array.isArray(serverItems)) {
-            const items = serverItems.map((item: any) => ({
+            const items = (
+              serverItems as {
+                productId: string;
+                name: string;
+                price: number;
+                quantity: number;
+              }[]
+            ).map((item) => ({
               id: item.productId,
               title: item.name,
               price: item.price,

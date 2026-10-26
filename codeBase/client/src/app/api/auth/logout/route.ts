@@ -22,7 +22,7 @@ export async function POST() {
     res.cookies.delete("token");
     res.cookies.delete("refreshToken");
     return res;
-  } catch (error) {
+  } catch {
     const res = NextResponse.json(
       { success: true, message: "Logged out" },
       { status: 200 },

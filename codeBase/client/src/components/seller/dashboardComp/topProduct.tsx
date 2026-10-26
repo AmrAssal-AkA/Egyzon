@@ -55,7 +55,9 @@ function normalizeTopProduct(
 
   const category =
     typeof rawCat === "object" && rawCat !== null
-      ? (rawCat as any).categoryName || (rawCat as any).name || "General"
+      ? (rawCat as { categoryName?: string; name?: string }).categoryName ||
+        (rawCat as { categoryName?: string; name?: string }).name ||
+        "General"
       : typeof rawCat === "string" && rawCat.trim() !== ""
         ? rawCat
         : "General";

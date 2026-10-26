@@ -165,12 +165,6 @@ export default function BalanceWallet({
     }
   };
 
-  const resetWithdrawForm = () => {
-    setWithdrawAmount("");
-    setWithdrawError("");
-  };
-
-
   // --- Statement Submit Handler ---
   const handleStatementSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

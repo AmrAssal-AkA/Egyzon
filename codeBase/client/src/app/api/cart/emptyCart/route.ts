@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { serverClient } from "@/lib/serverClient";
 import axios from "axios";
 import { cookies } from "next/headers";
 
-export async function DELETE(req: NextRequest) {
+export async function DELETE() {
   try {
     console.log("API /api/cart/emptyCart hit.");
     

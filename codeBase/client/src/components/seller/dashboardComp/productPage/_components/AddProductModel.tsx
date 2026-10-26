@@ -29,9 +29,52 @@ interface CategoryOption {
   name: string;
 }
 
+type ErrorLike =
+  | string
+  | {
+      response?: { data?: { message?: string; error?: string } };
+      message?: string;
+      error?: string;
+    }
+  | null
+  | undefined;
+
+const getErrorMessage = (err: unknown, fallback: string): string => {
+  const e = err as ErrorLike;
+  if (typeof e === "string") return e || fallback;
+  return (
+    e?.response?.data?.message ||
+    e?.response?.data?.error ||
+    e?.message ||
+    e?.error ||
+    fallback
+  );
+};
+
+const getCategoryName = (category: Product["category"]): string => {
+  if (typeof category === "string") return category;
+  if (category && typeof category === "object") {
+    return category.categoryName || category.name || "";
+  }
+  return "";
+};
+
+const getInitialImages = (product: Product): string[] => {
+  if (Array.isArray(product.imageUrl) && product.imageUrl.length > 0) {
+    return product.imageUrl;
+  }
+  if (typeof product.imageUrl === "string" && product.imageUrl) {
+    return [product.imageUrl];
+  }
+  if (product.image) {
+    return [product.image];
+  }
+  return [];
+};
+
 interface AddProductModelProps {
   onClose: () => void;
-  onSave: (data?: any) => void;
+  onSave: (data?: Partial<Product>) => void;
   editingProduct?: Product | null;
   isDiscountOnly?: boolean;
 }
@@ -57,12 +100,7 @@ export default function AddProductModel({
     description: editingProduct
       ? editingProduct.description || editingProduct.productDescription || ""
       : "",
-    category:
-      typeof editingProduct?.category === "string"
-        ? editingProduct.category
-        : (editingProduct?.category as any)?.categoryName ||
-          (editingProduct?.category as any)?.name ||
-          "",
+    category: getCategoryName(editingProduct?.category),
     price: editingProduct ? editingProduct.price.toString() : "",
     discount: editingProduct
       ? (
@@ -79,41 +117,20 @@ export default function AddProductModel({
 
   // Product Images File State
   const [productImages, setProductImages] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>(() => {
-    if (!editingProduct) return [];
-    if (
-      Array.isArray(editingProduct.imageUrl) &&
-      editingProduct.imageUrl.length > 0
-    ) {
-      return editingProduct.imageUrl;
-    }
-    if (
-      typeof editingProduct.imageUrl === "string" &&
-      editingProduct.imageUrl
-    ) {
-      return [editingProduct.imageUrl];
-    }
-    if (editingProduct.image) {
-      return [editingProduct.image];
-    }
-    return [];
-  });
+  const [imagePreviews, setImagePreviews] = useState<string[]>(() =>
+    editingProduct ? getInitialImages(editingProduct) : [],
+  );
 
-  useEffect(() => {
+  // Adjust state when the editing product changes (instead of an effect)
+  const [prevEditingProduct, setPrevEditingProduct] = useState(editingProduct);
+  if (editingProduct !== prevEditingProduct) {
+    setPrevEditingProduct(editingProduct);
     if (editingProduct) {
       setFormData({
         name: editingProduct.name || editingProduct.productName || "",
         description:
           editingProduct.description || editingProduct.productDescription || "",
-        category:
-          typeof editingProduct.category === "object" &&
-          editingProduct.category !== null
-            ? (editingProduct.category as any).categoryName ||
-              (editingProduct.category as any).name ||
-              ""
-            : typeof editingProduct.category === "string"
-              ? editingProduct.category
-              : "",
+        category: getCategoryName(editingProduct.category),
         price: (editingProduct.price ?? "").toString(),
         discount: (
           editingProduct.discount ??
@@ -123,20 +140,15 @@ export default function AddProductModel({
         stock: (editingProduct.stock ?? "").toString(),
         status: (editingProduct.status as Product["status"]) || "Active",
       });
-
-      const initialImgs =
-        Array.isArray(editingProduct.imageUrl) &&
-        editingProduct.imageUrl.length > 0
-          ? editingProduct.imageUrl
-          : typeof editingProduct.imageUrl === "string" &&
-              editingProduct.imageUrl
-            ? [editingProduct.imageUrl]
-            : editingProduct.image
-              ? [editingProduct.image]
-              : [];
-      setImagePreviews(initialImgs);
+      setImagePreviews(getInitialImages(editingProduct));
     }
-  }, [editingProduct]);
+  }
+
+  // Initial values captured once for the mount-time category fetch
+  const [initialCategory] = useState(() => formData.category);
+  const [initialEditingCategory] = useState(() =>
+    getCategoryName(editingProduct?.category),
+  );
 
   // New Category State
   const [newCategory, setNewCategory] = useState({
@@ -152,7 +164,7 @@ export default function AddProductModel({
   const [categorySuccess, setCategorySuccess] = useState<string | null>(null);
 
   // Overall Submission State
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
   // Fetch Categories on mount
@@ -163,7 +175,7 @@ export default function AddProductModel({
         const cats = await fetchCategories();
         if (Array.isArray(cats) && cats.length > 0) {
           const options: CategoryOption[] = cats
-            .map((c: any) => ({
+            .map((c) => ({
               id: String(c._id || c.id || ""),
               name: String(
                 c.categoryName || c.name || (typeof c === "string" ? c : ""),
@@ -174,21 +186,20 @@ export default function AddProductModel({
           setCategoriesList(options);
 
           if (options.length > 0) {
-            const targetCategory =
-              editingProduct?.category || formData.category;
+            const targetCategory = initialEditingCategory || initialCategory;
             const initialMatch = options.find(
               (c) =>
                 c.name.toLowerCase() === (targetCategory || "").toLowerCase(),
             );
             if (initialMatch) {
               setSelectedCategoryId(initialMatch.id);
-              if (!formData.category) {
+              if (!initialCategory) {
                 setFormData((prev) => ({
                   ...prev,
                   category: initialMatch.name,
                 }));
               }
-            } else if (!formData.category && options[0]) {
+            } else if (!initialCategory && options[0]) {
               setFormData((prev) => ({ ...prev, category: options[0].name }));
               setSelectedCategoryId(options[0].id);
             }
@@ -204,7 +215,7 @@ export default function AddProductModel({
       }
     }
     loadCategories();
-  }, []);
+  }, [initialCategory, initialEditingCategory]);
 
   // Handle Product Images Change
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -289,14 +300,9 @@ export default function AddProductModel({
       setNewCategoryImage(null);
       setCategoryImagePreview(null);
       setCategoryMode("existing");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to create category:", err);
-      const errorMessage =
-        err?.response?.data?.message ||
-        err?.response?.data?.error ||
-        err?.message ||
-        err?.error ||
-        (typeof err === "string" ? err : "Failed to create category");
+      const errorMessage = getErrorMessage(err, "Failed to create category");
       setCategoryError(errorMessage);
     } finally {
       setIsCreatingCategory(false);
@@ -348,15 +354,12 @@ export default function AddProductModel({
             ...editingProduct,
             discount: discountValue,
           });
-        } catch (err: any) {
+        } catch (err: unknown) {
           console.error("Apply discount failed:", err);
-          const errorMessage =
-            err?.response?.data?.message ||
-            err?.message ||
-            err?.error ||
-            (typeof err === "string"
-              ? err
-              : "Failed to apply discount. Try again.");
+          const errorMessage = getErrorMessage(
+            err,
+            "Failed to apply discount. Try again.",
+          );
           updateToast(toastId, {
             status: "error",
             message: errorMessage,
@@ -598,15 +601,12 @@ export default function AddProductModel({
             },
           );
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Product submission failed:", err);
-        const errorMessage =
-          err?.response?.data?.message ||
-          err?.message ||
-          err?.error ||
-          (typeof err === "string"
-            ? err
-            : "Failed to process product. Try again.");
+        const errorMessage = getErrorMessage(
+          err,
+          "Failed to process product. Try again.",
+        );
         updateToast(toastId, {
           status: "error",
           message: errorMessage,

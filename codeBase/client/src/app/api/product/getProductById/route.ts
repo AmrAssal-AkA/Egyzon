@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
           { status: 200 }
         );
       }
-    } catch (err1: any) {
+    } catch (err1) {
       // If direct route failed, try query route /api/product?id= or /api/product/getProductById
       if (axios.isAxiosError(err1) && err1.response?.status !== 404) {
         console.warn(`[getProductById] /api/product/${productId} returned status ${err1.response?.status}`);
@@ -69,8 +69,8 @@ export async function GET(req: NextRequest) {
       { success: false, message: "Product not found", data: null },
       { status: 404 }
     );
-  } catch (error: any) {
-    console.error("Get product by ID route error:", error?.message || error);
+  } catch (error) {
+    console.error("Get product by ID route error:", (error instanceof Error ? error.message : undefined) || error);
     return NextResponse.json(
       { success: false, message: "Product not found", data: null },
       { status: 404 }

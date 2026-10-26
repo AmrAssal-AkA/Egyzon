@@ -1,6 +1,5 @@
 import React from "react";
 
-import AnalyticCard from "@/components/seller/dashboardComp/AnalyticCard";
 import TotalRevenueCard from "@/components/seller/dashboardComp/TotalRevenueCard";
 import TotalOrdersCard from "@/components/seller/dashboardComp/TotalOrdersCard";
 import TotalProductsCard from "@/components/seller/dashboardComp/TotalProductsCard";

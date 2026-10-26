@@ -20,9 +20,6 @@ export const OnboardingContent: React.FC = () => {
   const token = searchParams.get("token") || "";
   const { user, isAuthenticated, loading: authLoading, refreshSession } = useAuth();
 
-  const [validationStatus, setValidationStatus] = useState<ValidationStatus>("loading");
-  const [validationError, setValidationError] = useState<string>("");
-
   const formatAddressAsString = useCallback((addr: unknown): string => {
     if (!addr) return "";
     if (typeof addr === "string") return addr;
@@ -45,7 +42,9 @@ export const OnboardingContent: React.FC = () => {
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
-  useEffect(() => {
+  const [prevUser, setPrevUser] = useState(user);
+  if (prevUser !== user) {
+    setPrevUser(user);
     if (user?.address) setAddress(formatAddressAsString(user.address));
     if (user?.phoneNumber) {
       const phoneStr = typeof user.phoneNumber === "string" ? user.phoneNumber : String(user.phoneNumber);
@@ -57,40 +56,46 @@ export const OnboardingContent: React.FC = () => {
         setPhoneNumber(phoneStr);
       }
     }
-  }, [user, formatAddressAsString]);
+  }
 
-  const validateToken = useCallback(async (tokenToVerify: string) => {
-    if (!tokenToVerify) {
+  const [tokenResult, setTokenResult] = useState<{ token: string; status: ValidationStatus; error: string } | null>(null);
+
+  let validationStatus: ValidationStatus = "loading";
+  let validationError = "";
+  if (!authLoading) {
+    if (!token) {
       if (isAuthenticated || user) {
-        setValidationStatus("valid");
-        return;
-      }
-      setValidationStatus("invalid");
-      setValidationError("Please sign in or use a valid email verification link to complete setup.");
-      return;
-    }
-
-    setValidationStatus("loading");
-    setValidationError("");
-
-    try {
-      const res = await authServices.verifyEmail(tokenToVerify);
-      if (res.success) {
-        setValidationStatus("valid");
+        validationStatus = "valid";
       } else {
-        setValidationStatus("invalid");
-        setValidationError(res.message || "Invalid or expired verification token.");
+        validationStatus = "invalid";
+        validationError = "Please sign in or use a valid email verification link to complete setup.";
       }
-    } catch (err: unknown) {
-      setValidationStatus("invalid");
-      setValidationError("Failed to verify token. Please try again.");
+    } else if (tokenResult && tokenResult.token === token) {
+      validationStatus = tokenResult.status;
+      validationError = tokenResult.error;
     }
-  }, [isAuthenticated, user]);
+  }
 
   useEffect(() => {
-    if (authLoading) return;
-    validateToken(token);
-  }, [token, validateToken, authLoading]);
+    if (authLoading || !token) return;
+    let cancelled = false;
+    const validate = async () => {
+      let result: { token: string; status: ValidationStatus; error: string };
+      try {
+        const res = await authServices.verifyEmail(token);
+        result = res.success
+          ? { token, status: "valid", error: "" }
+          : { token, status: "invalid", error: res.message || "Invalid or expired verification token." };
+      } catch {
+        result = { token, status: "invalid", error: "Failed to verify token. Please try again." };
+      }
+      if (!cancelled) setTokenResult(result);
+    };
+    void validate();
+    return () => {
+      cancelled = true;
+    };
+  }, [token, authLoading]);
 
   // Input Validation Logic
   const COUNTRY_CODE_REGEX = /^\+\d{1,4}$/;

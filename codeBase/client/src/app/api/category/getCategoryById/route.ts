@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error) {
 
     if (axios.isAxiosError(error) && error.response) {
       return NextResponse.json(
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { success: false, message: error?.message || "Internal Server Error", data: [] },
+      { success: false, message: (error instanceof Error ? error.message : undefined) || "Internal Server Error", data: [] },
       { status: 500 }
     );
   }

@@ -39,9 +39,9 @@ export default function StoreProductCard({ product }: StoreProductCardProps) {
   const isLowStock = !isOutOfStock && stock <= 5;
 
   const productId: string = String(
-    (product as any)._id ||
-    (product as any).id ||
-    (product as any).productId ||
+    product._id ||
+    product.id ||
+    product.productId ||
     ""
   );
 
@@ -160,7 +160,7 @@ export default function StoreProductCard({ product }: StoreProductCardProps) {
         <div className="flex items-center justify-between gap-1 text-[11px] text-muted-foreground font-medium mb-1">
           <span className="truncate">
             {typeof product.category === "object" && product.category !== null
-              ? (product.category as any).name || (product.category as any).categoryName
+              ? product.category.name || product.category.categoryName
               : typeof product.category === "string"
                 ? product.category
                 : product.brand || "Product"}

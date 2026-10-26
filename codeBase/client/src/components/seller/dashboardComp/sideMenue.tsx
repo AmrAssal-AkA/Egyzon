@@ -33,10 +33,12 @@ export default function SellerSideMenue({ storeName }: Props = {}) {
     user?.storeName ||
     (user?.FirstName ? `${user.FirstName}'s Store` : "Seller Store");
 
-  // Close mobile drawer on route navigation
-  useEffect(() => {
+  // Close mobile drawer on route navigation (adjust state during render)
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
     setIsMobileOpen(false);
-  }, [pathname]);
+  }
 
   // Lock body scroll and handle Escape key while mobile menu is open
   useEffect(() => {

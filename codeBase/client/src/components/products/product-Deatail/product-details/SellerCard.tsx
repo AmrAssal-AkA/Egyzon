@@ -1,7 +1,6 @@
 import React from "react";
-import Link from "next/link";
 import Image from "next/image";
-import { BadgeCheck, Store } from "lucide-react";
+import { BadgeCheck } from "lucide-react";
 
 import { Seller } from "@/types/store";
 

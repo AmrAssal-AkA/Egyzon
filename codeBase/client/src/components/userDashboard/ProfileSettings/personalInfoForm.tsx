@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { Loader2, Pencil } from "lucide-react";
 import { toast } from "sonner";
@@ -15,12 +15,14 @@ export default function PersonalInfoForm() {
   const [lastName, setLastName] = useState(user?.LastName || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
+  const [prevSync, setPrevSync] = useState({ user, isEditing });
+  if (prevSync.user !== user || prevSync.isEditing !== isEditing) {
+    setPrevSync({ user, isEditing });
     if (!isEditing && user) {
       setFirstName(user.FirstName || "");
       setLastName(user.LastName || "");
     }
-  }, [user, isEditing]);
+  }
 
   const handleEditName = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();

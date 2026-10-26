@@ -29,7 +29,7 @@ export function useSocket() {
         if (!cancelled && response?.data) {
           initialNotifications(response.data);
         }
-      } catch (error) {
+      } catch {
          // Handle error if needed
       } finally {
         if (!cancelled) {

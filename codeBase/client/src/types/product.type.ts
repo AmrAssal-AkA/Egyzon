@@ -48,6 +48,7 @@ export interface Product {
     name?: string;
   };
   sellerName?: string;
+  productId?: string;
   storeName?: string;
   createdAt?: string;
   category?:

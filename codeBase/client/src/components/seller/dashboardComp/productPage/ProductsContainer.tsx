@@ -33,7 +33,6 @@ export default function ProductsContainer() {
 
   const loadProducts = useCallback(async () => {
     try {
-      setLoading(true);
       const response = await sellerService.getSellerProducts();
       if (response && response.success && Array.isArray(response.data)) {
         const mapped: Product[] = response.data.map((p: SellerProduct) => {
@@ -47,7 +46,7 @@ export default function ProductsContainer() {
             ? p.imageUrl[0]
             : typeof p.imageUrl === "string"
               ? p.imageUrl
-              : (p as any).image;
+              : (p as SellerProduct & { image?: string }).image;
 
           const prodId = p._id || String(Math.random());
 
@@ -85,7 +84,13 @@ export default function ProductsContainer() {
   }, []);
 
   useEffect(() => {
-    loadProducts();
+    // Defer so state updates happen asynchronously, not within the effect body
+    Promise.resolve().then(loadProducts);
+  }, [loadProducts]);
+
+  const reloadProducts = useCallback(() => {
+    setLoading(true);
+    return loadProducts();
   }, [loadProducts]);
 
   // Dynamic tab counts
@@ -129,7 +134,7 @@ export default function ProductsContainer() {
     setIsModalOpen(true);
   };
 
-  const handleSaveProduct = (savedData?: any) => {
+  const handleSaveProduct = (savedData?: Partial<Product>) => {
     if (savedData) {
       let computedStatus: Product["status"] = savedData.status || "Active";
       const stockVal = savedData.stock || 0;
@@ -175,9 +180,9 @@ export default function ProductsContainer() {
           name: savedData.name,
           productName: savedData.name,
           category: savedData.category,
-          price: savedData.price,
-          stock: savedData.stock,
-          maxStock: Math.max(100, savedData.stock),
+          price: savedData.price ?? 0,
+          stock: savedData.stock ?? 0,
+          maxStock: Math.max(100, savedData.stock ?? 0),
           status: computedStatus,
           sku: "AUTO-GENERATED",
           image: "📦",
@@ -188,7 +193,7 @@ export default function ProductsContainer() {
       }
     }
     // Refresh products list and inventory value from server
-    loadProducts();
+    reloadProducts();
     mutateInventoryValue();
     setIsModalOpen(false);
   };
@@ -209,14 +214,14 @@ export default function ProductsContainer() {
       if (response && response.success) {
         toast.success(response.message || "Product deleted successfully");
         setProducts((prev) => prev.filter((p) => (p.id ?? p._id) !== id));
-        loadProducts();
+        reloadProducts();
         mutateInventoryValue();
       } else {
         toast.error(response?.message || "Failed to delete product");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to delete product:", error);
-      toast.error(error?.message || "Failed to delete product");
+      toast.error((error instanceof Error && error.message) || "Failed to delete product");
     }
   };
 
@@ -250,7 +255,7 @@ export default function ProductsContainer() {
           onDeleteProduct={handleDeleteProduct}
           onApplyDiscount={handleOpenDiscountModal}
           onUpdateStock={() => {
-            loadProducts();
+            reloadProducts();
             mutateInventoryValue();
           }}
         />

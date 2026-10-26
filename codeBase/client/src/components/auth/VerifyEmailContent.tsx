@@ -14,16 +14,14 @@ export default function VerifyEmailContent() {
   const { verifyEmail } = useAuth();
   const router = useRouter()
   
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
-  const [message, setMessage] = useState<string>("");
+  const [verifyStatus, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const [verifyMessage, setMessage] = useState<string>("");
+  const status = token ? verifyStatus : "error";
+  const message = token ? verifyMessage : "Verification token is missing.";
   const called = useRef(false);
 
   useEffect(() => {
-    if (!token) {
-      setStatus("error");
-      setMessage("Verification token is missing.");
-      return;
-    }
+    if (!token) return;
 
     if (called.current) return;
     called.current = true;

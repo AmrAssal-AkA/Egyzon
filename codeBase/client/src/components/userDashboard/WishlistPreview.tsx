@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ShoppingCart, Heart } from 'lucide-react';
@@ -9,15 +9,17 @@ import { useCartStore } from "@/stores/buyer/useCart";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
+const subscribeNoop = () => () => {};
+
 export default function WishlistPreview() {
   const { items } = useWishlistStore();
   const addToCart = useCartStore((state) => state.addToCart);
   const { user, isSeller } = useAuth();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(
+    subscribeNoop,
+    () => true,
+    () => false,
+  );
 
   const handleAddToCart = (item: { id: string; title: string; price: number; image?: string }) => {
     if (!user) {

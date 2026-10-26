@@ -67,7 +67,7 @@ async function handleEditStock(req: NextRequest) {
       data || { success: true, message: "Product stock updated successfully" },
       { status: backendRes.status || 200 }
     );
-  } catch (error: any) {
+  } catch (error) {
     console.error("Edit stock route error:", error);
 
     if (axios.isAxiosError(error) && error.response) {
@@ -81,7 +81,7 @@ async function handleEditStock(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { success: false, message: error?.message || "Internal Server Error" },
+      { success: false, message: (error instanceof Error ? error.message : undefined) || "Internal Server Error" },
       { status: 500 }
     );
   }

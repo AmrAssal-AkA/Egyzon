@@ -1,7 +1,7 @@
 import Image from "next/image";
 import React from "react";
 
-import { OrderItem, OrderReviewProps } from "@/types/cart.type";
+import { OrderReviewProps } from "@/types/cart.type";
 
 export function OrderReview({ orderItems, summary }: OrderReviewProps) {
   return (

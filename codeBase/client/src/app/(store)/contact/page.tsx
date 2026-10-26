@@ -1,8 +1,7 @@
 import React from "react";
 import Link from "next/link";
-import { Sparkles, HelpCircle, ArrowRight } from "lucide-react";
+import { Sparkles, ArrowRight } from "lucide-react";
 import { ContactFormSection } from "@/components/home/contact-form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata = {
   title: "Contact Us - Egyzon Customer & Vendor Support",

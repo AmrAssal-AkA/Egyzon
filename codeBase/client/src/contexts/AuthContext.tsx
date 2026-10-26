@@ -83,24 +83,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const loadSession = useCallback(async () => {
-    const cookieToken = readAccessTokenFromCookies();
-    if (cookieToken) {
-      setToken(cookieToken);
-    }
-
-    const res = await authServices.me();
-    if (res.success && res.data) {
-      const nextToken = cookieToken ?? null;
-      setUser({ ...res.data, token: nextToken, Access_token: nextToken });
-      syncUserBuyerStores(res.data.role);
-    } else {
-      setUser(null);
-      setToken(null);
-    }
-    setLoading(false);
-  }, []);
   useEffect(() => {
+    const loadSession = async () => {
+      const cookieToken = readAccessTokenFromCookies();
+
+      const res = await authServices.me();
+      if (res.success && res.data) {
+        const nextToken = cookieToken ?? null;
+        setToken(nextToken);
+        setUser({ ...res.data, token: nextToken, Access_token: nextToken });
+        syncUserBuyerStores(res.data.role);
+      } else {
+        setUser(null);
+        setToken(null);
+      }
+      setLoading(false);
+    };
     void loadSession();
 
     const interceptorId = ApiCall.interceptors.response.use(
@@ -121,7 +119,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       ApiCall.interceptors.response.eject(interceptorId);
     };
-  }, [loadSession, refreshSession]);
+  }, [refreshSession]);
 
   const login = async (payload: LoginPayload) => {
     const res = await authServices.login(payload);

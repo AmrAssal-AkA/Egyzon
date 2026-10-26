@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -31,16 +31,21 @@ function extractLast4(pan?: string | null): string {
   return digits.length >= 4 ? digits.slice(-4) : digits;
 }
 
+const subscribeNoop = () => () => {};
+
 export default function CheckoutConfirmationClientPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { lastOrder, updateLastOrderPayment } = useCartStore();
-  const [isHydrated, setIsHydrated] = useState(false);
-  const [isPaymentFailed, setIsPaymentFailed] = useState(false);
-
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
+  const isHydrated = useSyncExternalStore(
+    subscribeNoop,
+    () => true,
+    () => false,
+  );
+  const successQuery = searchParams.get("success");
+  const isPaymentFailed =
+    successQuery !== null &&
+    !(successQuery === "true" && searchParams.get("error_occured") !== "true");
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -68,13 +73,11 @@ export default function CheckoutConfirmationClientPage() {
           status: "Paid",
           orderStatus: "Confirmed",
         });
-        setIsPaymentFailed(false);
       } else {
         updateLastOrderPayment({
           status: "Failed",
           orderStatus: "Payment Failed",
         });
-        setIsPaymentFailed(true);
       }
     }
   }, [isHydrated, searchParams, updateLastOrderPayment]);

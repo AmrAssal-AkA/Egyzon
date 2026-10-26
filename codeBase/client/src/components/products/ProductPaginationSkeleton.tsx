@@ -3,7 +3,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 
 export function ProductPaginationSkeleton({
-  itemCount = 5,
   showSummary = true,
 }: {
   itemCount?: number;

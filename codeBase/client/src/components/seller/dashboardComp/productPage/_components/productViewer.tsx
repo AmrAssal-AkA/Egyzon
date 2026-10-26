@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import {
   Pencil,
@@ -68,9 +68,12 @@ export default function ProductViewer({
   const [isUpdatingStock, setIsUpdatingStock] = useState<boolean>(false);
   const itemsPerPage = 5;
 
-  useEffect(() => {
+  // Sync local copy when the incoming list changes (adjust state during render)
+  const [prevProductsList, setPrevProductsList] = useState(productsList);
+  if (productsList !== prevProductsList) {
+    setPrevProductsList(productsList);
     setProducts(productsList);
-  }, [productsList]);
+  }
 
   // Filter products based on search, tab, and category
   const filteredProducts = useMemo(() => {

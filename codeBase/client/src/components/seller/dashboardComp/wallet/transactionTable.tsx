@@ -5,9 +5,6 @@ import React, { useState, useMemo } from "react";
 import Link from "next/link";
 
 import {
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
   Download,
   ChevronLeft,
   ChevronRight,
@@ -48,10 +45,13 @@ export default function TransactionTable({
 
   // Decide if we are in controlled or uncontrolled mode
   const isControlled = controlledTransactions !== undefined;
-  const currentQuery =
-    isControlled && controlledQueryState
-      ? { ...internalQuery, ...controlledQueryState }
-      : internalQuery;
+  const currentQuery = useMemo(
+    () =>
+      isControlled && controlledQueryState
+        ? { ...internalQuery, ...controlledQueryState }
+        : internalQuery,
+    [isControlled, controlledQueryState, internalQuery],
+  );
 
   // Fetch real transactions via SWR when in uncontrolled mode
   const {
@@ -184,13 +184,6 @@ export default function TransactionTable({
 
   // --- Interactive Handlers ---
 
-  const handleSort = (field: "date" | "id" | "amount") => {
-    const isAsc =
-      currentQuery.sortBy === field && currentQuery.sortOrder === "asc";
-    const newOrder = isAsc ? "desc" : "asc";
-    updateQuery({ sortBy: field, sortOrder: newOrder });
-  };
-
   const handleExport = () => {
     if (onExport) {
       onExport();
@@ -261,34 +254,6 @@ export default function TransactionTable({
       default:
         return "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200";
     }
-  };
-
-  // Sorting Header Helper
-  const SortableHeader = ({
-    field,
-    label,
-  }: {
-    field: "date" | "id" | "amount";
-    label: string;
-  }) => {
-    const isActive = currentQuery.sortBy === field;
-    return (
-      <button
-        onClick={() => handleSort(field)}
-        className="flex items-center gap-1.5 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer text-left font-semibold uppercase text-xs"
-      >
-        {label}
-        {isActive ? (
-          currentQuery.sortOrder === "asc" ? (
-            <ArrowUp className="h-3.5 w-3.5 text-blue-500" />
-          ) : (
-            <ArrowDown className="h-3.5 w-3.5 text-blue-500" />
-          )
-        ) : (
-          <ArrowUpDown className="h-3.5 w-3.5 text-slate-400 opacity-60 hover:opacity-100" />
-        )}
-      </button>
-    );
   };
 
   // Skeletons

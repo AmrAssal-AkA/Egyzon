@@ -36,8 +36,10 @@ export default function StoreCreationContainer() {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Pre-fill store name from authenticated user if available
-  useEffect(() => {
+  // Pre-fill store name from authenticated user if available (adjust state during render)
+  const [prevUser, setPrevUser] = useState<typeof user | undefined>(undefined);
+  if (user !== prevUser) {
+    setPrevUser(user);
     if (user?.storeName) {
       setFormData((prev) => ({
         ...prev,
@@ -49,7 +51,7 @@ export default function StoreCreationContainer() {
         storeName: `${user.FirstName}'s Store`,
       }));
     }
-  }, [user]);
+  }
 
   // Clean up object URLs on unmount
   useEffect(() => {

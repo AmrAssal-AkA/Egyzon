@@ -128,7 +128,10 @@ export default function StoreAddressSection({
   const [selectedLocation, setSelectedLocation] = useState<AddressSuggestion | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  // Sync with the address prop (adjust state during render)
+  const [prevAddress, setPrevAddress] = useState<string | undefined>(undefined);
+  if (address !== prevAddress) {
+    setPrevAddress(address);
     setSearchTerm(address);
     if (address) {
       const match = EGYPTIAN_COMMERCIAL_LOCATIONS.find((loc) =>
@@ -139,7 +142,7 @@ export default function StoreAddressSection({
         setSelectedLocation(match);
       }
     }
-  }, [address]);
+  }
 
   // Click outside listener for suggestions
   useEffect(() => {

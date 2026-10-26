@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
       data || { success: true, message: "Category created successfully" },
       { status: backendRes.status || 201 }
     );
-  } catch (error: any) {
+  } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       return NextResponse.json(
         error.response.data || {
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { success: false, message: error?.message || "Internal Server Error" },
+      { success: false, message: (error instanceof Error ? error.message : undefined) || "Internal Server Error" },
       { status: 500 }
     );
   }

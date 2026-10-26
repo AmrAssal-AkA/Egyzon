@@ -37,8 +37,8 @@ export default function StorefrontClient({ store }: StorefrontClientProps) {
       let catName = "";
       if (typeof product.category === "object" && product.category !== null) {
         catName =
-          (product.category as any).name ||
-          (product.category as any).categoryName ||
+          product.category.name ||
+          product.category.categoryName ||
           "";
       } else if (typeof product.category === "string") {
         catName = product.category;
@@ -51,8 +51,8 @@ export default function StorefrontClient({ store }: StorefrontClientProps) {
       const img = Array.isArray(product.imageUrl)
         ? product.imageUrl[0]
         : product.imageUrl ||
-          (product as any).image ||
-          (product as any).thumbnail;
+          product.image ||
+          product.thumbnail;
 
       const existing = map.get(catName);
       if (existing) {
@@ -76,7 +76,7 @@ export default function StorefrontClient({ store }: StorefrontClientProps) {
     if (store.featuredProductIds && store.featuredProductIds.length > 0) {
       const explicit = store.products.filter((p) => {
         const pid = String(
-          (p as any)._id || (p as any).id || (p as any).productId,
+          p._id || p.id || p.productId,
         );
         return store.featuredProductIds?.includes(pid);
       });
@@ -160,7 +160,7 @@ export default function StorefrontClient({ store }: StorefrontClientProps) {
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
                   {featuredProducts.map((prod) => (
                     <StoreProductCard
-                      key={prod._id || prod.id || (prod as any).productId}
+                      key={prod._id || prod.id || prod.productId}
                       product={prod}
                     />
                   ))}

@@ -3,10 +3,8 @@
 import { memo, useEffect, useMemo, useState } from "react";
 import { Filter, Search, SlidersHorizontal, X } from "lucide-react";
 
-import { cn } from "@/lib/utils";
 import {
   useFilterStore,
-  type AvailabilityFilter,
   type DiscountFilter,
 } from "@/stores/buyer/filter";
 import { useCategories } from "@/hooks/useCategory";
@@ -18,10 +16,6 @@ const DEFAULT_MAX_PRICE = 2000;
 
 
 
-const availabilityOptions: { label: string; value: AvailabilityFilter }[] = [
-  { label: "In Stock", value: "inStock" },
-  { label: "Out of Stock", value: "outOfStock" },
-];
 
 const discountOptions: { label: string; value: DiscountFilter }[] = [
   { label: "On Sale", value: "onSale" },
@@ -76,14 +70,10 @@ function FilterContent({
   const selectedBrands = useFilterStore((state) => state.brand);
   const minPrice = useFilterStore((state) => state.minPrice);
   const selectedMaxPrice = useFilterStore((state) => state.maxPrice);
-  const selectedRating = useFilterStore((state) => state.rating);
-  const availability = useFilterStore((state) => state.availability);
   const discount = useFilterStore((state) => state.discount);
   const setCategory = useFilterStore((state) => state.setCategory);
   const setBrand = useFilterStore((state) => state.setBrand);
   const setPriceRange = useFilterStore((state) => state.setPriceRange);
-  const setRating = useFilterStore((state) => state.setRating);
-  const setAvailability = useFilterStore((state) => state.setAvailability);
   const setDiscount = useFilterStore((state) => state.setDiscount);
 
 

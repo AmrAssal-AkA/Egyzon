@@ -52,12 +52,12 @@ export default function AddCreditCardModal({
   onBankAccountAdded,
   defaultTab = "bank_account",
 }: AddCreditCardModalProps) {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
   const [activeTab, setActiveTab] = useState<"bank_account" | "credit_card">(defaultTab);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Lock background scroll when modal is open to isolate background
   useEffect(() => {

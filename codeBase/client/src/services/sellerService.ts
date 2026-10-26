@@ -465,13 +465,16 @@ export const sellerService = {
         };
       }
 
-      const list = Array.isArray(data.data)
-        ? data.data
-        : Array.isArray((data as any).orders)
-          ? (data as any).orders
-          : Array.isArray((data as any).allOrders)
-            ? (data as any).allOrders
-            : [];
+      const alt = data as { orders?: unknown; allOrders?: unknown };
+      const list = (
+        Array.isArray(data.data)
+          ? data.data
+          : Array.isArray(alt.orders)
+            ? alt.orders
+            : Array.isArray(alt.allOrders)
+              ? alt.allOrders
+              : []
+      ) as typeof data.data;
 
       return {
         success: true,

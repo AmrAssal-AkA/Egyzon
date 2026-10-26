@@ -10,6 +10,19 @@ export interface WishlistItem {
   image: string;
 }
 
+interface RawWishlistProduct {
+  _id?: string;
+  id?: string;
+  productId?: string;
+  productName?: string;
+  title?: string;
+  name?: string;
+  price?: number | string;
+  imageUrl?: string[] | string;
+  image?: string;
+  thumbnail?: string;
+}
+
 interface WishlistState {
   items: WishlistItem[];
   addItem: (item: WishlistItem) => void;
@@ -31,7 +44,7 @@ export const useWishlistStore = create<WishlistState>()(
         if (currentItems.some((i) => i.id === item.id)) {
           return;
         }
-        const image = item.image || (item as any).thumbnail || "/images/placeholder.jpg";
+        const image = item.image || (item as { thumbnail?: string }).thumbnail || "/images/placeholder.jpg";
         const normalizedItem: WishlistItem = {
           id: item.id,
           title: item.title,
@@ -82,7 +95,7 @@ export const useWishlistStore = create<WishlistState>()(
         try {
           const response = await getWishlist();
           if (response?.success && response?.data) {
-            let rawItems: any[] = [];
+            let rawItems: unknown[] = [];
             const data = response.data;
             if (Array.isArray(data)) {
               rawItems = data;
@@ -101,9 +114,10 @@ export const useWishlistStore = create<WishlistState>()(
             }
 
             const items: WishlistItem[] = rawItems
-              .map((p: any) => {
-                if (!p) return null;
-                const id = p._id || p.id || p.productId || (typeof p === "string" ? p : "");
+              .map((raw) => {
+                if (!raw) return null;
+                const p = raw as RawWishlistProduct;
+                const id = p._id || p.id || p.productId || (typeof raw === "string" ? raw : "");
                 if (!id) return null;
                 const title = p.productName || p.title || p.name || "Product";
                 const price = typeof p.price === "number" ? p.price : Number(p.price) || 0;

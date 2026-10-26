@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { serverClient } from "@/lib/serverClient";
 import axios from "axios";
 import { cookies } from "next/headers";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("Access_token")?.value || cookieStore.get("token")?.value;

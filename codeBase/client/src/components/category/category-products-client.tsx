@@ -75,7 +75,7 @@ export default function CategoryProductsClient({
         <div className="flex items-center justify-between sm:justify-end gap-3 text-sm">
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
+            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
             className="px-3 py-2 rounded-lg bg-background border border-input text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="featured">Sort by: Featured</option>

@@ -15,7 +15,6 @@ import {
   CreditCard,
   Truck,
   FileText,
-  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -57,9 +56,10 @@ export default function CheckoutClientPage() {
   });
 
   // Automatically autofill user info if logged in
-  useEffect(() => {
-    if (!user) return;
-
+  const [prevUser, setPrevUser] = useState(user);
+  if (prevUser !== user) {
+    setPrevUser(user);
+    if (user) {
     const profileAddress = Array.isArray(user.address)
       ? user.address
           .filter((part): part is string => Boolean(part && part.trim()))
@@ -75,7 +75,8 @@ export default function CheckoutClientPage() {
       address1: prev.address1 || profileAddress || "",
       phone: prev.phone || user.phoneNumber || "",
     }));
-  }, [user]);
+    }
+  }
 
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [paymentMethod, setPaymentMethod] =

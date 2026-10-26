@@ -93,9 +93,9 @@ export default async function StorePage({ params }: StorePageProps) {
     const pSellerId =
       typeof p.sellerId === "string"
         ? p.sellerId
-        : (p as any).seller?._id ||
-          (p as any).seller?.id ||
-          (p as any).seller;
+        : p.seller?._id ||
+          p.seller?.id ||
+          p.seller;
     return pSellerId === rawId || pSellerId === rawStore?._id;
   });
 

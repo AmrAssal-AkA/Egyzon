@@ -23,7 +23,7 @@ export async function GET() {
       { success: true, message: "Categories fetched successfully", data: categories },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error) {
 
     if (axios.isAxiosError(error) && error.response) {
       return NextResponse.json(
@@ -37,7 +37,7 @@ export async function GET() {
     }
 
     return NextResponse.json(
-      { success: false, message: error?.message || "Internal Server Error", data: [] },
+      { success: false, message: (error instanceof Error ? error.message : undefined) || "Internal Server Error", data: [] },
       { status: 500 }
     );
   }

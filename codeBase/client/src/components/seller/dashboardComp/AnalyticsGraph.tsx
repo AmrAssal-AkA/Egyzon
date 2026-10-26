@@ -72,7 +72,7 @@ export default function AnalyticsGraph({
     const handleSalesUpdate = (data: SalesPerformanceData) => {
       if (data && (!data.timeframe || data.timeframe === apiTimeframe)) {
         mutate(
-          (prev) => ({
+          () => ({
             success: true,
             message: 'Real-time update received',
             data,
@@ -165,11 +165,11 @@ export default function AnalyticsGraph({
   // Calculated metrics
   const totalRevenue = useMemo(
     () => salesPerformance?.totalRevenue ?? fetchedRevenue ?? activeData.reduce((acc, item) => acc + item.revenue, 0),
-    [salesPerformance?.totalRevenue, fetchedRevenue, activeData]
+    [salesPerformance, fetchedRevenue, activeData]
   )
   const totalOrders = useMemo(
     () => salesPerformance?.totalOrders ?? fetchedOrders ?? activeData.reduce((acc, item) => acc + item.orders, 0),
-    [salesPerformance?.totalOrders, fetchedOrders, activeData]
+    [salesPerformance, fetchedOrders, activeData]
   )
   const avgOrderValue = useMemo(() => {
     if (salesPerformance?.AverageOrderValue !== undefined) {
@@ -181,7 +181,7 @@ export default function AnalyticsGraph({
     if (!activeData.length) return '0.0'
     const sum = activeData.reduce((acc, item) => acc + item.conversionRate, 0)
     return (sum / activeData.length).toFixed(1)
-  }, [salesPerformance?.AverageOrderValue, totalRevenue, totalOrders, activeData])
+  }, [salesPerformance, totalRevenue, totalOrders, activeData])
 
   const peakIndex = useMemo(() => {
     if (salesPerformance?.peak?.label) {
@@ -197,7 +197,7 @@ export default function AnalyticsGraph({
       }
     })
     return maxIdx
-  }, [activeData, activeMetric, salesPerformance?.peak])
+  }, [activeData, activeMetric, salesPerformance])
 
   // Growth percentage vs previous baseline
   const growthRate = useMemo(() => {
@@ -211,7 +211,7 @@ export default function AnalyticsGraph({
     if (firstVal === 0) return '+100%'
     const pct = ((lastVal - firstVal) / firstVal) * 100
     return `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%`
-  }, [salesPerformance?.revenueChangePercent, activeData, activeMetric])
+  }, [salesPerformance, activeData, activeMetric])
 
   const isDataLoading = isPerfLoading || isRevLoading || isOrdLoading
 
