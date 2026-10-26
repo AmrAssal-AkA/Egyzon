@@ -6,6 +6,7 @@ import { customerService } from "@/services/customer.services";
 import {
   CustomerOrderHistoryResponse,
   CustomerTotalSpendResponse,
+  CustomerTotalOrdersResponse,
 } from "@/types/customer";
 
 export const useCustomerOrderHistory = () => {
@@ -44,4 +45,23 @@ export const useCustomerTotalSpend = () => {
     mutate,
   };
 };
+
+export const useCustomerTotalOrders = () => {
+  const { data, error, isLoading, mutate } =
+    useSWR<CustomerTotalOrdersResponse>(
+      "/api/customer/totalOrders",
+      () => customerService.getTotalOrders(),
+      {
+        revalidateOnFocus: true,
+      }
+    );
+
+  return {
+    totalOrders: data?.data?.totalOrders ?? 0,
+    isLoading,
+    error,
+    mutate,
+  };
+};
+
 

@@ -1,9 +1,10 @@
 import React from "react";
 
-import { IdCardIcon, ShieldCheckIcon, MessageSquareWarning} from "lucide-react";
+import { IdCardIcon, ShieldCheckIcon, MessageSquareWarning } from "lucide-react";
 
 import PersonalInfoForm from "@/components/userDashboard/ProfileSettings/personalInfoForm";
 import ChangePassword from "@/components/userDashboard/ProfileSettings/chnagePassword";
+import DeleteAccount from "@/components/userDashboard/ProfileSettings/deleteAccount";
 
 function ProfileSettings() {
   return (
@@ -51,9 +52,7 @@ function ProfileSettings() {
         <p className="text-md text-gray-700 dark:text-gray-300 mb-4">
           Deleting your account is a permanent action and cannot be undone. Please ensure you have backed up any important data before proceeding. If you are sure, you can delete your account below.
         </p>
-        <button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded">
-          Delete Account
-        </button>
+        <DeleteAccount />
       </div>
     </main>
   );

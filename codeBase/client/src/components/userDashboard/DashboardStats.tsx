@@ -5,12 +5,16 @@ import React from "react";
 import { Package, Heart, DollarSign } from "lucide-react";
 
 import { useAuth } from "@/hooks/useAuth";
-import { useCustomerTotalSpend } from "@/hooks/useCustomer";
+import {
+  useCustomerTotalOrders,
+  useCustomerTotalSpend,
+} from "@/hooks/useCustomer";
 import { useWishlistCount } from "@/stores/buyer/wishlist";
 
 export default function DashboardStats() {
   const { user } = useAuth();
   const wishlistCount = useWishlistCount();
+  const { totalOrders, isLoading: isOrdersLoading } = useCustomerTotalOrders();
   const { totalSpend, isLoading: isSpendLoading } = useCustomerTotalSpend();
 
   if (!user) {
@@ -32,8 +36,11 @@ export default function DashboardStats() {
             Total Orders
           </p>
           <p className="text-xl font-bold text-gray-900 dark:text-white">
-            {/* totalOrders: requires a separate orders API call */}
-            {0}
+            {isOrdersLoading ? (
+              <span className="animate-pulse">Loading...</span>
+            ) : (
+              totalOrders
+            )}
           </p>
         </div>
       </div>

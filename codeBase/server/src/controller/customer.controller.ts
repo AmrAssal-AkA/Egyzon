@@ -10,6 +10,7 @@ import { hashPassword, comparePasswords } from "../utils/password.ustils";
 import changePasswordTemplate from "../templates/changePasswordTemp";
 import { sendSuccessResponse, sendErrorResponse } from "../utils/Responses";
 import logger from "../utils/logger";
+import { type changeCustomerNameSchemaType, type changePasswordSchemaType } from "../validators/user.validate";
 
 
 export const CustomerController = {
@@ -17,7 +18,7 @@ export const CustomerController = {
     try {
       const userId = req.user?.userId;
       if (!userId) return sendErrorResponse(res, 401, "Unauthorized");
-      const { currentPassword, newPassword, confirmPassword } = req.body;
+      const { currentPassword, newPassword, confirmPassword } = req.body as changePasswordSchemaType;
       const user = await User.findById(userId);
       if (!user) return sendErrorResponse(res, 404, "User not found");
        {/* see the user password correct or non correct */}
@@ -102,6 +103,39 @@ export const CustomerController = {
       return sendSuccessResponse(res, 200, "Total amount spent retrieved successfully", { totalAmountSpent });
     }catch(error){
       if(error instanceof AppError) return sendErrorResponse(res,error.statusCode,error.status ,error.message);
+      return sendErrorResponse(res, 500, "Internal Server Error");
+    }
+  },
+  changeCustomerName: async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) return sendErrorResponse(res, 401, "Unauthorized");
+      const { FirstName, LastName } = req.body as changeCustomerNameSchemaType;
+      const user = await User.findById(userId);
+      if (!user) return sendErrorResponse(res, 404, "User not found");
+      user.FirstName = FirstName;
+      user.LastName = LastName;
+      await user.save();
+      return sendSuccessResponse(res, 200, "Customer name changed successfully", { FirstName, LastName });
+    }catch(error){
+      if (error instanceof AppError) return sendErrorResponse(res,error.statusCode,error.status ,error.message);
+      return sendErrorResponse(res, 500, "Internal Server Error");
+    }
+  },
+  deleteCustomerAccount: async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.userId;
+      const { email } = req.body;
+      if (!userId) return sendErrorResponse(res, 401, "Unauthorized");
+      const user =  await User.findById(userId);
+      if (!user) return sendErrorResponse(res, 404, "User not found");
+      if (user.email !== email) return sendErrorResponse(res, 400, "Email does not match");
+      await User.findByIdAndDelete(userId);
+      await Customer.findByIdAndDelete(userId);
+      await Order.deleteMany({ customer: userId });
+      return sendSuccessResponse(res, 200, "Customer account deleted successfully");
+    }catch (error){
+      if (error instanceof AppError) return sendErrorResponse(res,error.statusCode,error.status ,error.message);
       return sendErrorResponse(res, 500, "Internal Server Error");
     }
   }
