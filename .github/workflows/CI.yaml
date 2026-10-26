@@ -10,30 +10,8 @@ on:
        - main
 
 jobs:
-  changes:
-    name: "check for changes"
-    runs-on: ubuntu-latest
-    outputs:
-      server: ${{ steps.check.outputs.server }}
-      client: ${{ steps.check.outputs.client }}
-      admin: ${{ steps.check.outputs.admin }}
-    
-    steps:
-      - uses: actions/checkout@v7
-      - uses: dorny/paths-filter@v2
-        id: filter
-        with:
-          filters: |
-            server:
-              - 'server/**'
-            client:
-              - 'client/**'
-            admin:
-              - 'admin/**'
-
-  server:
-    name: "server"
-    needs: changes
+  client-app-tests:
+    name: "client App Tests"
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -45,10 +23,18 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 25
-      - name: "install dependencies"
-        run: npm ci
-      
-      - name: "build"
+          cache: "npm"
+          cache-dependency-path: ./codeBase/client/package-lock.json
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run typecheck
+        run: npm run typecheck
+
+      - name: Run build
         run: npm run build
     
 
@@ -65,12 +51,13 @@ jobs:
       - name: "setup node"
         uses: actions/setup-node@v3
         with:
-          node-version: 20
-      - name: "install dependencies"
-        run: npm ci
-      - name: "run typecheck"
-        run: npm run typecheck
-      - name: "build"
+          node-version: 25
+          cache: "npm"
+          cache-dependency-path: ./codeBase/server/package-lock.json
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run build
         run: npm run build
       
   admin:
@@ -86,9 +73,11 @@ jobs:
       - name: "setup node"
         uses: actions/setup-node@v3
         with:
-          node-version: 20
-      - name: "install dependencies"
-        run: npm ci
-      
-      - name: "run build"
+          node-version: 25
+          cache: "npm"
+          cache-dependency-path: ./codeBase/admin/package-lock.json
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run build
         run: npm run build
