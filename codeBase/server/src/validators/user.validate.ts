@@ -58,9 +58,9 @@ export const forgetPasswordSchema = z.object({
 export const resetPasswordSchema = z.object({
     body: z.object({
         newPassword: PasswordSchema,
-        confirmNewPassword: PasswordSchema,
-    })
-})
+        confirmPassword: PasswordSchema.optional(),
+    }),
+});
 
 export const adminLoginSchema = z.object({
     body: z.object({
@@ -69,7 +69,25 @@ export const adminLoginSchema = z.object({
     })
 })
 
+export const changePasswordSchema = z.object({
+    body: z.object({
+        currentPassword: PasswordSchema,
+        newPassword: PasswordSchema,
+        confirmPassword: PasswordSchema,
+    }),
+});
+
+export const changeCustomerNameSchema = z.object({
+    body: z.object({
+        FirstName: safeTextSchema.min(1, { message: "First name is required" }).transform(sentizePlainText),
+        LastName: safeTextSchema.min(1, { message: "Last name is required" }).transform(sentizePlainText),
+    })
+})
+
+
 export type ReagisterSchemaType = z.infer<typeof RegisterSchema>['body'];
 export type LoginSchemaType = z.infer<typeof LoginSchema>['body'];
 export type UpdateUserSchemaType = z.infer<typeof updateUserSchema>['body'];
 export type UserResposnseSchemaType = z.infer<typeof userResposnseSchema>;
+export type changePasswordSchemaType = z.infer<typeof changePasswordSchema>['body'];
+export type changeCustomerNameSchemaType = z.infer<typeof changeCustomerNameSchema>['body'];
