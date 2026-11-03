@@ -8,6 +8,8 @@ import { ThemeProvider } from "@/provider/theme-provider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import NotificationListener from '@/components/seller/common/NotificationListener'
 import {ToastContainer} from "@/components/toast/ToastContainer";
+import {Analytics} from "@vercel/analytics/next"
+
 
 const geist = Geist({
   subsets: ["latin"],
@@ -56,6 +58,7 @@ export default function RootLayout({children} : Readonly<{children: React.ReactN
           >
             <AuthProvider>
               {children}
+              <Analytics />
               <Toaster position="bottom-left" />
               <NotificationListener />
               <ToastContainer />
