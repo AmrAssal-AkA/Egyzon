@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-
-import "./globals.css";
 import { Geist } from "next/font/google";
+import {Analytics} from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next"
+
 import {Toaster} from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/provider/theme-provider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import NotificationListener from '@/components/seller/common/NotificationListener'
 import {ToastContainer} from "@/components/toast/ToastContainer";
-import {Analytics} from "@vercel/analytics/next"
-
+import "./globals.css";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -18,7 +18,7 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Egyzon",
+  title: "Egyzon - the place where ultimate customers meets ultimate sellers",
   description: "Egyzon is a platform that provides a comprehensive solution for managing and optimizing your business operations. Our platform offers a range of features designed to streamline processes, improve efficiency, and enhance decision-making. With Egyzon, you can easily track performance metrics, manage resources, and gain valuable insights into your business operations. Whether you're a small business owner or a large enterprise, Egyzon is the perfect tool to help you achieve your goals and drive success.",
   openGraph: {
     title: "Egyzon",
@@ -59,6 +59,7 @@ export default function RootLayout({children} : Readonly<{children: React.ReactN
             <AuthProvider>
               {children}
               <Analytics />
+              <SpeedInsights />
               <Toaster position="bottom-left" />
               <NotificationListener />
               <ToastContainer />

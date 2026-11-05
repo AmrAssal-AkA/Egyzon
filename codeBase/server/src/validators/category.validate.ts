@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-const categoryInputRegex = /^[a-zA-Z0-9\s]+$/; //
+const categoryInputRegex = /^[a-zA-Z0-9\s ,.-]+$/; //
 
 
 export const categoryBaseSchema = z.object({
