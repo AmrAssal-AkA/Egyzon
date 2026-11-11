@@ -41,6 +41,6 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true
   },
-    "include": ["server.ts","src/**/*"],
+    "include": ["server.ts","worker.ts", "src/**/*"],
     "exclude": ["node_modules", "src/scripts/verifySwagger.ts"]
 }

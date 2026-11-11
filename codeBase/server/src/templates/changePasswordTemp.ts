@@ -1,4 +1,3 @@
-import { sendEmail } from "../services/email";
 import {
   renderEmailLayout,
   renderButton,
@@ -6,17 +5,23 @@ import {
   renderUrlFallback,
 } from "./emailLayout";
 
-const changePasswordTemplate = async (
-  to: string,
-  name: string,
-  token?: string,
-) => {
-  const frontendUrl = process.env.FRONTEND_URL;
+export interface ChangePasswordContext {
+  name?: string | undefined;
+  token?: string | undefined;
+  resetPasswordUrl?: string | undefined;
+}
+
+export const renderChangePasswordTemplate = ({
+  name,
+  token,
+  resetPasswordUrl,
+}: ChangePasswordContext): { subject: string; html: string } => {
+  const frontendUrl = process.env.FRONTEND_URL || "https://egyzon.com";
   const displayName = name ? name.trim() : "there";
 
   if (token) {
     // Case 1: Password reset / change request with token
-    const resetUrl = `${frontendUrl}/reset-password/${token}`;
+    const resetUrl = resetPasswordUrl || `${frontendUrl}/reset-password/${token}`;
     const content = `
       <div style="text-align: left;">
         <h1 style="margin: 0 0 16px 0; font-size: 22px; font-weight: 700; color: #0f172a; line-height: 1.3;">
@@ -46,8 +51,7 @@ const changePasswordTemplate = async (
       </div>
     `;
 
-    await sendEmail({
-      to,
+    return {
       subject: "Password Change Request - Egyzon",
       html: renderEmailLayout({
         title: "Password Change Request - Egyzon",
@@ -59,7 +63,7 @@ const changePasswordTemplate = async (
         },
         content,
       }),
-    });
+    };
   } else {
     // Case 2: Confirmation that password was successfully updated
     const loginUrl = `${frontendUrl}/login`;
@@ -76,7 +80,7 @@ const changePasswordTemplate = async (
         ${renderInfoBox({
           title: "Did you make this change?",
           content:
-            "If you made this update, you can safely ignore this message. However, if you did <strong>not</strong> change your password, someone else may have gained access to your account. Please contact our support team immediately.",
+            "If you did not make this change, someone else may have gained access to your account. Please contact our support team immediately.",
           bgColor: "#fef2f2",
           borderColor: "#fee2e2",
           titleColor: "#991b1b",
@@ -99,8 +103,7 @@ const changePasswordTemplate = async (
       </div>
     `;
 
-    await sendEmail({
-      to,
+    return {
       subject: "Your Egyzon Password Has Been Changed",
       html: renderEmailLayout({
         title: "Password Changed - Egyzon",
@@ -112,8 +115,8 @@ const changePasswordTemplate = async (
         },
         content,
       }),
-    });
+    };
   }
 };
 
-export default changePasswordTemplate;
+export default renderChangePasswordTemplate;

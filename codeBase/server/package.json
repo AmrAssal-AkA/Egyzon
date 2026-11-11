@@ -7,9 +7,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --watch src --ext ts --exec tsx ./server.ts",
+    "dev:worker": "nodemon --config nodemon.worker.json",
     "build": "tsc",
     "docs:verify": "tsx src/scripts/verifySwagger.ts",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "start:worker": "node dist/worker.js"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +21,7 @@
     "@types/passport-google-oauth20": "^2.0.17",
     "axios": "^1.19.0",
     "bcryptjs": "^3.0.3",
+    "bullmq": "^6.7.3",
     "clamscan": "^2.4.0",
     "cloudinary": "^2.10.0",
     "cookie": "^2.0.1",

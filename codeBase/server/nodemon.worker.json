@@ -1,0 +1,1 @@
+{"watch": ["src", "worker.ts"], "ext": "ts", "exec": "tsx ./worker.ts"}

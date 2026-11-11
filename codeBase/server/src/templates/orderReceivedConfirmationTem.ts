@@ -1,12 +1,15 @@
-import { sendEmail } from "../services/email";
 import { renderEmailLayout, renderButton, renderInfoBox } from "./emailLayout";
 
-export const sendOrderReceivedConfirmationEmail = async (order: any) => {
-  const customerEmail =
-    order.customerEmail ||
-    order.customer?.email ||
-    order.billingData?.email ||
-    order.email;
+export interface OrderReceivedConfirmationContext {
+  order?: any;
+}
+
+export const renderOrderReceivedConfirmationTemplate = ({
+  order,
+}: OrderReceivedConfirmationContext): { subject: string; html: string } => {
+  if (!order) {
+    order = {};
+  }
 
   const displayOrderId =
     order.orderNumber || order.orderId || order._id?.toString() || "N/A";
@@ -176,23 +179,19 @@ export const sendOrderReceivedConfirmationEmail = async (order: any) => {
     </div>
   `;
 
-  try {
-    await sendEmail({
-      to: customerEmail,
-      subject: `Order Confirmation #${displayOrderId} - Egyzon`,
-      html: renderEmailLayout({
-        title: `Order Confirmation #${displayOrderId} - Egyzon`,
-        previewText: `Thank you for your order! Order #${displayOrderId} has been received.`,
-        badge: {
-          text: "Order Confirmed",
-          bgColor: "#eff6ff",
-          textColor: "#1d4ed8",
-        },
-        content,
-      }),
-    });
-  } catch (error) {
-    console.error("Failed to send order confirmation email:", error);
-    throw new Error("Failed to send order confirmation email");
-  }
+  return {
+    subject: `Order Confirmation #${displayOrderId} - Egyzon`,
+    html: renderEmailLayout({
+      title: `Order Confirmation #${displayOrderId} - Egyzon`,
+      previewText: `Thank you for your order! Order #${displayOrderId} has been received.`,
+      badge: {
+        text: "Order Confirmed",
+        bgColor: "#eff6ff",
+        textColor: "#1d4ed8",
+      },
+      content,
+    }),
+  };
 };
+
+export default renderOrderReceivedConfirmationTemplate;
