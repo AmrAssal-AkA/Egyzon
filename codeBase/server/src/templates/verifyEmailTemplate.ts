@@ -1,4 +1,3 @@
-import { sendEmail } from "../services/email";
 import {
   renderEmailLayout,
   renderButton,
@@ -6,15 +5,22 @@ import {
   renderUrlFallback,
 } from "./emailLayout";
 
-const verifyEmailTemplate = async (
-  to: string,
-  verificationUrl: string,
-) => {
+export interface VerifyEmailContext {
+  name?: string | undefined;
+  verificationUrl: string;
+}
+
+export const renderVerifyEmailTemplate = ({
+  name,
+  verificationUrl,
+}: VerifyEmailContext): { subject: string; html: string } => {
+  const displayName = name ? name.trim() : "";
+  const greeting = displayName ? `Welcome to Egyzon, ${displayName}!` : "Welcome to Egyzon!";
 
   const content = `
     <div style="text-align: left;">
       <h1 style="margin: 0 0 16px 0; font-size: 22px; font-weight: 700; color: #0f172a; line-height: 1.3;">
-        Welcome to Egyzon!
+        ${greeting}
       </h1>
       
       <p style="margin: 0 0 16px 0; color: #475569; font-size: 15px; line-height: 1.6;">
@@ -39,8 +45,7 @@ const verifyEmailTemplate = async (
     </div>
   `;
 
-  await sendEmail({
-    to,
+  return {
     subject: "Verify Your Email Address - Egyzon",
     html: renderEmailLayout({
       title: "Verify Your Email Address - Egyzon",
@@ -52,7 +57,7 @@ const verifyEmailTemplate = async (
       },
       content,
     }),
-  });
+  };
 };
 
-export default verifyEmailTemplate;
+export default renderVerifyEmailTemplate;

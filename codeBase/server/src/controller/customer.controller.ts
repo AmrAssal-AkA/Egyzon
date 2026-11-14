@@ -7,7 +7,7 @@ import User from "../models/userModel";
 import Customer from "../models/customerModel";
 import Order from "../models/orderModel";
 import { hashPassword, comparePasswords } from "../utils/password.ustils";
-import changePasswordTemplate from "../templates/changePasswordTemp";
+import { enqueueEmail } from "../queues";
 import { sendSuccessResponse, sendErrorResponse } from "../utils/Responses";
 import logger from "../utils/logger";
 import { type changeCustomerNameSchemaType, type changePasswordSchemaType } from "../validators/user.validate";
@@ -32,9 +32,12 @@ export const CustomerController = {
       user.password = newHashedPassword;
       await user.save();
       try {
-        changePasswordTemplate(user.email, user.FirstName);
+        await enqueueEmail("changePassword", {
+          to: user.email,
+          name: user.FirstName,
+        });
       } catch (err) {
-        logger.error("Error sending password change email:", err);
+        logger.error("Error enqueuing password change email:", err);
       }
       return sendSuccessResponse(res, 200, "Password changed successfully");
     } catch (error) {

@@ -7,9 +7,10 @@ import { hashPassword } from "../../utils/password.ustils";
 import { signAccessToken, signRefreshToken } from "../../utils/jwt.util";
 import { sendSuccessResponse, sendErrorResponse } from "../../utils/Responses";
 import { generateToken } from "../../utils/cryptoTokens";
-import verifyEmailTemplate from "../../templates/verifyEmailTemplate";
+import { enqueueEmail } from "../../queues";
 import RefreshTokenModel from "../../models/refreshToken";
 import logger from "../../utils/logger";
+
 
 const RegisterUser = async (userData: any, res: Response, req: Request) => {
   try {
@@ -52,7 +53,11 @@ const RegisterUser = async (userData: any, res: Response, req: Request) => {
     const verificationUrl = `${process.env.FRONTEND_URL}/verifyEmail?token=${emailTokenValue}`;
     // Send verification email
     try {
-      verifyEmailTemplate(email, verificationUrl);
+      await enqueueEmail("verifyEmail", {
+        userId: newUser._id.toString(),
+        to: email,
+        verificationUrl,
+      });
     }catch (err) {
       logger.error("Error sending verification email:", err);
     }

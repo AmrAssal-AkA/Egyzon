@@ -29,6 +29,14 @@ import walletRoute from "./src/routes/wallet.route";
 import logger from "./src/utils/logger";
 import newletterRoute from "./src/routes/newsletter.routes";
 import contactRoute from "./src/routes/contact.routes";
+import { startEmailWorker } from "./src/workers/index";
+
+startEmailWorker().then(() => {
+  logger.info("Email worker started successfully");
+}).catch((error) => {
+  logger.error("Error starting email worker", error);
+  process.exit(1);
+});
 
 const app = express();
 const httpServer = http.createServer(app);

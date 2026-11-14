@@ -1,6 +1,6 @@
 {
   "name": "egyzon-server",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Egyzon server",
   "main": "server.js",
   "type": "commonjs",
@@ -19,6 +19,7 @@
     "@types/passport-google-oauth20": "^2.0.17",
     "axios": "^1.19.0",
     "bcryptjs": "^3.0.3",
+    "bullmq": "^6.7.3",
     "clamscan": "^2.4.0",
     "cloudinary": "^2.10.0",
     "cookie": "^2.0.1",

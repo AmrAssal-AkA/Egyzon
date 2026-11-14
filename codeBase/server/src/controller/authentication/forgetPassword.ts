@@ -1,13 +1,12 @@
 import type { Request, Response } from "express";
 
-
-import { forgetPasswordTemplate } from "../../templates/forgetPassword";
 import { hashPassword } from "../../utils/password.ustils";
 import { sendErrorResponse, sendSuccessResponse } from "../../utils/Responses";
 import { AppError } from "../../utils/AppError";
 import User from "../../models/userModel";
 import { generateToken, hashToken } from "../../utils/cryptoTokens";
 import logger from "../../utils/logger";
+import { enqueueEmail } from "../../queues";
 
 const RequestForgetPassword = async (req: Request, res: Response) => {
   try {
@@ -25,7 +24,12 @@ const RequestForgetPassword = async (req: Request, res: Response) => {
 
     const resetPasswordUrl = `${process.env.FRONTEND_URL}/forgetPassword/resetPassword?token=${token}&email=${emailAddress}`;
     try {
-          await forgetPasswordTemplate(emailAddress, token, resetPasswordUrl);
+      await enqueueEmail("forgetPassword", {
+        to: emailAddress,
+        emailAddress,
+        token,
+        resetPasswordUrl,
+      });
     } catch (error) {
       logger.error("Error sending email:", error);
       return sendErrorResponse(res, 500, "Failed to send reset password email");

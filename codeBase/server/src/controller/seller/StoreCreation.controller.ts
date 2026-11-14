@@ -6,12 +6,16 @@ import uploadImage from "../../config/cloudainry.config";
 import { AppError } from "../../utils/AppError";
 import logger from "../../utils/logger";
 import { NotificationServices } from "../../services/notification.services";
+import { enqueueEmail, enqueueNotification } from "../../queues";
+import User from "../../models/userModel";
 
 export const createRequestToJoin = async (req: Request, res: Response) => {
   let uploadedCommercialRegister: { public_id: string } | undefined;
   let uploadedTaxCard: { public_id: string } | undefined;
   try {
     const userId = req.user?.userId;
+    const user = await User.findById(userId).select("FirstName email");
+  
     if (!userId)
       return sendErrorResponse(
         res,
@@ -84,11 +88,19 @@ export const createRequestToJoin = async (req: Request, res: Response) => {
 
     await SellerServices.ApplyAsPartner(sellerData, userId);
     try {
-      NotificationServices.notifyPartenerApplicantsToAdmin({
-        applicantId: userId,
-        applicationId: new Date().toISOString(),
-        applicantName: storeName,
-        shopName: storeName,
+      await enqueueEmail("sellerApplyApplicant", {
+        to: user?.email || "",
+        applicantName: user?.FirstName || "",
+        storeName,
+      });
+      await enqueueNotification("admin", {
+        type: "new_partner_application",
+        message: `New partner application from ${storeName}`,
+        data: {
+          storeName,
+          commercialRegisterNumber,
+          taxCardNumber,
+        },
       });
     } catch (error) {
       logger.warn(

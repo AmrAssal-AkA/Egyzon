@@ -1,11 +1,19 @@
-import { sendEmail } from "../services/email";
 import { renderEmailLayout, renderButton, renderInfoBox } from "./emailLayout";
 
-export const SellerApplyApplicantTemplate = async (
-  to: string,
-  applicantName: string,
-  storeName: string,
-) => {
+export interface SellerApplyApplicantContext {
+  applicantName?: string | undefined;
+  storeName: string;
+}
+
+export interface SellerApplyApprovalContext {
+  applicantName?: string | undefined;
+  storeName: string;
+}
+
+export const renderSellerApplyApplicantTemplate = ({
+  applicantName,
+  storeName,
+}: SellerApplyApplicantContext): { subject: string; html: string } => {
   const frontendUrl = process.env.FRONTEND_URL || "https://egyzon.com";
   const name = applicantName ? applicantName.trim() : "Partner";
 
@@ -76,8 +84,7 @@ export const SellerApplyApplicantTemplate = async (
     </div>
   `;
 
-  await sendEmail({
-    to,
+  return {
     subject: `Application Received for ${storeName} - Egyzon`,
     html: renderEmailLayout({
       title: "Seller Application Received - Egyzon",
@@ -89,14 +96,13 @@ export const SellerApplyApplicantTemplate = async (
       },
       content,
     }),
-  });
+  };
 };
 
-export const SellerApplyApplovalTemplate = async (
-  to: string,
-  applicantName: string,
-  storeName: string,
-) => {
+export const renderSellerApplyApprovalTemplate = ({
+  applicantName,
+  storeName,
+}: SellerApplyApprovalContext): { subject: string; html: string } => {
   const frontendUrl = process.env.FRONTEND_URL || "https://egyzon.com";
   const sellerDashboardUrl = `${frontendUrl}/seller`;
   const name = applicantName ? applicantName.trim() : "Partner";
@@ -175,8 +181,7 @@ export const SellerApplyApplovalTemplate = async (
     </div>
   `;
 
-  await sendEmail({
-    to,
+  return {
     subject: `Congratulations! ${storeName} is Approved on Egyzon`,
     html: renderEmailLayout({
       title: "Seller Application Approved - Egyzon",
@@ -188,5 +193,7 @@ export const SellerApplyApplovalTemplate = async (
       },
       content,
     }),
-  });
+  };
 };
+
+export const renderSellerApplyApplovalTemplate = renderSellerApplyApprovalTemplate;

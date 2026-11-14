@@ -1,4 +1,3 @@
-import { sendEmail } from "../services/email";
 import {
   renderEmailLayout,
   renderButton,
@@ -6,17 +5,30 @@ import {
   renderUrlFallback,
 } from "./emailLayout";
 
-export const forgetPasswordTemplate = async (
-  to: string,
-  token: string,
-  resetPasswordUrl: string,
-) => {
-  const fullResetUrl = `${resetPasswordUrl}?token=${token}`;
+export interface ForgetPasswordContext {
+  name?: string | undefined;
+  token?: string | undefined;
+  resetPasswordUrl: string;
+}
+
+export const renderForgetPasswordTemplate = ({
+  name,
+  token,
+  resetPasswordUrl,
+}: ForgetPasswordContext): { subject: string; html: string } => {
+  let fullResetUrl = resetPasswordUrl;
+  if (token && !fullResetUrl.includes("token=")) {
+    const separator = fullResetUrl.includes("?") ? "&" : "?";
+    fullResetUrl = `${fullResetUrl}${separator}token=${token}`;
+  }
+
+  const displayName = name ? name.trim() : "";
+  const greeting = displayName ? `Hello ${displayName},` : "Password Reset Request";
 
   const content = `
     <div style="text-align: left;">
       <h1 style="margin: 0 0 16px 0; font-size: 22px; font-weight: 700; color: #0f172a; line-height: 1.3;">
-        Password Reset Request
+        ${greeting}
       </h1>
 
       <p style="margin: 0 0 16px 0; color: #475569; font-size: 15px; line-height: 1.6;">
@@ -46,8 +58,7 @@ export const forgetPasswordTemplate = async (
     </div>
   `;
 
-  return sendEmail({
-    to,
+  return {
     subject: "Reset Your Password - Egyzon",
     html: renderEmailLayout({
       title: "Reset Your Password - Egyzon",
@@ -59,5 +70,7 @@ export const forgetPasswordTemplate = async (
       },
       content,
     }),
-  });
+  };
 };
+
+export default renderForgetPasswordTemplate;
