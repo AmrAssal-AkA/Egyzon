@@ -1,17 +1,15 @@
 {
   "name": "egyzon-server",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Egyzon server",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --watch src --ext ts --exec tsx ./server.ts",
-    "dev:worker": "nodemon --config nodemon.worker.json",
     "build": "tsc",
     "docs:verify": "tsx src/scripts/verifySwagger.ts",
-    "start": "node dist/server.js",
-    "start:worker": "node dist/worker.js"
+    "start": "node dist/server.js"
   },
   "keywords": [],
   "author": "",
